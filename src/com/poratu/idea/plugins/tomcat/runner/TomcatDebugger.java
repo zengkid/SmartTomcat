@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * Time   : 11:00 AM
  */
 public class TomcatDebugger extends GenericDebuggerRunner {
-    private static final String RUNNER_ID = "Tomcatbugger";
+    private static final String RUNNER_ID = "TomcatDebugger";
 
     @NotNull
     public String getRunnerId() {
