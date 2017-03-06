@@ -2,10 +2,13 @@ package com.poratu.idea.plugins.tomcat.setting;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Enumeration;
+import java.util.List;
 
 /**
  * Author : zengkid
@@ -13,6 +16,8 @@ import javax.swing.*;
  * Time   : 00:14
  */
 public class TomcatSettingConfigurable implements Configurable {
+
+
     @Nls
     @Override
     public String getDisplayName() {
@@ -22,27 +27,59 @@ public class TomcatSettingConfigurable implements Configurable {
     @Nullable
     @Override
     public String getHelpTopic() {
-        return "help tomcat plugin";
+        return "Smart Tomcat Help";
     }
 
     @Nullable
     @Override
     public JComponent createComponent() {
-        return new JLabel("hello");
+
+        TomcatSetting tomcatSetting = TomcatSetting.getInstance();
+        return tomcatSetting.getMainPanel();
+
     }
 
     @Override
     public boolean isModified() {
+        TomcatSetting tomcatSetting = TomcatSetting.getInstance();
+        JList tomcatList = tomcatSetting.getTomcatList();
+        DefaultListModel<TomcatInfo> model = (DefaultListModel) tomcatList.getModel();
+        List<TomcatInfo> tomcatInfos = TomcatInfoConfigs.getInstance().getTomcatInfos();
+
+        if (model.size() != tomcatInfos.size()) {
+            return true;
+        }
+
+        for (int i = 0; i < tomcatInfos.size(); i++) {
+            TomcatInfo info1 = tomcatInfos.get(i);
+            TomcatInfo info2 = model.elementAt(i);
+            if (!info1.equals(info2)) {
+                return true;
+            }
+        }
+
         return false;
     }
 
     @Override
     public void apply() throws ConfigurationException {
+        TomcatSetting tomcatSetting = TomcatSetting.getInstance();
+        JList tomcatList = tomcatSetting.getTomcatList();
+        DefaultListModel<TomcatInfo> model = (DefaultListModel) tomcatList.getModel();
+
+
+        List<TomcatInfo> tomcatInfos = TomcatInfoConfigs.getInstance().getTomcatInfos();
+        tomcatInfos.clear();
+        Enumeration<TomcatInfo> elements = model.elements();
+        while (elements.hasMoreElements()) {
+            TomcatInfo tomcatInfo = elements.nextElement();
+            tomcatInfos.add(tomcatInfo);
+        }
 
     }
 
     @Override
     public void reset() {
-
+//        TomcatInfoConfigs.getInstance().getTomcatInfos().clear();
     }
 }

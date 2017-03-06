@@ -1,19 +1,25 @@
 package com.poratu.idea.plugins.tomcat.conf;
 
+import com.intellij.facet.FacetManager;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 import com.poratu.idea.plugins.tomcat.setting.RunnerSetting;
+import com.poratu.idea.plugins.tomcat.setting.TomcatSetting;
+import com.poratu.idea.plugins.tomcat.setting.TomcatSettingConfigurable;
 import org.jdesktop.swingx.JXButton;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -79,9 +85,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
     @NotNull
     @Override
     protected JComponent createEditor() {
-//        return new RunnerConfig().getMainPanel();
-
-//        FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(false, true, false, false, false, false);
 
         TextFieldWithBrowseButton tomcatField = runnerSetting.getTomcatField();
         TextFieldWithBrowseButton docBaseField = runnerSetting.getDocBaseField();
@@ -91,17 +94,10 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         configrationButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                DialogWrapper dialogWrapper = new DialogWrapper(project) {
-//                    @Nullable
-//                    @Override
-//                    protected JComponent createCenterPanel() {
-//                        return new JLabel("test");
-//                    }
-//                };
-//                dialogWrapper.show();
-//                FacetManager.getInstance()
 
-                System.out.println("e.getActionCommand(1) = " + e.getActionCommand());
+
+                ShowSettingsUtil.getInstance().showSettingsDialog(project, TomcatSettingConfigurable.class);
+
             }
         });
 

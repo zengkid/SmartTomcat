@@ -29,9 +29,12 @@
   -->
 
   <extensions defaultExtensionNs="com.intellij">
-    <!--<applicationConfigurable instance="com.poratuu.idea.plugins.TomcatSettingConfigurable"/>-->
+    <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatSettingConfigurable"/>
 
     <configurationType implementation="com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType"/>
+
+    <applicationService  serviceInterface="com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs" serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs"/>
+
 
     <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunner" order="first"/>
     <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatDebugger" order="last"/>
