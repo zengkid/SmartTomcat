@@ -13,6 +13,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.ComboboxWithBrowseButton;
 import com.intellij.ui.DocumentAdapter;
 import com.poratu.idea.plugins.tomcat.setting.RunnerSetting;
 import com.poratu.idea.plugins.tomcat.setting.TomcatSetting;
@@ -27,6 +28,8 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.text.NumberFormat;
 
@@ -55,7 +58,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         }
 
         if (tomcatInstallation != null && !"".equals(tomcatInstallation.trim())) {
-            runnerSetting.getTomcatField().setText(tomcatInstallation);
+//            runnerSetting.getTomcatField().setText(tomcatInstallation);
         }
         String docBase = tomcatRunConfiguration.getDocBase();
         if (docBase != null && !"".equals(docBase.trim())) {
@@ -76,7 +79,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
 
     @Override
     protected void applyEditorTo(TomcatRunConfiguration tomcatRunConfiguration) throws ConfigurationException {
-        tomcatRunConfiguration.setTomcatInstallation(runnerSetting.getTomcatField().getText());
+//        tomcatRunConfiguration.setTomcatInstallation(runnerSetting.getTomcatField().getText());
         tomcatRunConfiguration.setDocBase(runnerSetting.getDocBaseField().getText());
         tomcatRunConfiguration.setContextPath(runnerSetting.getContextPathField().getText());
         tomcatRunConfiguration.setPort(runnerSetting.getPortField().getText());
@@ -86,10 +89,18 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
     @Override
     protected JComponent createEditor() {
 
-        TextFieldWithBrowseButton tomcatField = runnerSetting.getTomcatField();
+        ComboboxWithBrowseButton tomcatField = runnerSetting.getTomcatField();
         TextFieldWithBrowseButton docBaseField = runnerSetting.getDocBaseField();
         JTextField contextPathField = runnerSetting.getContextPathField();
         JFormattedTextField portField = runnerSetting.getPortField();
+        tomcatField.addBrowseFolderListener(project, FileChooserDescriptorFactory.createSingleFolderDescriptor());
+        tomcatField.getComboBox().setModel(new DefaultComboBoxModel());
+        tomcatField.getComboBox().addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                System.out.println("e = " + e);
+            }
+        });
         JXButton configrationButton = runnerSetting.getConfigrationButton();
         configrationButton.addActionListener(new ActionListener() {
             @Override
@@ -102,7 +113,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         });
 
 
-        tomcatField.addBrowseFolderListener("tomcat", "Choose Tomcat Folder", project, FileChooserDescriptorFactory.createSingleFolderDescriptor());
+//        tomcatField.addBrowseFolderListener("tomcat", "Choose Tomcat Folder", project, FileChooserDescriptorFactory.createSingleFolderDescriptor());
 
         docBaseField.addBrowseFolderListener("webapp", "Choose Web Folder", project, FileChooserDescriptorFactory.createSingleFolderDescriptor().withRoots(project.getBaseDir()));
         docBaseField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {

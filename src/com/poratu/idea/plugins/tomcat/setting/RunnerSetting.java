@@ -20,7 +20,7 @@ import javax.swing.*;
  */
 public class RunnerSetting {
     private JPanel mainPanel;
-    private TextFieldWithBrowseButton tomcatField;
+    private ComboboxWithBrowseButton tomcatField;
     private TextFieldWithBrowseButton docBaseField;
     private JTextField contextPathField;
     private JFormattedTextField portField;
@@ -37,7 +37,7 @@ public class RunnerSetting {
         return mainPanel;
     }
 
-    public TextFieldWithBrowseButton getTomcatField() {
+    public ComboboxWithBrowseButton getTomcatField() {
         return tomcatField;
     }
 

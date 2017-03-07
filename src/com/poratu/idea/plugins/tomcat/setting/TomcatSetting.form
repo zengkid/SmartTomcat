@@ -47,6 +47,7 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
+                  <editable value="false"/>
                   <text value=""/>
                 </properties>
               </component>
@@ -58,6 +59,7 @@
                   <forms defaultalign-horz="false"/>
                 </constraints>
                 <properties>
+                  <editable value="false"/>
                   <text value=""/>
                 </properties>
               </component>
@@ -94,12 +96,14 @@
                   <text value="Tomcat Server : "/>
                 </properties>
               </component>
-              <component id="f9737" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="tomcatServerField">
+              <component id="f0a77" class="javax.swing.JTextField" binding="tomcatServerField">
                 <constraints>
                   <grid row="4" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                   <forms/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <editable value="false"/>
+                </properties>
               </component>
             </children>
           </grid>

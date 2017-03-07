@@ -52,7 +52,7 @@ public class TomcatInfo {
 
     @Override
     public String toString() {
-        return name + " " + version + (number > 0 ? "(" + number + ")" : "");
+        return name + (number > 0 ? "(" + number + ")" : "");
     }
 
     public int getNumber() {

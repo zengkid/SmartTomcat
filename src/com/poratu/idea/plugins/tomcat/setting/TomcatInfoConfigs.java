@@ -8,8 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Author : zengkid
@@ -60,5 +59,14 @@ public class TomcatInfoConfigs implements PersistentStateComponent<TomcatInfoCon
     public static TomcatInfoConfigs getInstance(Project project) {
         TomcatInfoConfigs sfec = ServiceManager.getService(project, TomcatInfoConfigs.class);
         return sfec;
+    }
+
+    public int getMaxVersion(TomcatInfo tomcatInfo) {
+        Optional<TomcatInfo> maxTomcatInfo = tomcatInfos.stream().filter(it -> it.equals(tomcatInfo)).max(Comparator.comparingInt(TomcatInfo::getNumber));
+        int max = 0;
+        if (maxTomcatInfo.isPresent()) {
+            max =  maxTomcatInfo.get().getNumber();
+        }
+        return max;
     }
 }

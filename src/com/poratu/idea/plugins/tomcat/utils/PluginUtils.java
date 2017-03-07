@@ -1,10 +1,12 @@
 package com.poratu.idea.plugins.tomcat.utils;
 
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Author : zengkid
@@ -15,29 +17,51 @@ public abstract class PluginUtils {
     public static TomcatInfo getTomcatInfo(String javaHome, String tomcatHome) {
 //        java -cp lib/catalina.jar org.apache.catalina.util.ServerInfo
         String command = javaHome + "/bin/java -cp " + tomcatHome + "/lib/catalina.jar org.apache.catalina.util.ServerInfo";
-        TomcatInfo tomcatInfo = null;
+        BufferedReader reader = null;
+        final TomcatInfo tomcatInfo = new TomcatInfo();
+        tomcatInfo.setPath(tomcatHome);
         try {
             Process process = Runtime.getRuntime().exec(command);
             process.waitFor();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            Stream<String> lines = reader.lines();
+            lines.forEach(s -> {
+                if (s.startsWith("Server version")) {
+                    String name = StringUtils.replace(getValue(s), "/", " ");
+                    tomcatInfo.setName(name);
+                } else if (s.startsWith("Server number")) {
+                    String version = getValue(s);
+                    tomcatInfo.setVersion(version);
+                }
 
-            Optional<String> first = reader.lines().filter(s -> s.startsWith("Server number")).findFirst();
-            if (first.isPresent()) {
-                tomcatInfo = new TomcatInfo();
-                String tomcatVersion = first.get();
-                String[] strings = tomcatVersion.split(":");
-                tomcatInfo.setPath(tomcatHome);
-                tomcatInfo.setName("Tomcat");
-                tomcatInfo.setVersion(strings[1].trim());
+            });
 
-            }
             reader.close();
 
         } catch (Exception e) {
+            return null;
 
-
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return tomcatInfo;
+
+    }
+
+    private static String getValue(String s) {
+        String[] strings = StringUtils.split(s, ":");
+        String result = "";
+        if (strings != null && strings.length == 2) {
+            result = strings[1].trim();
+        }
+        return result;
+
 
     }
 

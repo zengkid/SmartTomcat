@@ -4,8 +4,6 @@ import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.ui.LabeledComponent;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.AnActionButtonRunnable;
@@ -16,9 +14,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Optional;
 
 /**
  * Author : zengkid
@@ -28,13 +23,11 @@ import java.util.Optional;
 public class TomcatSetting {
     private JPanel mainPanel;
     private JList tomcatList;
-    private LabeledComponent<JTextField> tomcatPath;
-    private LabeledComponent<JTextField> tomcatName;
     private JPanel tomcatListPanel;
     private JPanel tomcatSetupPanel;
     private JTextField tomcatNameField;
     private JTextField tomcatVersionField;
-    private TextFieldWithBrowseButton tomcatServerField;
+    private JTextField tomcatServerField;
     private static TomcatSetting tomcatSetting = new TomcatSetting();
 
     private boolean inited = false;
@@ -77,8 +70,8 @@ public class TomcatSetting {
                     if (model.contains(tomcatInfo)) {
                         TomcatInfo[] infos = new TomcatInfo[size];
                         model.copyInto(infos);
-                        Optional<TomcatInfo> max = Arrays.stream(infos).filter(it -> it.equals(tomcatInfo)).max(Comparator.comparingInt(TomcatInfo::getNumber));
-                        tomcatInfo.setNumber(max.get().getNumber() + 1);
+                        int maxVersion = TomcatInfoConfigs.getInstance().getMaxVersion(tomcatInfo);
+                        tomcatInfo.setNumber(maxVersion + 1);
                     }
                     model.add(size, tomcatInfo);
                     tomcatList.setSelectedIndex(size);
@@ -134,14 +127,6 @@ public class TomcatSetting {
 
     public JList getTomcatList() {
         return tomcatList;
-    }
-
-    public LabeledComponent<JTextField> getTomcatPath() {
-        return tomcatPath;
-    }
-
-    public LabeledComponent<JTextField> getTomcatName() {
-        return tomcatName;
     }
 
 }
