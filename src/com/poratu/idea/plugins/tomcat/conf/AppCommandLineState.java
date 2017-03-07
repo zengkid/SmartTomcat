@@ -63,7 +63,7 @@ public class AppCommandLineState extends JavaCommandLineState {
     @Override
     protected JavaParameters createJavaParameters() throws ExecutionException {
 
-        Path tomcatInstallationPath = Paths.get(configuration.getTomcatInstallation());
+        Path tomcatInstallationPath = Paths.get(configuration.getTomcatInfo().getPath());
         String docBase = configuration.getDocBase();
         String contextPath = configuration.getContextPath();
         String port = configuration.getPort();

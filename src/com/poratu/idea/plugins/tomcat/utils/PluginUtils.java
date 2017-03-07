@@ -1,5 +1,7 @@
 package com.poratu.idea.plugins.tomcat.utils;
 
+import com.intellij.openapi.projectRoots.ProjectJdkTable;
+import com.intellij.openapi.projectRoots.Sdk;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import org.apache.commons.lang.StringUtils;
 
@@ -14,6 +16,20 @@ import java.util.stream.Stream;
  * Time   : 21:35
  */
 public abstract class PluginUtils {
+
+    public static Sdk getDefaultJDK(){
+        Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
+        if (allJdks == null || allJdks.length == 0) {
+            //todo: guide user to config the SDK
+        }
+        Sdk jdk = allJdks[0];
+        return jdk;
+    }
+
+    public static TomcatInfo getTomcatInfo(String tomcatHome) {
+        return getTomcatInfo(getDefaultJDK().getHomePath(), tomcatHome);
+    }
+
     public static TomcatInfo getTomcatInfo(String javaHome, String tomcatHome) {
 //        java -cp lib/catalina.jar org.apache.catalina.util.ServerInfo
         String command = javaHome + "/bin/java -cp " + tomcatHome + "/lib/catalina.jar org.apache.catalina.util.ServerInfo";

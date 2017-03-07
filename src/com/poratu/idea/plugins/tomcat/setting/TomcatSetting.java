@@ -56,16 +56,10 @@ public class TomcatSetting {
                     }
                     String presentableUrl = virtualFile.getPresentableUrl();
 
-                    Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
-                    if (allJdks == null || allJdks.length == 0) {
-                        //todo: guide user to config the SDK
-                        return;
-
-                    }
-                    Sdk jdk = allJdks[0];
 
 
-                    TomcatInfo tomcatInfo = PluginUtils.getTomcatInfo(jdk.getHomePath(), presentableUrl);
+
+                    TomcatInfo tomcatInfo = PluginUtils.getTomcatInfo(presentableUrl);
                     int size = model.size();
                     if (model.contains(tomcatInfo)) {
                         TomcatInfo[] infos = new TomcatInfo[size];

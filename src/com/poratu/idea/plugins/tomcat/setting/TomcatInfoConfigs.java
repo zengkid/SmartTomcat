@@ -24,6 +24,15 @@ import java.util.*;
 public class TomcatInfoConfigs implements PersistentStateComponent<TomcatInfoConfigs> {
 
     private List<TomcatInfo> tomcatInfos = new ArrayList<>();
+    private TomcatInfo current;
+
+    public TomcatInfo getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(TomcatInfo current) {
+        this.current = current;
+    }
 
     public List<TomcatInfo> getTomcatInfos() {
         return tomcatInfos;

@@ -4,7 +4,6 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
@@ -12,6 +11,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.WriteExternalException;
+import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
+import com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +23,8 @@ import org.jetbrains.annotations.Nullable;
  * Time   : 3:14 PM
  */
 public class TomcatRunConfiguration extends RunConfigurationBase implements RunProfileWithCompileBeforeLaunchOption {
-    private String tomcatInstallation;
+    private TomcatInfo tomcatInfo;
+    //    private String tomcatInstallation;
     private String docBase;
     private String contextPath;
     private String port;
@@ -58,7 +60,8 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
     @Override
     public void readExternal(Element element) throws InvalidDataException {
         super.readExternal(element);
-        this.tomcatInstallation = PropertiesComponent.getInstance().getValue("TOMCAT_INSTALLATION");
+        this.tomcatInfo = TomcatInfoConfigs.getInstance(getProject()).getCurrent();
+//        this.tomcatInstallation = PropertiesComponent.getInstance().getValue("TOMCAT_INSTALLATION");
 //        this.tomcatInstallation = JDOMExternalizerUtil.readField(element, "TOMCAT_INSTALLATION");
         this.docBase = JDOMExternalizerUtil.readField(element, "DOC_BASE");
         this.contextPath = JDOMExternalizerUtil.readField(element, "CONTEXT_PATH");
@@ -69,20 +72,12 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
     public void writeExternal(Element element) throws WriteExternalException {
         super.writeExternal(element);
 
-        PropertiesComponent.getInstance().setValue("TOMCAT_INSTALLATION", tomcatInstallation);
+        TomcatInfoConfigs.getInstance(getProject()).setCurrent(tomcatInfo);
 //        JDOMExternalizerUtil.writeField(element, "TOMCAT_INSTALLATION", tomcatInstallation);
         JDOMExternalizerUtil.writeField(element, "DOC_BASE", docBase);
         JDOMExternalizerUtil.writeField(element, "CONTEXT_PATH", contextPath);
         JDOMExternalizerUtil.writeField(element, "TOMCAT_PORT", port);
 
-    }
-
-    public String getTomcatInstallation() {
-        return tomcatInstallation;
-    }
-
-    public void setTomcatInstallation(String tomcatInstallation) {
-        this.tomcatInstallation = tomcatInstallation;
     }
 
     public String getDocBase() {
@@ -107,6 +102,14 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
 
     public void setPort(String port) {
         this.port = port;
+    }
+
+    public TomcatInfo getTomcatInfo() {
+        return tomcatInfo;
+    }
+
+    public void setTomcatInfo(TomcatInfo tomcatInfo) {
+        this.tomcatInfo = tomcatInfo;
     }
 
     @NotNull

@@ -8,10 +8,18 @@ import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.ComboboxWithBrowseButton;
+import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jdesktop.swingx.JXButton;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.List;
 
 /**
  * Author : zengkid
@@ -26,7 +34,6 @@ public class RunnerSetting {
     private JFormattedTextField portField;
     private JXButton configrationButton;
     private CommonJavaParametersPanel javaParametersPanel;
-    private ComboboxWithBrowseButton tomcatCombobox;
     private Project project;
 
     public RunnerSetting(Project project) {
@@ -53,10 +60,6 @@ public class RunnerSetting {
         return portField;
     }
 
-    public ComboboxWithBrowseButton getTomcatCombobox() {
-        return tomcatCombobox;
-    }
-
 
     public JXButton getConfigrationButton() {
         return configrationButton;
@@ -66,23 +69,36 @@ public class RunnerSetting {
         FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
 
 
+        tomcatField = new ComboboxWithBrowseButton();
+        JComboBox<TomcatInfo> comboBox = tomcatField.getComboBox();
 
-        tomcatCombobox = new ComboboxWithBrowseButton();
-        JComboBox<String> comboBox = tomcatCombobox.getComboBox();
-        CollectionComboBoxModel<String> aModel = new CollectionComboBoxModel<>();
+        List<TomcatInfo> tomcatInfos = TomcatInfoConfigs.getInstance().getTomcatInfos();
+        CollectionComboBoxModel<TomcatInfo> aModel = new CollectionComboBoxModel<>(tomcatInfos);
         comboBox.setModel(aModel);
 
-        tomcatCombobox.addBrowseFolderListener("title", "description", project, fileChooserDescriptor, new TextComponentAccessor<JComboBox>() {
+        tomcatField.addBrowseFolderListener("title", "description", project, fileChooserDescriptor, new TextComponentAccessor<JComboBox>() {
             public String getText(JComboBox comboBox) {
                 Object item = comboBox.getEditor().getItem();
                 return item.toString();
             }
 
             public void setText(JComboBox comboBox, @NotNull String text) {
-                comboBox.getEditor().setItem(text);
-                CollectionComboBoxModel model = (CollectionComboBoxModel) comboBox.getModel();
-                model.add(model.getSize(), text);
-                model.setSelectedItem(text);
+//                comboBox.getEditor().setItem(text);
+                TomcatInfo tomcatInfo = PluginUtils.getTomcatInfo(text);
+
+                if (tomcatInfo != null) {
+
+                    CollectionComboBoxModel<TomcatInfo> model = (CollectionComboBoxModel) comboBox.getModel();
+
+                    if (model.contains(tomcatInfo)) {
+                        int maxVersion = TomcatInfoConfigs.getInstance().getMaxVersion(tomcatInfo);
+                        tomcatInfo.setNumber(maxVersion + 1);
+                    }
+
+                    model.add(model.getSize(), tomcatInfo);
+                    model.setSelectedItem(tomcatInfo);
+
+                }
             }
         });
     }
