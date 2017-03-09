@@ -2,8 +2,6 @@ package com.poratu.idea.plugins.tomcat.setting;
 
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.projectRoots.ProjectJdkTable;
-import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.AnActionButtonRunnable;
@@ -57,8 +55,6 @@ public class TomcatSetting {
                     String presentableUrl = virtualFile.getPresentableUrl();
 
 
-
-
                     TomcatInfo tomcatInfo = PluginUtils.getTomcatInfo(presentableUrl);
                     int size = model.size();
                     if (model.contains(tomcatInfo)) {
@@ -81,7 +77,11 @@ public class TomcatSetting {
                     if (!e.getValueIsAdjusting()) {
                         TomcatInfo tomcatInfo = (TomcatInfo) tomcatList.getSelectedValue();
                         if (tomcatInfo != null) {
-                            tomcatNameField.setText(tomcatInfo.getName());
+                            String tomcatName = tomcatInfo.getName();
+                            if (tomcatInfo.getNumber() > 0) {
+                                tomcatName = tomcatName + "(" + tomcatInfo.getNumber() + ")";
+                            }
+                            tomcatNameField.setText(tomcatName);
                             tomcatVersionField.setText(tomcatInfo.getVersion());
                             tomcatServerField.setText(tomcatInfo.getPath());
                         } else {

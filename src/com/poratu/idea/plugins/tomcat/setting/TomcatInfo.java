@@ -42,12 +42,15 @@ public class TomcatInfo {
 
         TomcatInfo that = (TomcatInfo) o;
 
+        if (number != that.number) return false;
         return name != null ? name.equals(that.name) : that.name == null;
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + number;
+        return result;
     }
 
     @Override
