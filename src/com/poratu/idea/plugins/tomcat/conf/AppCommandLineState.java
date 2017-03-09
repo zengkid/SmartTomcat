@@ -38,6 +38,9 @@ import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Author : zengkid
@@ -67,6 +70,7 @@ public class AppCommandLineState extends JavaCommandLineState {
         String docBase = configuration.getDocBase();
         String contextPath = configuration.getContextPath();
         String port = configuration.getPort();
+        String tomcatVersion = configuration.getTomcatInfo().getVersion();
 
         Project project = this.configuration.getProject();
 
@@ -103,7 +107,7 @@ public class AppCommandLineState extends JavaCommandLineState {
         javaParams.setWorkingDirectory(workPath.toFile());
 
         try {
-            updateServerConf(module, confPath, contextPath, docBase, port);
+            updateServerConf(tomcatVersion, module, confPath, contextPath, docBase, port);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -122,7 +126,7 @@ public class AppCommandLineState extends JavaCommandLineState {
         return consoleView;
     }
 
-    private void updateServerConf(Module module, Path confPath, String contextPath, String docBase, String port) throws Exception {
+    private void updateServerConf(String tomcatVersion, Module module, Path confPath, String contextPath, String docBase, String port) throws Exception {
 
         Path serverXml = confPath.resolve("server.xml");
 
@@ -153,34 +157,53 @@ public class AppCommandLineState extends JavaCommandLineState {
 
         Element contextE = doc.createElement("Context");
         contextE.setAttribute("docBase", docBase);
-        contextE.setAttribute(  "path", (contextPath.startsWith("/") ? "" : "/") + contextPath);
+        contextE.setAttribute("path", (contextPath.startsWith("/") ? "" : "/") + contextPath);
         hostNode.appendChild(contextE);
 
 
-        Element resourcesE = doc.createElement("Resources");
-        contextE.appendChild(resourcesE);
-
+        List<String> paths = new ArrayList<>();
         VirtualFile[] classPaths = ModuleRootManager.getInstance(module).orderEntries().withoutSdk().productionOnly().getClassesRoots();
-        for (VirtualFile path : classPaths) {
-            String classPath = path.getPresentableUrl();
-            File file = Paths.get(classPath).toFile();
-            if (file.isFile()) {
-                Element postResourcesE = doc.createElement("PostResources");
-
-                postResourcesE.setAttribute("base", classPath);
-                postResourcesE.setAttribute("className", "org.apache.catalina.webresources.FileResourceSet");
-                postResourcesE.setAttribute("webAppMount", "/WEB-INF/lib/" + file.getName());
-                resourcesE.appendChild(postResourcesE);
-
-            } else {
-                Element preResourcesE = doc.createElement("PreResources");
-                preResourcesE.setAttribute("base", classPath);
-                preResourcesE.setAttribute("className", "org.apache.catalina.webresources.DirResourceSet");
-                preResourcesE.setAttribute("webAppMount", "/WEB-INF/classes");
-                resourcesE.appendChild(preResourcesE);
+        if (classPaths != null && classPaths.length > 0) {
+            for (VirtualFile path : classPaths) {
+                String classPath = path.getPresentableUrl();
+                paths.add(classPath);
             }
+            int index = tomcatVersion.indexOf(".");
+            int version = Integer.valueOf(tomcatVersion.substring(0, index));
 
+
+            if (version >= 8) { //for tomcat8
+
+                Element resourcesE = doc.createElement("Resources");
+                contextE.appendChild(resourcesE);
+                for (String classPath : paths) {
+                    File file = Paths.get(classPath).toFile();
+
+                    if (file.isFile()) {
+                        Element postResourcesE = doc.createElement("PostResources");
+
+                        postResourcesE.setAttribute("base", classPath);
+                        postResourcesE.setAttribute("className", "org.apache.catalina.webresources.FileResourceSet");
+                        postResourcesE.setAttribute("webAppMount", "/WEB-INF/lib/" + file.getName());
+                        resourcesE.appendChild(postResourcesE);
+
+                    } else {
+                        Element preResourcesE = doc.createElement("PreResources");
+                        preResourcesE.setAttribute("base", classPath);
+                        preResourcesE.setAttribute("className", "org.apache.catalina.webresources.DirResourceSet");
+                        preResourcesE.setAttribute("webAppMount", "/WEB-INF/classes");
+                        resourcesE.appendChild(preResourcesE);
+                    }
+
+                }
+            } else if (version >= 6) { //for tomcat6-7
+                Element loaderE = doc.createElement("Loader");
+                loaderE.setAttribute("className", "org.apache.catalina.loader.VirtualWebappLoader");
+                loaderE.setAttribute("virtualClasspath", paths.stream().collect(Collectors.joining(";")));
+                contextE.appendChild(loaderE);
+            }
         }
+
 
         Source source = new DOMSource(doc);
         StreamResult result = new StreamResult(new OutputStreamWriter(new FileOutputStream(serverXml.toFile()),
