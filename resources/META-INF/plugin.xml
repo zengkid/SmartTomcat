@@ -1,21 +1,22 @@
 <idea-plugin version="2">
   <id>com.poratu.idea.plugins.tomcat</id>
-  <name>SmartTomcat</name>
+  <name>Smart Tomcat</name>
   <version>1.0</version>
   <vendor email="zengkid@msn.com">zengkid</vendor>
 
   <description><![CDATA[
+      This is for Tomcat Server plugin.
       The SmartTomcat will auto load the Webapp classes and libs from project and module,
-      you needn't to copy the classes and libs to the WEB-INF/classes and WEB-INF/lib.<br/>
-      1.the plugin will not copy any your project files to the temp folder.<br/>
-      2.once the java class changes and recompile to classes, the SmartTomcat will auto load the new classes.<br/>
+      You needn't copy the classes and libs to the WEB-INF/classes and WEB-INF/lib.<br/>
+      The SmartTomcat plugin will auto config the classpath for tomcat server.
 
-      The SmartTomcat only support Tomcat 8+ <br/>
+      The SmartTomcat support Tomcat 6+ <br/>
 
     ]]></description>
 
   <change-notes><![CDATA[
-      The first release.
+      1.add tomcat6 and tomcat6 support
+      2.can add multiple tomcat server in setting.
     ]]>
   </change-notes>
 
