@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * Time   : 11:01 AM
  */
 public class TomcatRunner extends DefaultProgramRunner {
-    private static final String RUNNER_ID = "TomcatRunner";
+    private static final String RUNNER_ID = "SmartTomcatRunner";
 
     @NotNull
     @Override
