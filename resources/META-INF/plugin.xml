@@ -8,14 +8,14 @@
       This is for Tomcat Server plugin.
       The SmartTomcat will auto load the Webapp classes and libs from project and module,
       You needn't copy the classes and libs to the WEB-INF/classes and WEB-INF/lib.<br/>
-      The SmartTomcat plugin will auto config the classpath for tomcat server.
+      The Smart Tomcat plugin will auto config the classpath for tomcat server.<br/>
 
-      The SmartTomcat support Tomcat 6+ <br/>
+      The Smart Tomcat support Tomcat 6+ <br/>
 
     ]]></description>
 
   <change-notes><![CDATA[
-      1.add tomcat6 and tomcat6 support
+      1.add tomcat6 and tomcat7 support
       2.can add multiple tomcat server in setting.
     ]]>
   </change-notes>
@@ -34,7 +34,7 @@
 
     <configurationType implementation="com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType"/>
 
-    <applicationService  serviceInterface="com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs" serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs"/>
+    <applicationService  serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs"/>
 
 
     <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunner" order="first"/>
