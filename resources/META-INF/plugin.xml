@@ -15,8 +15,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      1.add tomcat6 and tomcat7 support
-      2.can add multiple tomcat server in setting.
+      1.fixed null pointer exception when choose the webapp folder does not include current project mould.
     ]]>
   </change-notes>
 
