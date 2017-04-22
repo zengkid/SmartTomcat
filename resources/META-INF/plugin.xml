@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>com.poratu.idea.plugins.tomcat</id>
   <name>Smart Tomcat</name>
-  <version>1.5</version>
+  <version>1.6</version>
   <vendor email="zengkid@msn.com">zengkid</vendor>
 
   <description><![CDATA[
