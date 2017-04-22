@@ -117,7 +117,8 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
                     if (text != null && !text.trim().equals("")) {
                         VirtualFile fileByIoFile = LocalFileSystem.getInstance().findFileByIoFile(new File(text));
                         Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, project);
-                        contextPathField.setText("/" + module.getName());
+                        String contextPath = module == null ? "/" : "/" + module.getName();
+                        contextPathField.setText(contextPath);
                     }
                 }
 

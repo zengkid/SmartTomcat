@@ -92,7 +92,7 @@ public class AppCommandLineState extends JavaCommandLineState {
         Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, project);
 
         String userHome = System.getProperty("user.home");
-        Path workPath = Paths.get(userHome, "TomcatRunner", project.getName(), module.getName());
+        Path workPath = Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
         Path confPath = workPath.resolve("conf");
         if (!confPath.toFile().exists()) {
             confPath.toFile().mkdirs();

@@ -76,7 +76,7 @@ public class RunnerSetting {
         CollectionComboBoxModel<TomcatInfo> aModel = new CollectionComboBoxModel<>(tomcatInfos);
         comboBox.setModel(aModel);
 
-        tomcatField.addBrowseFolderListener("title", "description", project, fileChooserDescriptor, new TextComponentAccessor<JComboBox>() {
+        tomcatField.addBrowseFolderListener("Tomcat Server", "Please choose tomcat server path", project, fileChooserDescriptor, new TextComponentAccessor<JComboBox>() {
             public String getText(JComboBox comboBox) {
                 Object item = comboBox.getEditor().getItem();
                 return item.toString();
