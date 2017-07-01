@@ -6,6 +6,10 @@ sudo: required
 before_install:
      - chmod +x gradlew
 
+cache:
+ directories:
+  — $HOME/.gradle
+
 deploy:
   provider: releases
   skip_cleanup: true
