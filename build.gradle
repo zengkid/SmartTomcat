@@ -2,7 +2,7 @@ plugins {
     id "org.jetbrains.intellij" version "0.2.13"
 }
 
-apply plugin: 'org.jetbrains.intellij'
+//apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
 
 // On travis, we don't want to deploy to Jetbrains that requires credentials
@@ -47,4 +47,4 @@ task wrapper(type: Wrapper) {
     gradleVersion = '3.5'
 }
 
-version '1.7'
+version '1.9'
