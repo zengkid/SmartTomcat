@@ -15,7 +15,6 @@ deploy:
   skip_cleanup: true
   api_key: "6e0f357789f538324bbf41fbacab7f30797a23ab"
   file_glob: true
-  file: SmartTomcat*.zip
+  file: SmartTomcat*.jar
   on:
     tags: true
-    all_branches: true
