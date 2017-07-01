@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.ComboboxWithBrowseButton;
+import com.intellij.ui.RawCommandLineEditor;
 import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jdesktop.swingx.JXButton;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,7 @@ public class RunnerSetting {
     private JTextField contextPathField;
     private JFormattedTextField portField;
     private JXButton configrationButton;
-    private CommonJavaParametersPanel javaParametersPanel;
+    private RawCommandLineEditor vmOptons;
     private Project project;
 
     public RunnerSetting(Project project) {
@@ -63,6 +64,10 @@ public class RunnerSetting {
 
     public JXButton getConfigrationButton() {
         return configrationButton;
+    }
+
+    public RawCommandLineEditor getVmOptons() {
+        return vmOptons;
     }
 
     private void createUIComponents() {

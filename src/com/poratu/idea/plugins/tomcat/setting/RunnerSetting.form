@@ -9,7 +9,7 @@
     <rowspec value="top:4dlu:noGrow"/>
     <rowspec value="center:max(d;4px):noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
-    <rowspec value="center:140px:noGrow"/>
+    <rowspec value="center:max(d;4px):noGrow"/>
     <colspec value="fill:135px:noGrow"/>
     <colspec value="left:0px:noGrow"/>
     <colspec value="fill:400px:grow"/>
@@ -104,15 +104,24 @@
           <text value="Configuration"/>
         </properties>
       </component>
-      <component id="a29be" class="com.intellij.execution.ui.CommonJavaParametersPanel" binding="javaParametersPanel">
+      <component id="7eb04" class="javax.swing.JLabel">
         <constraints>
-          <grid row="8" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="-1"/>
-          </grid>
-          <forms defaultalign-horz="false" defaultalign-vert="false"/>
+          <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <forms/>
         </constraints>
         <properties>
-          <VMParameters value=""/>
+          <text value="VM options"/>
+        </properties>
+      </component>
+      <component id="cbe38" class="com.intellij.ui.RawCommandLineEditor" binding="vmOptons">
+        <constraints>
+          <grid row="8" column="2" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties>
+          <dialogCaption value="VM options"/>
+          <doubleBuffered value="false"/>
+          <text value=""/>
         </properties>
       </component>
     </children>

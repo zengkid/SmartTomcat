@@ -28,6 +28,7 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
     private String docBase;
     private String contextPath;
     private String port;
+    private String vmOptions;
 
 
     protected TomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
@@ -66,6 +67,7 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         this.docBase = JDOMExternalizerUtil.readField(element, "DOC_BASE");
         this.contextPath = JDOMExternalizerUtil.readField(element, "CONTEXT_PATH");
         this.port = JDOMExternalizerUtil.readField(element, "TOMCAT_PORT");
+        this.vmOptions = JDOMExternalizerUtil.readField(element, "VM_OPTIONS");
     }
 
     @Override
@@ -77,6 +79,7 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         JDOMExternalizerUtil.writeField(element, "DOC_BASE", docBase);
         JDOMExternalizerUtil.writeField(element, "CONTEXT_PATH", contextPath);
         JDOMExternalizerUtil.writeField(element, "TOMCAT_PORT", port);
+        JDOMExternalizerUtil.writeField(element, "VM_OPTIONS", vmOptions);
 
     }
 
@@ -110,6 +113,14 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
 
     public void setTomcatInfo(TomcatInfo tomcatInfo) {
         this.tomcatInfo = tomcatInfo;
+    }
+
+    public String getVmOptions() {
+        return vmOptions;
+    }
+
+    public void setVmOptions(String vmOptions) {
+        this.vmOptions = vmOptions;
     }
 
     @NotNull

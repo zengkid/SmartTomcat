@@ -33,7 +33,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -65,58 +64,59 @@ public class AppCommandLineState extends JavaCommandLineState {
 
     @Override
     protected JavaParameters createJavaParameters() throws ExecutionException {
-
-        Path tomcatInstallationPath = Paths.get(configuration.getTomcatInfo().getPath());
-        String docBase = configuration.getDocBase();
-        String contextPath = configuration.getContextPath();
-        String port = configuration.getPort();
-        String tomcatVersion = configuration.getTomcatInfo().getVersion();
-
-        Project project = this.configuration.getProject();
-
-        JavaParameters javaParams = new JavaParameters();
-
-
-        ProjectRootManager manager = ProjectRootManager.getInstance(project);
-        javaParams.setJdk(manager.getProjectSdk());
-
-        javaParams.setDefaultCharset(project);
-
-        javaParams.setMainClass(TOMCAT_MAIN_CLASS);
-        javaParams.getProgramParametersList().add("start");
-        addBinFolder(tomcatInstallationPath, javaParams);
-        addLibFolder(tomcatInstallationPath, javaParams);
-
-
-        VirtualFile fileByIoFile = LocalFileSystem.getInstance().findFileByIoFile(new File(docBase));
-        Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, project);
-
-        String userHome = System.getProperty("user.home");
-        Path workPath = Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
-        Path confPath = workPath.resolve("conf");
-        if (!confPath.toFile().exists()) {
-            confPath.toFile().mkdirs();
-        }
-
-
         try {
+
+            Path tomcatInstallationPath = Paths.get(configuration.getTomcatInfo().getPath());
+            String docBase = configuration.getDocBase();
+            String contextPath = configuration.getContextPath();
+            String port = configuration.getPort();
+            String tomcatVersion = configuration.getTomcatInfo().getVersion();
+            String vmOptions = configuration.getVmOptions();
+
+            Project project = this.configuration.getProject();
+
+            JavaParameters javaParams = new JavaParameters();
+
+
+            ProjectRootManager manager = ProjectRootManager.getInstance(project);
+            javaParams.setJdk(manager.getProjectSdk());
+
+            javaParams.setDefaultCharset(project);
+
+            javaParams.setMainClass(TOMCAT_MAIN_CLASS);
+            javaParams.getProgramParametersList().add("start");
+            addBinFolder(tomcatInstallationPath, javaParams);
+            addLibFolder(tomcatInstallationPath, javaParams);
+
+
+            VirtualFile fileByIoFile = LocalFileSystem.getInstance().findFileByIoFile(new File(docBase));
+            Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, project);
+
+            String userHome = System.getProperty("user.home");
+            Path workPath = Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
+            Path confPath = workPath.resolve("conf");
+            if (!confPath.toFile().exists()) {
+                confPath.toFile().mkdirs();
+            }
+
+
             FileUtil.copyFileOrDir(tomcatInstallationPath.resolve("conf").toFile(), confPath.toFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        javaParams.setWorkingDirectory(workPath.toFile());
 
-        try {
+            javaParams.setWorkingDirectory(workPath.toFile());
+
+
             updateServerConf(tomcatVersion, module, confPath, contextPath, docBase, port);
+
+
+            javaParams.setPassParentEnvs(false);
+            javaParams.getVMParametersList().addParametersString(vmOptions);
+            return javaParams;
+
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
 
-//        ModifiableRootModel modifiableModel = ModuleRootManager.getInstance(module).getModifiableModel();
-//        modifiableModel.getContentEntries()[0].addExcludeFolder()
-
-        return javaParams;
     }
 
     @Nullable
