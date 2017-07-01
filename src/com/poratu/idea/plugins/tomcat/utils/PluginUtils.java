@@ -20,7 +20,7 @@ public abstract class PluginUtils {
     public static Sdk getDefaultJDK(){
         Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
         if (allJdks == null || allJdks.length == 0) {
-            //todo: guide user to config the SDK
+            throw new RuntimeException("Please setup your project JDK first");
         }
         Sdk jdk = allJdks[0];
         return jdk;
