@@ -1,0 +1,17 @@
+language: java
+jdk: oraclejdk8
+script: ./gradlew assemble test
+sudo: required
+
+before_script:
+    - chmod +x gradlew
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  file_glob: true
+  file: $CI_HOME/built/distributions/SmartTomcat*.zip
+  on:
+    repo: halirutan/SmartTomcat
+    tags: true
+    all_branches: true
