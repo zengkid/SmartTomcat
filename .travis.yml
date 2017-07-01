@@ -3,6 +3,8 @@ jdk: oraclejdk8
 script: ./gradlew assemble test
 sudo: required
 
+before_install:
+     - chmod +x gradlew
 before_script:
     - chmod +x gradlew
 
