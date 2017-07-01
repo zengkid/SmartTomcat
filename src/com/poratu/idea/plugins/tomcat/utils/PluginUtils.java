@@ -55,7 +55,7 @@ public abstract class PluginUtils {
             reader.close();
 
         } catch (Exception e) {
-            return null;
+            throw new RuntimeException(e);
 
         } finally {
             if (reader != null) {
@@ -79,12 +79,5 @@ public abstract class PluginUtils {
         return result;
 
 
-    }
-
-    public static void main(String[] args) {
-        String javaHome = "D:\\develop\\Java\\jdk1.8.0_45";
-        String tomcatHome = "D:\\develop\\server\\tomcat8";
-        TomcatInfo tomcatInfo = getTomcatInfo(javaHome, tomcatHome);
-        System.out.println("tomcatInfo = " + tomcatInfo);
     }
 }
