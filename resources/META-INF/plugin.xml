@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>com.poratu.idea.plugins.tomcat</id>
   <name>Smart Tomcat</name>
-  <version>1.7</version>
+  <version>1.8</version>
   <vendor email="zengkid@msn.com">zengkid</vendor>
 
   <description><![CDATA[
@@ -15,7 +15,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      1.support VM options now
+      1.throw exception
     ]]>
   </change-notes>
 
