@@ -13,7 +13,7 @@ cache:
 deploy:
   provider: releases
   skip_cleanup: true
-  api_key: "6e0f357789f538324bbf41fbacab7f30797a23ab"
+  api_key: "50dde6503ca328fc8980e63252d3bd55e0d9b66f"
   file_glob: true
 #  file: SmartTomcat*.jar
   file: build/libs/SmartTomcat*.jar
