@@ -15,7 +15,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      1.throw exception
+      1.ignore classpath for provide and test scope.
     ]]>
   </change-notes>
 
