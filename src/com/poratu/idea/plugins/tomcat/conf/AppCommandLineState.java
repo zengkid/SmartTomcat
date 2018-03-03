@@ -162,7 +162,7 @@ public class AppCommandLineState extends JavaCommandLineState {
 
 
         List<String> paths = new ArrayList<>();
-        VirtualFile[] classPaths = ModuleRootManager.getInstance(module).orderEntries().withoutSdk().productionOnly().getClassesRoots();
+        VirtualFile[] classPaths = ModuleRootManager.getInstance(module).orderEntries().withoutSdk().runtimeOnly().productionOnly().getClassesRoots();
         if (classPaths != null && classPaths.length > 0) {
             for (VirtualFile path : classPaths) {
                 String classPath = path.getPresentableUrl();
