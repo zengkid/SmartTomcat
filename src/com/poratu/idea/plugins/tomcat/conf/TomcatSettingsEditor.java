@@ -90,6 +90,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         tomcatRunConfiguration.setContextPath(runnerSetting.getContextPathField().getText());
         tomcatRunConfiguration.setPort(runnerSetting.getPortField().getText());
         tomcatRunConfiguration.setVmOptions(runnerSetting.getVmOptons().getText());
+        tomcatRunConfiguration.setEnvOptions(runnerSetting.getEnvOptions().getText());
     }
 
     @NotNull
