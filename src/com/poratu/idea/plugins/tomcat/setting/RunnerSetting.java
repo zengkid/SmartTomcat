@@ -35,6 +35,7 @@ public class RunnerSetting {
     private JFormattedTextField portField;
     private JXButton configrationButton;
     private RawCommandLineEditor vmOptons;
+    private RawCommandLineEditor envOptions;
     private Project project;
 
     public RunnerSetting(Project project) {
@@ -68,6 +69,10 @@ public class RunnerSetting {
 
     public RawCommandLineEditor getVmOptons() {
         return vmOptons;
+    }
+
+    public RawCommandLineEditor getEnvOptions() {
+        return envOptions;
     }
 
     private void createUIComponents() {
