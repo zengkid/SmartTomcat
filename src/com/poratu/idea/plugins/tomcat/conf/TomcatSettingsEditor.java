@@ -77,6 +77,11 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             runnerSetting.getVmOptons().setText(vmOptions);
         }
 
+        String envOptions = tomcatRunConfiguration.getEnvOptions();
+        if (envOptions != null && !"".equals(envOptions.trim())) {
+            runnerSetting.getEnvOptions().setText(envOptions);
+        }
+
     }
 
     @Override

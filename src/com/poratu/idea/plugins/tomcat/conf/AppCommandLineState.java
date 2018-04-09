@@ -125,6 +125,7 @@ public class AppCommandLineState extends JavaCommandLineState {
 
     private Map<String, String> parseEnvVariables(String variables) {
         Map<String, String> map = new HashMap<>();
+        if (variables == null || variables.trim().equals("")) return map;
         try {
             String[] tokens = variables.split(" ");
             for (String token : tokens) {
