@@ -155,11 +155,15 @@ public class AppCommandLineState extends JavaCommandLineState {
         org.w3c.dom.Document doc = builder.parse(serverXml.toUri().toString());
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
+        XPathExpression exprConnectorShutdown = xpath.compile("/Server[@shutdown='SHUTDOWN']");
         XPathExpression exprConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[@protocol='HTTP/1.1']");
+        XPathExpression exprConnectorAjp = xpath.compile("/Server/Service[@name='Catalina']/Connector[@protocol='AJP/1.3']");
         XPathExpression expr = xpath.compile("/Server/Service[@name='Catalina']/Engine[@name='Catalina']/Host");
         XPathExpression exprContext = xpath.compile
                 ("/Server/Service[@name='Catalina']/Engine[@name='Catalina']/Host/Context");
 
+        Element portShutdown = (Element) exprConnectorShutdown.evaluate(doc, XPathConstants.NODE);
+        Element portEAjp = (Element) exprConnectorAjp.evaluate(doc, XPathConstants.NODE);
         Element portE = (Element) exprConnector.evaluate(doc, XPathConstants.NODE);
         Node hostNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
         NodeList nodeList = (NodeList) exprContext.evaluate(doc, XPathConstants.NODESET);
@@ -170,7 +174,8 @@ public class AppCommandLineState extends JavaCommandLineState {
                 node.getParentNode().removeChild(node);
             }
         }
-
+        portShutdown.setAttribute("port", (Integer.valueOf(port) + 2) + "");
+        portEAjp.setAttribute("port", (Integer.valueOf(port) + 1) + "");
         portE.setAttribute("port", port);
 
 
