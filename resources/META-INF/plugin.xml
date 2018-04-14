@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>com.poratu.idea.plugins.tomcat</id>
   <name>Smart Tomcat</name>
-  <version>1.9</version>
+  <version>2.0</version>
   <vendor email="zengkid@msn.com">zengkid</vendor>
 
   <description><![CDATA[
@@ -15,7 +15,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      1.ignore classpath for provide and test scope.
+      Added environment variable feature (provided by <a href="https://github.com/yl-coder">You Liang</a>
     ]]>
   </change-notes>
 
