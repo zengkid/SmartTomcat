@@ -77,6 +77,11 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             runnerSetting.getVmOptons().setText(vmOptions);
         }
 
+        String envOptions = tomcatRunConfiguration.getEnvOptions();
+        if (envOptions != null && !"".equals(envOptions.trim())) {
+            runnerSetting.getEnvOptions().setText(envOptions);
+        }
+
     }
 
     @Override
@@ -90,6 +95,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         tomcatRunConfiguration.setContextPath(runnerSetting.getContextPathField().getText());
         tomcatRunConfiguration.setPort(runnerSetting.getPortField().getText());
         tomcatRunConfiguration.setVmOptions(runnerSetting.getVmOptons().getText());
+        tomcatRunConfiguration.setEnvOptions(runnerSetting.getEnvOptions().getText());
     }
 
     @NotNull

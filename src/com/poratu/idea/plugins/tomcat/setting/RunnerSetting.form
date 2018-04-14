@@ -10,6 +10,8 @@
     <rowspec value="center:max(d;4px):noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
     <rowspec value="center:max(d;4px):noGrow"/>
+    <rowspec value="top:3dlu:noGrow"/>
+    <rowspec value="center:max(d;4px):noGrow"/>
     <colspec value="fill:135px:noGrow"/>
     <colspec value="left:0px:noGrow"/>
     <colspec value="fill:400px:grow"/>
@@ -121,6 +123,25 @@
         <properties>
           <dialogCaption value="VM options"/>
           <doubleBuffered value="false"/>
+          <text value=""/>
+        </properties>
+      </component>
+      <component id="40838" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties>
+          <text value="Env options"/>
+        </properties>
+      </component>
+      <component id="43f5c" class="com.intellij.ui.RawCommandLineEditor" binding="envOptions">
+        <constraints>
+          <grid row="10" column="2" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties>
+          <dialogCaption value="VM options"/>
           <text value=""/>
         </properties>
       </component>
