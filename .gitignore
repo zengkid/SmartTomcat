@@ -21,3 +21,4 @@ build
 target
 gradle
 bin
+gradle.properties
