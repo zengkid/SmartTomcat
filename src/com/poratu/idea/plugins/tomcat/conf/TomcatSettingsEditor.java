@@ -162,6 +162,8 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         formatter.setMaximum(65535);
         tf.setDefaultFormatter(formatter);
         portField.setFormatterFactory(tf);
+        ajpPort.setFormatterFactory(tf);
+        adminPort.setFormatterFactory(tf);
 
         return runnerSetting.getMainPanel();
     }
