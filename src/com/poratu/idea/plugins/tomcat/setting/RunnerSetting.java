@@ -1,9 +1,14 @@
 package com.poratu.idea.plugins.tomcat.setting;
 
-import com.intellij.execution.ui.CommonJavaParametersPanel;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
+import com.intellij.execution.ui.CommonJavaParametersPanel;
+import javax.swing.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.CollectionComboBoxModel;
@@ -13,13 +18,10 @@ import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jdesktop.swingx.JXButton;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 
 /**
@@ -33,9 +35,13 @@ public class RunnerSetting {
     private TextFieldWithBrowseButton docBaseField;
     private JTextField contextPathField;
     private JFormattedTextField portField;
+
+
     private JXButton configrationButton;
     private RawCommandLineEditor vmOptons;
     private RawCommandLineEditor envOptions;
+    private JFormattedTextField ajpPort;
+    private JFormattedTextField adminPort;
     private Project project;
 
     public RunnerSetting(Project project) {
@@ -62,6 +68,13 @@ public class RunnerSetting {
         return portField;
     }
 
+    public JFormattedTextField getAjpPort() {
+        return ajpPort;
+    }
+
+    public JFormattedTextField getAdminPort() {
+        return adminPort;
+    }
 
     public JXButton getConfigrationButton() {
         return configrationButton;

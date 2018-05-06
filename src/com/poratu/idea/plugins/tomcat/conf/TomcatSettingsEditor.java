@@ -72,6 +72,15 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         if (port != null && !"".equals(port.trim())) {
             runnerSetting.getPortField().setText(port);
         }
+        String ajpPort = tomcatRunConfiguration.getAjpPort();
+        if (ajpPort != null && !"".equals(ajpPort.trim())) {
+            runnerSetting.getAjpPort().setText(ajpPort);
+        }
+        String adminPort = tomcatRunConfiguration.getAdminPort();
+        if (adminPort != null && !"".equals(adminPort.trim())) {
+            runnerSetting.getAdminPort().setText(adminPort);
+        }
+
         String vmOptions = tomcatRunConfiguration.getVmOptions();
         if (vmOptions != null && !"".equals(vmOptions.trim())) {
             runnerSetting.getVmOptons().setText(vmOptions);
@@ -94,6 +103,8 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         tomcatRunConfiguration.setDocBase(runnerSetting.getDocBaseField().getText());
         tomcatRunConfiguration.setContextPath(runnerSetting.getContextPathField().getText());
         tomcatRunConfiguration.setPort(runnerSetting.getPortField().getText());
+        tomcatRunConfiguration.setAjpPort(runnerSetting.getAjpPort().getText());
+        tomcatRunConfiguration.setAdminPort(runnerSetting.getAdminPort().getText());
         tomcatRunConfiguration.setVmOptions(runnerSetting.getVmOptons().getText());
         tomcatRunConfiguration.setEnvOptions(runnerSetting.getEnvOptions().getText());
     }
@@ -106,6 +117,8 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         TextFieldWithBrowseButton docBaseField = runnerSetting.getDocBaseField();
         JTextField contextPathField = runnerSetting.getContextPathField();
         JFormattedTextField portField = runnerSetting.getPortField();
+        JFormattedTextField ajpPort = runnerSetting.getAjpPort();
+        JFormattedTextField adminPort = runnerSetting.getAdminPort();
         JXButton configrationButton = runnerSetting.getConfigrationButton();
         configrationButton.addActionListener(new ActionListener() {
             @Override
@@ -138,6 +151,8 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
 
 
         portField.setValue(8080);
+        ajpPort.setValue(8009);
+        adminPort.setValue(8005);
         DefaultFormatterFactory tf = new DefaultFormatterFactory();
         NumberFormat format = NumberFormat.getInstance();
         format.setGroupingUsed(false);

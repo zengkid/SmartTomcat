@@ -72,6 +72,8 @@ public class AppCommandLineState extends JavaCommandLineState {
             String docBase = configuration.getDocBase();
             String contextPath = configuration.getContextPath();
             String port = configuration.getPort();
+            String ajpPort = configuration.getAjpPort();
+            String adminPort = configuration.getAdminPort();
             String tomcatVersion = configuration.getTomcatInfo().getVersion();
             String vmOptions = configuration.getVmOptions();
             String envOptions = configuration.getEnvOptions();
@@ -108,7 +110,7 @@ public class AppCommandLineState extends JavaCommandLineState {
             javaParams.setWorkingDirectory(workPath.toFile());
 
 
-            updateServerConf(tomcatVersion, module, confPath, contextPath, docBase, port);
+            updateServerConf(tomcatVersion, module, confPath, contextPath, docBase, port, ajpPort, adminPort);
 
 
             javaParams.setPassParentEnvs(false);
@@ -145,7 +147,7 @@ public class AppCommandLineState extends JavaCommandLineState {
         return consoleView;
     }
 
-    private void updateServerConf(String tomcatVersion, Module module, Path confPath, String contextPath, String docBase, String port) throws Exception {
+    private void updateServerConf(String tomcatVersion, Module module, Path confPath, String contextPath, String docBase, String port, String ajpPort, String adminPort) throws Exception {
 
         Path serverXml = confPath.resolve("server.xml");
 
@@ -174,8 +176,8 @@ public class AppCommandLineState extends JavaCommandLineState {
                 node.getParentNode().removeChild(node);
             }
         }
-        portShutdown.setAttribute("port", (Integer.valueOf(port) + 2) + "");
-        portEAjp.setAttribute("port", (Integer.valueOf(port) + 1) + "");
+        portShutdown.setAttribute("port", adminPort);
+        portEAjp.setAttribute("port", ajpPort);
         portE.setAttribute("port", port);
 
 
