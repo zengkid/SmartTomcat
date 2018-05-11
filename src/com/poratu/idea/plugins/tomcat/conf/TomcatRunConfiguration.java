@@ -28,6 +28,8 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
     private String docBase;
     private String contextPath;
     private String port;
+    private String ajpPort;
+    private String adminPort;
     private String vmOptions;
     private String envOptions;
 
@@ -68,6 +70,8 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         this.docBase = JDOMExternalizerUtil.readField(element, "DOC_BASE");
         this.contextPath = JDOMExternalizerUtil.readField(element, "CONTEXT_PATH");
         this.port = JDOMExternalizerUtil.readField(element, "TOMCAT_PORT");
+        this.ajpPort = JDOMExternalizerUtil.readField(element, "AJP_PORT");
+        this.adminPort = JDOMExternalizerUtil.readField(element, "ADMIN_PORT");
         this.vmOptions = JDOMExternalizerUtil.readField(element, "VM_OPTIONS");
         this.envOptions = JDOMExternalizerUtil.readField(element, "ENV_OPTIONS");
     }
@@ -81,6 +85,8 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         JDOMExternalizerUtil.writeField(element, "DOC_BASE", docBase);
         JDOMExternalizerUtil.writeField(element, "CONTEXT_PATH", contextPath);
         JDOMExternalizerUtil.writeField(element, "TOMCAT_PORT", port);
+        JDOMExternalizerUtil.writeField(element, "AJP_PORT", ajpPort);
+        JDOMExternalizerUtil.writeField(element, "ADMIN_PORT", adminPort);
         JDOMExternalizerUtil.writeField(element, "VM_OPTIONS", vmOptions);
         JDOMExternalizerUtil.writeField(element, "ENV_OPTIONS", envOptions);
     }
@@ -107,6 +113,22 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
 
     public void setPort(String port) {
         this.port = port;
+    }
+
+    public String getAjpPort() {
+        return ajpPort;
+    }
+
+    public void setAjpPort(String ajpPort) {
+        this.ajpPort = ajpPort;
+    }
+
+    public String getAdminPort() {
+        return adminPort;
+    }
+
+    public void setAdminPort(String adminPort) {
+        this.adminPort = adminPort;
     }
 
     public TomcatInfo getTomcatInfo() {
