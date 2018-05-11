@@ -72,6 +72,8 @@ public class AppCommandLineState extends JavaCommandLineState {
             String docBase = configuration.getDocBase();
             String contextPath = configuration.getContextPath();
             String port = configuration.getPort();
+            String ajpPort = configuration.getAjpPort();
+            String adminPort = configuration.getAdminPort();
             String tomcatVersion = configuration.getTomcatInfo().getVersion();
             String vmOptions = configuration.getVmOptions();
             String envOptions = configuration.getEnvOptions();
@@ -108,7 +110,7 @@ public class AppCommandLineState extends JavaCommandLineState {
             javaParams.setWorkingDirectory(workPath.toFile());
 
 
-            updateServerConf(tomcatVersion, module, confPath, contextPath, docBase, port);
+            updateServerConf(tomcatVersion, module, confPath, contextPath, docBase, port, ajpPort, adminPort);
 
 
             javaParams.setPassParentEnvs(false);
@@ -145,7 +147,7 @@ public class AppCommandLineState extends JavaCommandLineState {
         return consoleView;
     }
 
-    private void updateServerConf(String tomcatVersion, Module module, Path confPath, String contextPath, String docBase, String port) throws Exception {
+    private void updateServerConf(String tomcatVersion, Module module, Path confPath, String contextPath, String docBase, String port, String ajpPort, String adminPort) throws Exception {
 
         Path serverXml = confPath.resolve("server.xml");
 
@@ -155,11 +157,15 @@ public class AppCommandLineState extends JavaCommandLineState {
         org.w3c.dom.Document doc = builder.parse(serverXml.toUri().toString());
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
+        XPathExpression exprConnectorShutdown = xpath.compile("/Server[@shutdown='SHUTDOWN']");
         XPathExpression exprConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[@protocol='HTTP/1.1']");
+        XPathExpression exprConnectorAjp = xpath.compile("/Server/Service[@name='Catalina']/Connector[@protocol='AJP/1.3']");
         XPathExpression expr = xpath.compile("/Server/Service[@name='Catalina']/Engine[@name='Catalina']/Host");
         XPathExpression exprContext = xpath.compile
                 ("/Server/Service[@name='Catalina']/Engine[@name='Catalina']/Host/Context");
 
+        Element portShutdown = (Element) exprConnectorShutdown.evaluate(doc, XPathConstants.NODE);
+        Element portEAjp = (Element) exprConnectorAjp.evaluate(doc, XPathConstants.NODE);
         Element portE = (Element) exprConnector.evaluate(doc, XPathConstants.NODE);
         Node hostNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
         NodeList nodeList = (NodeList) exprContext.evaluate(doc, XPathConstants.NODESET);
@@ -170,7 +176,8 @@ public class AppCommandLineState extends JavaCommandLineState {
                 node.getParentNode().removeChild(node);
             }
         }
-
+        portShutdown.setAttribute("port", adminPort);
+        portEAjp.setAttribute("port", ajpPort);
         portE.setAttribute("port", port);
 
 
