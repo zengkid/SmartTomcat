@@ -27,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.Map;
 
 /**
  * Author : zengkid
@@ -86,9 +87,14 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             runnerSetting.getVmOptons().setText(vmOptions);
         }
 
-        String envOptions = tomcatRunConfiguration.getEnvOptions();
-        if (envOptions != null && !"".equals(envOptions.trim())) {
-            runnerSetting.getEnvOptions().setText(envOptions);
+        Map<String, String> envOptions = tomcatRunConfiguration.getEnvOptions();
+        if (envOptions != null && !envOptions.isEmpty()) {
+            runnerSetting.getEnvOptions().setEnvs(envOptions);
+        }
+
+        Boolean passParentEnvs = tomcatRunConfiguration.getPassParentEnvironmentVariables();
+        if (passParentEnvs != null) {
+            runnerSetting.getEnvOptions().setPassParentEnvs(passParentEnvs);
         }
 
     }
@@ -106,7 +112,8 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         tomcatRunConfiguration.setAjpPort(runnerSetting.getAjpPort().getText());
         tomcatRunConfiguration.setAdminPort(runnerSetting.getAdminPort().getText());
         tomcatRunConfiguration.setVmOptions(runnerSetting.getVmOptons().getText());
-        tomcatRunConfiguration.setEnvOptions(runnerSetting.getEnvOptions().getText());
+        tomcatRunConfiguration.setEnvOptions(runnerSetting.getEnvOptions().getEnvs());
+        tomcatRunConfiguration.setPassParentEnvironmentVariables(runnerSetting.getEnvOptions().isPassParentEnvs());
     }
 
     @NotNull
