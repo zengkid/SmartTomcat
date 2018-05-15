@@ -76,7 +76,7 @@ public class AppCommandLineState extends JavaCommandLineState {
             String adminPort = configuration.getAdminPort();
             String tomcatVersion = configuration.getTomcatInfo().getVersion();
             String vmOptions = configuration.getVmOptions();
-            String envOptions = configuration.getEnvOptions();
+            Map<String, String> envOptions = configuration.getEnvOptions();
 
             Project project = this.configuration.getProject();
 
@@ -113,9 +113,9 @@ public class AppCommandLineState extends JavaCommandLineState {
             updateServerConf(tomcatVersion, module, confPath, contextPath, docBase, port, ajpPort, adminPort);
 
 
-            javaParams.setPassParentEnvs(false);
+            javaParams.setPassParentEnvs(configuration.getPassParentEnvironmentVariables());
             javaParams.getVMParametersList().addParametersString(vmOptions);
-            javaParams.setEnv(parseEnvVariables(envOptions));
+            javaParams.setEnv(envOptions);
             return javaParams;
 
         } catch (Exception e) {
@@ -123,21 +123,6 @@ public class AppCommandLineState extends JavaCommandLineState {
         }
 
 
-    }
-
-    private Map<String, String> parseEnvVariables(String variables) {
-        Map<String, String> map = new HashMap<>();
-        if (variables == null || variables.trim().equals("")) return map;
-        try {
-            String[] tokens = variables.split(" ");
-            for (String token : tokens) {
-                String[] subTokens = token.trim().split("=");
-                map.put(subTokens[0], subTokens[1]);
-            }
-            return map;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Nullable
