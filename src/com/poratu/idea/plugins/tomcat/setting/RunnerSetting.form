@@ -139,14 +139,14 @@
           <text value="Env options"/>
         </properties>
       </component>
-      <component id="43f5c" class="com.intellij.ui.RawCommandLineEditor" binding="envOptions">
+      <component id="43f5c" class="com.intellij.execution.configuration.EnvironmentVariablesComponent" binding="envOptions">
         <constraints>
           <grid row="14" column="2" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
           <forms/>
         </constraints>
         <properties>
-          <dialogCaption value="VM options"/>
           <text value=""/>
+          <toolTipText value="Warning: Experimental feature, use with extreme caution."/>
         </properties>
       </component>
       <component id="49ebe" class="javax.swing.JLabel">

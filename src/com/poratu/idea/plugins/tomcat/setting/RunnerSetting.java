@@ -1,5 +1,6 @@
 package com.poratu.idea.plugins.tomcat.setting;
 
+import com.intellij.execution.configuration.EnvironmentVariablesComponent;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
@@ -39,7 +40,7 @@ public class RunnerSetting {
 
     private JXButton configrationButton;
     private RawCommandLineEditor vmOptons;
-    private RawCommandLineEditor envOptions;
+    private EnvironmentVariablesComponent envOptions;
     private JFormattedTextField ajpPort;
     private JFormattedTextField adminPort;
     private Project project;
@@ -84,7 +85,7 @@ public class RunnerSetting {
         return vmOptons;
     }
 
-    public RawCommandLineEditor getEnvOptions() {
+    public EnvironmentVariablesComponent getEnvOptions() {
         return envOptions;
     }
 

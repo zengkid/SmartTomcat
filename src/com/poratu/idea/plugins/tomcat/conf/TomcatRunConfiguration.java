@@ -2,6 +2,7 @@ package com.poratu.idea.plugins.tomcat.conf;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
+import com.intellij.execution.configuration.EnvironmentVariablesComponent;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.module.Module;
@@ -17,6 +18,9 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Author : zengkid
  * Date   : 2/16/2017
@@ -31,7 +35,8 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
     private String ajpPort;
     private String adminPort;
     private String vmOptions;
-    private String envOptions;
+    private Map<String, String> envOptions;
+    private Boolean passParentEnvironmentVariables;
 
 
     protected TomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
@@ -73,7 +78,11 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         this.ajpPort = JDOMExternalizerUtil.readField(element, "AJP_PORT");
         this.adminPort = JDOMExternalizerUtil.readField(element, "ADMIN_PORT");
         this.vmOptions = JDOMExternalizerUtil.readField(element, "VM_OPTIONS");
-        this.envOptions = JDOMExternalizerUtil.readField(element, "ENV_OPTIONS");
+        if(envOptions == null) {
+            envOptions = new HashMap<String, String>();
+        }
+        EnvironmentVariablesComponent.readExternal(element, envOptions);
+        this.passParentEnvironmentVariables = Boolean.valueOf(JDOMExternalizerUtil.readField(element, "PASS_PARENT_ENV_OPTIONS"));
     }
 
     @Override
@@ -88,7 +97,13 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         JDOMExternalizerUtil.writeField(element, "AJP_PORT", ajpPort);
         JDOMExternalizerUtil.writeField(element, "ADMIN_PORT", adminPort);
         JDOMExternalizerUtil.writeField(element, "VM_OPTIONS", vmOptions);
-        JDOMExternalizerUtil.writeField(element, "ENV_OPTIONS", envOptions);
+        if(envOptions != null && !envOptions.isEmpty()) {
+            EnvironmentVariablesComponent.writeExternal(element, envOptions);
+        }
+        if(passParentEnvironmentVariables == null) {
+            passParentEnvironmentVariables = Boolean.TRUE;
+        }
+        JDOMExternalizerUtil.writeField(element, "PASS_PARENT_ENV_OPTIONS", "" + passParentEnvironmentVariables);
     }
 
     public String getDocBase() {
@@ -147,10 +162,18 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         this.vmOptions = vmOptions;
     }
 
-    public String getEnvOptions() { return envOptions; }
+    public Map<String, String> getEnvOptions() { return envOptions; }
 
-    public void setEnvOptions(String envOptions) {
+    public void setEnvOptions(Map<String, String> envOptions) {
         this.envOptions = envOptions;
+    }
+
+    public Boolean getPassParentEnvironmentVariables() {
+        return passParentEnvironmentVariables;
+    }
+
+    public void setPassParentEnvironmentVariables(Boolean passParentEnvironmentVariables) {
+        this.passParentEnvironmentVariables = passParentEnvironmentVariables;
     }
 
     @NotNull
