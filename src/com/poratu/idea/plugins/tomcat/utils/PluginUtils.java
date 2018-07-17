@@ -32,7 +32,7 @@ public abstract class PluginUtils {
 
     public static TomcatInfo getTomcatInfo(String javaHome, String tomcatHome) {
 //        java -cp lib/catalina.jar org.apache.catalina.util.ServerInfo
-        String command = javaHome + "/bin/java -cp " + tomcatHome + "/lib/catalina.jar org.apache.catalina.util.ServerInfo";
+        String command = javaHome + "/bin/java -cp \"" + tomcatHome + "\"/lib/catalina.jar org.apache.catalina.util.ServerInfo";
         BufferedReader reader = null;
         final TomcatInfo tomcatInfo = new TomcatInfo();
         tomcatInfo.setPath(tomcatHome);
