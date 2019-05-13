@@ -55,6 +55,7 @@ public abstract class PluginUtils {
             reader.close();
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
 
         } finally {
