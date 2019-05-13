@@ -1,5 +1,6 @@
 package com.poratu.idea.plugins.tomcat.conf;
 
+import com.github.markusbernhardt.proxy.util.Logger;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.JavaCommandLineState;
@@ -38,7 +39,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -70,6 +70,7 @@ public class AppCommandLineState extends JavaCommandLineState {
 
             Path tomcatInstallationPath = Paths.get(configuration.getTomcatInfo().getPath());
             String docBase = configuration.getDocBase();
+            String moduleRoot = configuration.getDocModuleRoot();
             String contextPath = configuration.getContextPath();
             String port = configuration.getPort();
             String ajpPort = configuration.getAjpPort();
@@ -94,11 +95,14 @@ public class AppCommandLineState extends JavaCommandLineState {
             addLibFolder(tomcatInstallationPath, javaParams);
 
 
-            VirtualFile fileByIoFile = LocalFileSystem.getInstance().findFileByIoFile(new File(docBase));
+            VirtualFile fileByIoFile = LocalFileSystem.getInstance().findFileByIoFile(new File(moduleRoot));
             Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, project);
+            if(module == null) {
+                throw new ExecutionException("The Module Root specified is not a module according to Intellij");
+            }
 
             String userHome = System.getProperty("user.home");
-            Path workPath = Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
+            Path workPath = Paths.get(userHome, ".SmartTomcat", project.getName(), module == null ? "" : module.getName());
             Path confPath = workPath.resolve("conf");
             if (!confPath.toFile().exists()) {
                 confPath.toFile().mkdirs();
@@ -119,6 +123,7 @@ public class AppCommandLineState extends JavaCommandLineState {
             return javaParams;
 
         } catch (Exception e) {
+            Logger.log(AppCommandLineState.class, Logger.LogLevel.ERROR, "Error bro", e);
             throw new RuntimeException(e);
         }
 
