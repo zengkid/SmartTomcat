@@ -1,50 +1,29 @@
 plugins {
-    id "org.jetbrains.intellij" version "0.2.13"
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.4.8'
 }
 
-//apply plugin: 'org.jetbrains.intellij'
-apply plugin: 'java'
+version '3.0'
 
-// On travis, we don't want to deploy to Jetbrains that requires credentials
-if (project.file('gradle.properties').exists()) {
-    apply from: "gradle.properties"
-}
-
-intellij {
-    version = '2016.3.4'
-    updateSinceUntilBuild = false
-    pluginName = 'SmartTomcat'
-}
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
 }
 
-sourceSets {
-    //noinspection GroovyAssignabilityCheck
-    main {
-        java.srcDirs = ['src']
-        resources.srcDirs = ['resources']
-    }
-    test {
-        java.srcDirs = ['tests']
-        resources.srcDirs = ['testData']
-    }
-}
-
-task copyResourcesToClasses(type: Copy) {
-    from "${projectDir}/testData"
-    into "${buildDir}/classes/test"
-}
-
-instrumentTestCode.dependsOn copyResourcesToClasses
-
 dependencies {
-    compile fileTree(dir: 'lib', include: ['*.jar'])
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.5'
+intellij {
+    version '2019.1.1'
+    pluginName = 'SmartTomcat'
 }
-
-version '2.6'
+patchPluginXml {
+    changeNotes """
+      Updated the SmartTomcat project to the latest intellij plugin version<br>
+      Updated the structure of the project to match the default when auto-creating a new plugin project<br>
+      Added a Module Root box on the configuration screen<br>
+      <p>Select the directory that is the root directory for the Module you are deploying</p><br>
+      """
+}
