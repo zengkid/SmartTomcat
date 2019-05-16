@@ -65,6 +65,11 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             runnerSetting.getDocBaseField().setText(docBase);
             runnerSetting.getDocBaseField().getTextField().setText(docBase);
         }
+        String docModuleRoot = tomcatRunConfiguration.getDocModuleRoot();
+        if (docModuleRoot != null && !"".equals(docModuleRoot.trim())) {
+            runnerSetting.getDocModuleRoot().setText(docModuleRoot);
+            runnerSetting.getDocModuleRoot().getTextField().setText(docModuleRoot);
+        }
         String contextPath = tomcatRunConfiguration.getContextPath();
         if (contextPath != null && !"".equals(contextPath.trim())) {
             runnerSetting.getContextPathField().setText(contextPath);
@@ -107,6 +112,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             tomcatRunConfiguration.setTomcatInfo(selectedItem);
         }
         tomcatRunConfiguration.setDocBase(runnerSetting.getDocBaseField().getText());
+        tomcatRunConfiguration.setDocModuleRoot(runnerSetting.getDocModuleRoot().getText());
         tomcatRunConfiguration.setContextPath(runnerSetting.getContextPathField().getText());
         tomcatRunConfiguration.setPort(runnerSetting.getPortField().getText());
         tomcatRunConfiguration.setAjpPort(runnerSetting.getAjpPort().getText());
@@ -122,6 +128,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
 
         ComboboxWithBrowseButton tomcatField = runnerSetting.getTomcatField();
         TextFieldWithBrowseButton docBaseField = runnerSetting.getDocBaseField();
+        TextFieldWithBrowseButton docModuleRoot = runnerSetting.getDocModuleRoot();
         JTextField contextPathField = runnerSetting.getContextPathField();
         JFormattedTextField portField = runnerSetting.getPortField();
         JFormattedTextField ajpPort = runnerSetting.getAjpPort();
@@ -155,6 +162,25 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
 
             }
         });
+
+        docModuleRoot.addBrowseFolderListener("Module Root", "Choose Module Root Folder", project, FileChooserDescriptorFactory.createSingleFolderDescriptor().withRoots(project.getBaseDir()));
+//        docModuleRoot.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+//            @Override
+//            protected void textChanged(DocumentEvent documentEvent) {
+//
+//                if (!documentEvent.getType().equals(DocumentEvent.EventType.REMOVE)) {
+//                    String text = docBaseField.getText();
+//                    if (text != null && !text.trim().equals("")) {
+//                        VirtualFile fileByIoFile = LocalFileSystem.getInstance().findFileByIoFile(new File(text));
+//                        Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, project);
+//                        if(module == null) {
+//                            throw new RuntimeException("The Module Root specified is not a module according to Intellij");
+//                        }
+//                    }
+//                }
+//
+//            }
+//        });
 
 
         portField.setValue(8080);

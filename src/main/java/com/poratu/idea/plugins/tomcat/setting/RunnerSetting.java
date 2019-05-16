@@ -4,10 +4,7 @@ import com.intellij.execution.configuration.EnvironmentVariablesComponent;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
-import com.intellij.execution.ui.CommonJavaParametersPanel;
 import javax.swing.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 
 import com.intellij.openapi.ui.TextComponentAccessor;
@@ -19,10 +16,6 @@ import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jdesktop.swingx.JXButton;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 /**
@@ -34,6 +27,7 @@ public class RunnerSetting {
     private JPanel mainPanel;
     private ComboboxWithBrowseButton tomcatField;
     private TextFieldWithBrowseButton docBaseField;
+    private TextFieldWithBrowseButton docModuleRoot;
     private JTextField contextPathField;
     private JFormattedTextField portField;
 
@@ -59,6 +53,10 @@ public class RunnerSetting {
 
     public TextFieldWithBrowseButton getDocBaseField() {
         return docBaseField;
+    }
+
+    public TextFieldWithBrowseButton getDocModuleRoot() {
+        return docModuleRoot;
     }
 
     public JTextField getContextPathField() {

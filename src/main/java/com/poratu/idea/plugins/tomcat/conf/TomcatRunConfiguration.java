@@ -30,6 +30,7 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
     private TomcatInfo tomcatInfo;
     //    private String tomcatInstallation;
     private String docBase;
+    private String docModuleRoot;
     private String contextPath;
     private String port;
     private String ajpPort;
@@ -73,6 +74,7 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
 //        this.tomcatInstallation = PropertiesComponent.getInstance().getValue("TOMCAT_INSTALLATION");
 //        this.tomcatInstallation = JDOMExternalizerUtil.readField(element, "TOMCAT_INSTALLATION");
         this.docBase = JDOMExternalizerUtil.readField(element, "DOC_BASE");
+        this.docModuleRoot = JDOMExternalizerUtil.readField(element, "DOC_MODULE_ROOT");
         this.contextPath = JDOMExternalizerUtil.readField(element, "CONTEXT_PATH");
         this.port = JDOMExternalizerUtil.readField(element, "TOMCAT_PORT");
         this.ajpPort = JDOMExternalizerUtil.readField(element, "AJP_PORT");
@@ -92,6 +94,7 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         TomcatInfoConfigs.getInstance(getProject()).setCurrent(tomcatInfo);
 //        JDOMExternalizerUtil.writeField(element, "TOMCAT_INSTALLATION", tomcatInstallation);
         JDOMExternalizerUtil.writeField(element, "DOC_BASE", docBase);
+        JDOMExternalizerUtil.writeField(element, "DOC_MODULE_ROOT", docModuleRoot);
         JDOMExternalizerUtil.writeField(element, "CONTEXT_PATH", contextPath);
         JDOMExternalizerUtil.writeField(element, "TOMCAT_PORT", port);
         JDOMExternalizerUtil.writeField(element, "AJP_PORT", ajpPort);
@@ -112,6 +115,14 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
 
     public void setDocBase(String docBase) {
         this.docBase = docBase;
+    }
+
+    public String getDocModuleRoot() {
+        return docModuleRoot;
+    }
+
+    public void setDocModuleRoot(String docModuleRoot) {
+        this.docModuleRoot = docModuleRoot;
     }
 
     public String getContextPath() {
