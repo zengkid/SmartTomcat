@@ -1,0 +1,10 @@
+Config Example
+
+Deployment Directory:  project_name/web-module/src/main/webapp
+Modules Root: project_name/web-module
+Context Path: /web-dir    
+Server Port:8080
+Ajp port:8009
+Tomcat Port:8005
+Vm options:-Dspring.profiles.active=dev -Xmx2048m -Xms768m
+Evn options:
