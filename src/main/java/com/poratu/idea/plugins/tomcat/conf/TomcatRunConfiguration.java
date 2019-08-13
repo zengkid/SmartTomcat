@@ -38,6 +38,18 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
     private String vmOptions;
     private Map<String, String> envOptions;
     private Boolean passParentEnvironmentVariables;
+    private String className;
+    private String debug;
+    private String digest;
+    private String roleNameCol;
+    private String userCredCol;
+    private String userNameCol;
+    private String userRoleTable;
+    private String userTable;
+    private String jndiGlobal;
+    private String jndiName;
+    private String jndiType;
+    private String dataSourceName;
 
 
     protected TomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
@@ -85,6 +97,18 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         }
         EnvironmentVariablesComponent.readExternal(element, envOptions);
         this.passParentEnvironmentVariables = Boolean.valueOf(JDOMExternalizerUtil.readField(element, "PASS_PARENT_ENV_OPTIONS"));
+        this.className = JDOMExternalizerUtil.readField(element, "CLASS_NAME");
+        this.debug = JDOMExternalizerUtil.readField(element, "DEBUG");
+        this.digest = JDOMExternalizerUtil.readField(element, "DIGEST");
+        this.roleNameCol = JDOMExternalizerUtil.readField(element, "ROLE_NAME_COL");
+        this.userCredCol = JDOMExternalizerUtil.readField(element, "USER_CRED_COL");
+        this.userNameCol = JDOMExternalizerUtil.readField(element, "USER_NAME_COL");
+        this.userRoleTable = JDOMExternalizerUtil.readField(element, "USER_ROLE_TABLE");
+        this.userTable = JDOMExternalizerUtil.readField(element, "USER_TABLE");
+        this.jndiGlobal = JDOMExternalizerUtil.readField(element, "JNDI_GLOBAL");
+        this.jndiName = JDOMExternalizerUtil.readField(element, "JNDI_NAME");
+        this.jndiType = JDOMExternalizerUtil.readField(element, "JNDI_TYPE");
+        this.dataSourceName = JDOMExternalizerUtil.readField(element, "DATA_SOURCE_NAME");
     }
 
     @Override
@@ -107,6 +131,18 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
             passParentEnvironmentVariables = Boolean.TRUE;
         }
         JDOMExternalizerUtil.writeField(element, "PASS_PARENT_ENV_OPTIONS", "" + passParentEnvironmentVariables);
+        JDOMExternalizerUtil.writeField(element, "CLASS_NAME", className);
+        JDOMExternalizerUtil.writeField(element, "DEBUG", debug);
+        JDOMExternalizerUtil.writeField(element, "DIGEST", digest);
+        JDOMExternalizerUtil.writeField(element, "ROLE_NAME_COL", roleNameCol);
+        JDOMExternalizerUtil.writeField(element, "USER_CRED_COL", userCredCol);
+        JDOMExternalizerUtil.writeField(element, "USER_NAME_COL", userNameCol);
+        JDOMExternalizerUtil.writeField(element, "USER_ROLE_TABLE", userRoleTable);
+        JDOMExternalizerUtil.writeField(element, "USER_TABLE", userTable);
+        JDOMExternalizerUtil.writeField(element, "JNDI_GLOBAL", jndiGlobal);
+        JDOMExternalizerUtil.writeField(element, "JNDI_NAME", jndiName);
+        JDOMExternalizerUtil.writeField(element, "JNDI_TYPE", jndiType);
+        JDOMExternalizerUtil.writeField(element, "DATA_SOURCE_NAME", dataSourceName);
     }
 
     public String getDocBase() {
@@ -185,6 +221,102 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
 
     public void setPassParentEnvironmentVariables(Boolean passParentEnvironmentVariables) {
         this.passParentEnvironmentVariables = passParentEnvironmentVariables;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public String getDebug() {
+        return debug;
+    }
+
+    public void setDebug(String debug) {
+        this.debug = debug;
+    }
+
+    public String getDigest() {
+        return digest;
+    }
+
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
+
+    public String getRoleNameCol() {
+        return roleNameCol;
+    }
+
+    public void setRoleNameCol(String roleNameCol) {
+        this.roleNameCol = roleNameCol;
+    }
+
+    public String getUserCredCol() {
+        return userCredCol;
+    }
+
+    public void setUserCredCol(String userCredCol) {
+        this.userCredCol = userCredCol;
+    }
+
+    public String getUserNameCol() {
+        return userNameCol;
+    }
+
+    public void setUserNameCol(String userNameCol) {
+        this.userNameCol = userNameCol;
+    }
+
+    public String getUserRoleTable() {
+        return userRoleTable;
+    }
+
+    public void setUserRoleTable(String userRoleTable) {
+        this.userRoleTable = userRoleTable;
+    }
+
+    public String getUserTable() {
+        return userTable;
+    }
+
+    public void setUserTable(String userTable) {
+        this.userTable = userTable;
+    }
+
+    public String getJndiGlobal() {
+        return jndiGlobal;
+    }
+
+    public void setJndiGlobal(String jndiGlobal) {
+        this.jndiGlobal = jndiGlobal;
+    }
+
+    public String getJndiName() {
+        return jndiName;
+    }
+
+    public void setJndiName(String jndiName) {
+        this.jndiName = jndiName;
+    }
+
+    public String getJndiType() {
+        return jndiType;
+    }
+
+    public void setJndiType(String jndiType) {
+        this.jndiType = jndiType;
+    }
+
+    public String getDataSourceName() {
+        return dataSourceName;
+    }
+
+    public void setDataSourceName(String dataSourceName) {
+        this.dataSourceName = dataSourceName;
     }
 
     @NotNull
