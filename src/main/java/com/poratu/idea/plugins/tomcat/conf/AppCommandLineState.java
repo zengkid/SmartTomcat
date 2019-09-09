@@ -69,12 +69,8 @@ public class AppCommandLineState extends JavaCommandLineState {
         try {
 
             Path tomcatInstallationPath = Paths.get(configuration.getTomcatInfo().getPath());
-            String docBase = configuration.getDocBase();
             String moduleRoot = configuration.getDocModuleRoot();
             String contextPath = configuration.getContextPath();
-            String port = configuration.getPort();
-            String ajpPort = configuration.getAjpPort();
-            String adminPort = configuration.getAdminPort();
             String tomcatVersion = configuration.getTomcatInfo().getVersion();
             String vmOptions = configuration.getVmOptions();
             Map<String, String> envOptions = configuration.getEnvOptions();
@@ -114,7 +110,7 @@ public class AppCommandLineState extends JavaCommandLineState {
             javaParams.setWorkingDirectory(workPath.toFile());
 
 
-            updateServerConf(tomcatVersion, module, confPath, contextPath, docBase, port, ajpPort, adminPort);
+            updateServerConf(tomcatVersion, module, confPath, contextPath, configuration);
 
 
             javaParams.setPassParentEnvs(configuration.getPassParentEnvironmentVariables());
@@ -137,7 +133,7 @@ public class AppCommandLineState extends JavaCommandLineState {
         return consoleView;
     }
 
-    private void updateServerConf(String tomcatVersion, Module module, Path confPath, String contextPath, String docBase, String port, String ajpPort, String adminPort) throws Exception {
+    private void updateServerConf(String tomcatVersion, Module module, Path confPath, String contextPath, TomcatRunConfiguration cfg) throws Exception {
 
         Path serverXml = confPath.resolve("server.xml");
 
@@ -166,16 +162,37 @@ public class AppCommandLineState extends JavaCommandLineState {
                 node.getParentNode().removeChild(node);
             }
         }
-        portShutdown.setAttribute("port", adminPort);
-        portEAjp.setAttribute("port", ajpPort);
-        portE.setAttribute("port", port);
+        portShutdown.setAttribute("port", cfg.getAdminPort());
+        portEAjp.setAttribute("port", cfg.getAjpPort());
+        portE.setAttribute("port", cfg.getPort());
 
 
         Element contextE = doc.createElement("Context");
-        contextE.setAttribute("docBase", docBase);
+        contextE.setAttribute("docBase", cfg.getDocBase());
         contextE.setAttribute("path", (contextPath.startsWith("/") ? "" : "/") + contextPath);
         hostNode.appendChild(contextE);
 
+        if (!cfg.getClassName().isEmpty()) {
+            Element realmE = doc.createElement("Realm");
+            realmE.setAttribute("className", cfg.getClassName());
+            realmE.setAttribute("dataSourceName", cfg.getDataSourceName());
+            realmE.setAttribute("debug", cfg.getDebug());
+            realmE.setAttribute("digest", cfg.getDigest());
+            realmE.setAttribute("roleNameCol", cfg.getRoleNameCol());
+            realmE.setAttribute("userCredCol", cfg.getUserCredCol());
+            realmE.setAttribute("userNameCol", cfg.getUserNameCol());
+            realmE.setAttribute("userRoleTable", cfg.getUserRoleTable());
+            realmE.setAttribute("userTable", cfg.getUserTable());
+            contextE.appendChild(realmE);
+        }
+
+        if (!cfg.getJndiGlobal().isEmpty()) {
+            Element resourceLinkE = doc.createElement("ResourceLink");
+            resourceLinkE.setAttribute("global", cfg.getJndiGlobal());
+            resourceLinkE.setAttribute("name", cfg.getJndiName());
+            resourceLinkE.setAttribute("type", cfg.getJndiType());
+            contextE.appendChild(resourceLinkE);
+        }
 
         List<String> paths = new ArrayList<>();
         VirtualFile[] classPaths = ModuleRootManager.getInstance(module).orderEntries().withoutSdk().runtimeOnly().productionOnly().getClassesRoots();

@@ -102,6 +102,66 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             runnerSetting.getEnvOptions().setPassParentEnvs(passParentEnvs);
         }
 
+        String className = tomcatRunConfiguration.getClassName();
+        if (className != null && !"".equals(className.trim())) {
+            runnerSetting.getClassName().setText(className);
+        }
+
+        String debug = tomcatRunConfiguration.getDebug();
+        if (debug != null && !"".equals(debug.trim())) {
+            runnerSetting.getDebug().setText(debug);
+        }
+
+        String digest = tomcatRunConfiguration.getDigest();
+        if (digest != null && !"".equals(digest.trim())) {
+            runnerSetting.getDigest().setText(digest);
+        }
+
+        String roleNameCol = tomcatRunConfiguration.getRoleNameCol();
+        if (roleNameCol != null && !"".equals(roleNameCol.trim())) {
+            runnerSetting.getRoleNameCol().setText(roleNameCol);
+        }
+
+        String userCredCol = tomcatRunConfiguration.getUserCredCol();
+        if (userCredCol != null && !"".equals(userCredCol.trim())) {
+            runnerSetting.getUserCredCol().setText(userCredCol);
+        }
+
+        String userNameCol = tomcatRunConfiguration.getUserNameCol();
+        if (userNameCol != null && !"".equals(userNameCol.trim())) {
+            runnerSetting.getUserNameCol().setText(userNameCol);
+        }
+
+        String userRoleTable = tomcatRunConfiguration.getUserRoleTable();
+        if (userRoleTable != null && !"".equals(userRoleTable.trim())) {
+            runnerSetting.getUserRoleTable().setText(userRoleTable);
+        }
+
+        String userTable = tomcatRunConfiguration.getUserTable();
+        if (userTable != null && !"".equals(userTable.trim())) {
+            runnerSetting.getUserTable().setText(userTable);
+        }
+
+        String jndiGlobal = tomcatRunConfiguration.getJndiGlobal();
+        if (jndiGlobal != null && !"".equals(jndiGlobal.trim())) {
+            runnerSetting.getJndiGlobal().setText(jndiGlobal);
+        }
+
+        String jndiName = tomcatRunConfiguration.getJndiName();
+        if (jndiName != null && !"".equals(jndiName.trim())) {
+            runnerSetting.getJndiName().setText(jndiName);
+        }
+
+        String jndiType = tomcatRunConfiguration.getJndiType();
+        if (jndiType != null && !"".equals(jndiType.trim())) {
+            runnerSetting.getJndiType().setText(jndiType);
+        }
+
+        String dataSourceName = tomcatRunConfiguration.getDataSourceName();
+        if (dataSourceName != null && !"".equals(dataSourceName.trim())) {
+            runnerSetting.getDataSourceName().setText(dataSourceName);
+        }
+
     }
 
     @Override
@@ -120,6 +180,19 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         tomcatRunConfiguration.setVmOptions(runnerSetting.getVmOptons().getText());
         tomcatRunConfiguration.setEnvOptions(runnerSetting.getEnvOptions().getEnvs());
         tomcatRunConfiguration.setPassParentEnvironmentVariables(runnerSetting.getEnvOptions().isPassParentEnvs());
+        tomcatRunConfiguration.setClassName(runnerSetting.getClassName().getText());
+        tomcatRunConfiguration.setDebug(runnerSetting.getDebug().getText());
+        tomcatRunConfiguration.setDigest(runnerSetting.getDigest().getText());
+        tomcatRunConfiguration.setRoleNameCol(runnerSetting.getRoleNameCol().getText());
+        tomcatRunConfiguration.setUserCredCol(runnerSetting.getUserCredCol().getText());
+        tomcatRunConfiguration.setUserNameCol(runnerSetting.getUserNameCol().getText());
+        tomcatRunConfiguration.setUserRoleTable(runnerSetting.getUserRoleTable().getText());
+        tomcatRunConfiguration.setUserTable(runnerSetting.getUserTable().getText());
+        tomcatRunConfiguration.setJndiGlobal(runnerSetting.getJndiGlobal().getText());
+        tomcatRunConfiguration.setJndiName(runnerSetting.getJndiName().getText());
+        tomcatRunConfiguration.setJndiType(runnerSetting.getJndiType().getText());
+        tomcatRunConfiguration.setDataSourceName(runnerSetting.getDataSourceName().getText());
+
     }
 
     @NotNull
@@ -133,6 +206,18 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         JFormattedTextField portField = runnerSetting.getPortField();
         JFormattedTextField ajpPort = runnerSetting.getAjpPort();
         JFormattedTextField adminPort = runnerSetting.getAdminPort();
+        JTextField className = runnerSetting.getClassName();
+        JTextField debug = runnerSetting.getDebug();
+        JTextField digest = runnerSetting.getDigest();
+        JTextField roleNameCol = runnerSetting.getRoleNameCol();
+        JTextField userCredCol = runnerSetting.getUserCredCol();
+        JTextField userNameCol = runnerSetting.getUserNameCol();
+        JTextField userRoleTable = runnerSetting.getUserRoleTable();
+        JTextField userTable = runnerSetting.getUserTable();
+        JTextField jndiGlobal = runnerSetting.getJndiGlobal();
+        JTextField jndiName = runnerSetting.getJndiName();
+        JTextField jndiType = runnerSetting.getJndiType();
+        JTextField dataSourceName = runnerSetting.getDataSourceName();
         JXButton configrationButton = runnerSetting.getConfigrationButton();
         configrationButton.addActionListener(new ActionListener() {
             @Override
