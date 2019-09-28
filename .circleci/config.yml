@@ -34,7 +34,7 @@ jobs:
       - store_artifacts:
           path: build/test-results/test
 
-      - run: ./gradlew assemble
+      - run: ./gradlew buildPlugin
          
 
       - store_artifacts:
