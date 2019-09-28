@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.ui.ComboboxWithBrowseButton;
 import com.intellij.ui.DocumentAdapter;
 import com.poratu.idea.plugins.tomcat.setting.RunnerSetting;
@@ -65,11 +66,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             runnerSetting.getDocBaseField().setText(docBase);
             runnerSetting.getDocBaseField().getTextField().setText(docBase);
         }
-        String docModuleRoot = tomcatRunConfiguration.getDocModuleRoot();
-        if (docModuleRoot != null && !"".equals(docModuleRoot.trim())) {
-            runnerSetting.getDocModuleRoot().setText(docModuleRoot);
-            runnerSetting.getDocModuleRoot().getTextField().setText(docModuleRoot);
-        }
+
         String contextPath = tomcatRunConfiguration.getContextPath();
         if (contextPath != null && !"".equals(contextPath.trim())) {
             runnerSetting.getContextPathField().setText(contextPath);
@@ -172,7 +169,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             tomcatRunConfiguration.setTomcatInfo(selectedItem);
         }
         tomcatRunConfiguration.setDocBase(runnerSetting.getDocBaseField().getText());
-        tomcatRunConfiguration.setDocModuleRoot(runnerSetting.getDocModuleRoot().getText());
         tomcatRunConfiguration.setContextPath(runnerSetting.getContextPathField().getText());
         tomcatRunConfiguration.setPort(runnerSetting.getPortField().getText());
         tomcatRunConfiguration.setAjpPort(runnerSetting.getAjpPort().getText());
@@ -201,7 +197,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
 
         ComboboxWithBrowseButton tomcatField = runnerSetting.getTomcatField();
         TextFieldWithBrowseButton docBaseField = runnerSetting.getDocBaseField();
-        TextFieldWithBrowseButton docModuleRoot = runnerSetting.getDocModuleRoot();
+//        TextFieldWithBrowseButton docModuleRoot = runnerSetting.getModuleName();
         JTextField contextPathField = runnerSetting.getContextPathField();
         JFormattedTextField portField = runnerSetting.getPortField();
         JFormattedTextField ajpPort = runnerSetting.getAjpPort();
@@ -230,7 +226,8 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         });
 
 
-        docBaseField.addBrowseFolderListener("webapp", "Choose Web Folder", project, FileChooserDescriptorFactory.createSingleFolderDescriptor().withRoots(project.getBaseDir()));
+        VirtualFile baseDir = VirtualFileManager.getInstance().getFileSystem("file").findFileByPath(project.getBasePath());
+        docBaseField.addBrowseFolderListener("webapp", "Choose Web Folder", project, FileChooserDescriptorFactory.createSingleFolderDescriptor().withRoots(baseDir));
         docBaseField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(DocumentEvent documentEvent) {
@@ -242,13 +239,14 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
                         Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, project);
                         String contextPath = module == null ? "/" : "/" + module.getName();
                         contextPathField.setText(contextPath);
+
                     }
                 }
 
             }
         });
 
-        docModuleRoot.addBrowseFolderListener("Module Root", "Choose Module Root Folder", project, FileChooserDescriptorFactory.createSingleFolderDescriptor().withRoots(project.getBaseDir()));
+//        docModuleRoot.addBrowseFolderListener("Module Root", "Choose Module Root Folder", project, FileChooserDescriptorFactory.createSingleFolderDescriptor().withRoots(baseDir));
 //        docModuleRoot.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
 //            @Override
 //            protected void textChanged(DocumentEvent documentEvent) {
@@ -267,7 +265,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
 //            }
 //        });
 
-
+//        docModuleRoot.setText(baseDir.getName());
         portField.setValue(8080);
         ajpPort.setValue(8009);
         adminPort.setValue(8005);

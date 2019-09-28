@@ -4,9 +4,6 @@ import com.intellij.execution.configuration.EnvironmentVariablesComponent;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
-import javax.swing.*;
-
-
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.CollectionComboBoxModel;
@@ -16,6 +13,7 @@ import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jdesktop.swingx.JXButton;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.List;
 
 /**
@@ -27,7 +25,6 @@ public class RunnerSetting {
     private JPanel mainPanel;
     private ComboboxWithBrowseButton tomcatField;
     private TextFieldWithBrowseButton docBaseField;
-    private TextFieldWithBrowseButton docModuleRoot;
     private JTextField contextPathField;
     private JFormattedTextField portField;
 
@@ -67,10 +64,6 @@ public class RunnerSetting {
         return docBaseField;
     }
 
-    public TextFieldWithBrowseButton getDocModuleRoot() {
-        return docModuleRoot;
-    }
-
     public JTextField getContextPathField() {
         return contextPathField;
     }
@@ -99,18 +92,53 @@ public class RunnerSetting {
         return envOptions;
     }
 
-    public JFormattedTextField getClassName() {return className; }
-    public JFormattedTextField getDebug() {return  debug; }
-    public JFormattedTextField getDigest() { return digest; }
-    public JFormattedTextField getRoleNameCol() { return roleNameCol; }
-    public JFormattedTextField getUserCredCol() {return  userCredCol; }
-    public JFormattedTextField getUserNameCol() {return  userNameCol; }
-    public JFormattedTextField getUserRoleTable() {return  userRoleTable; }
-    public JFormattedTextField getUserTable() {return  userTable; }
-    public JFormattedTextField getJndiGlobal() {return  jndiGlobal; }
-    public JFormattedTextField getJndiName() {return  jndiName; }
-    public JFormattedTextField getJndiType() {return  jndiType; }
-    public JFormattedTextField getDataSourceName() {return  dataSourceName; }
+    public JFormattedTextField getClassName() {
+        return className;
+    }
+
+    public JFormattedTextField getDebug() {
+        return debug;
+    }
+
+    public JFormattedTextField getDigest() {
+        return digest;
+    }
+
+    public JFormattedTextField getRoleNameCol() {
+        return roleNameCol;
+    }
+
+    public JFormattedTextField getUserCredCol() {
+        return userCredCol;
+    }
+
+    public JFormattedTextField getUserNameCol() {
+        return userNameCol;
+    }
+
+    public JFormattedTextField getUserRoleTable() {
+        return userRoleTable;
+    }
+
+    public JFormattedTextField getUserTable() {
+        return userTable;
+    }
+
+    public JFormattedTextField getJndiGlobal() {
+        return jndiGlobal;
+    }
+
+    public JFormattedTextField getJndiName() {
+        return jndiName;
+    }
+
+    public JFormattedTextField getJndiType() {
+        return jndiType;
+    }
+
+    public JFormattedTextField getDataSourceName() {
+        return dataSourceName;
+    }
 
     private void createUIComponents() {
         FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
