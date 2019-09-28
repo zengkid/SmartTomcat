@@ -27,6 +27,6 @@ patchPluginXml {
       <a href="https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/">extracted Java functionality into a separate plugin</a>
       """
 }
-publishPlugin {
-    token intellijPublishToken
-}
+//publishPlugin {
+//    token intellijPublishToken
+//}
