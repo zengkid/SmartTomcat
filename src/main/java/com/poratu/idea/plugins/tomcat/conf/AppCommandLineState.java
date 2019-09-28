@@ -1,6 +1,5 @@
 package com.poratu.idea.plugins.tomcat.conf;
 
-import com.github.markusbernhardt.proxy.util.Logger;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.JavaCommandLineState;
@@ -121,7 +120,6 @@ public class AppCommandLineState extends JavaCommandLineState {
             return javaParams;
 
         } catch (Exception e) {
-            Logger.log(AppCommandLineState.class, Logger.LogLevel.ERROR, "Error bro", e);
             throw new RuntimeException(e);
         }
 

@@ -16,7 +16,7 @@ dependencies {
 }
 
 intellij {
-    version '2019.2'
+    version '2019.2.2'
     pluginName = 'SmartTomcat'
     plugins 'java'
     updateSinceUntilBuild false
@@ -29,4 +29,4 @@ patchPluginXml {
 }
 //publishPlugin {
 //    token intellijPublishToken
-//}
+//}gr
