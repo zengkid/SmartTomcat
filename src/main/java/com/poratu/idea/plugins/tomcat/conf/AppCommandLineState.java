@@ -69,7 +69,7 @@ public class AppCommandLineState extends JavaCommandLineState {
         try {
 
             Path tomcatInstallationPath = Paths.get(configuration.getTomcatInfo().getPath());
-            String moduleRoot = configuration.getDocModuleRoot();
+            String moduleRoot = configuration.getModuleName();
             String contextPath = configuration.getContextPath();
             String tomcatVersion = configuration.getTomcatInfo().getVersion();
             String vmOptions = configuration.getVmOptions();
@@ -90,15 +90,17 @@ public class AppCommandLineState extends JavaCommandLineState {
             addBinFolder(tomcatInstallationPath, javaParams);
             addLibFolder(tomcatInstallationPath, javaParams);
 
+            File file = new File(configuration.getDocBase());
+            VirtualFile fileByIoFile = LocalFileSystem.getInstance().findFileByIoFile(file);
+            Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, configuration.getProject());
 
-            VirtualFile fileByIoFile = LocalFileSystem.getInstance().findFileByIoFile(new File(moduleRoot));
-            Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, project);
+
             if(module == null) {
                 throw new ExecutionException("The Module Root specified is not a module according to Intellij");
             }
 
             String userHome = System.getProperty("user.home");
-            Path workPath = Paths.get(userHome, ".SmartTomcat", project.getName(), module == null ? "" : module.getName());
+            Path workPath = Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
             Path confPath = workPath.resolve("conf");
             if (!confPath.toFile().exists()) {
                 confPath.toFile().mkdirs();
