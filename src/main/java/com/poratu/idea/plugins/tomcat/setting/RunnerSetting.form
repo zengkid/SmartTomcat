@@ -153,9 +153,7 @@
           <forms/>
         </constraints>
         <properties>
-          <dialogCaption value="VM options"/>
           <doubleBuffered value="false"/>
-          <text value=""/>
         </properties>
       </component>
       <component id="40838" class="javax.swing.JLabel">
