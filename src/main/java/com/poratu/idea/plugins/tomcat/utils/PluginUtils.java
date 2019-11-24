@@ -17,6 +17,9 @@ import java.util.stream.Stream;
  */
 public abstract class PluginUtils {
 
+    private static final String GET_SERVER_INFO_COMMAND_TEMPLATE =
+            "%s/bin/java -cp \"%s/lib/catalina.jar\" org.apache.catalina.util.ServerInfo";
+
     public static Sdk getDefaultJDK(){
         Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
         if (allJdks == null || allJdks.length == 0) {
@@ -32,7 +35,9 @@ public abstract class PluginUtils {
 
     public static TomcatInfo getTomcatInfo(String javaHome, String tomcatHome) {
 //        java -cp lib/catalina.jar org.apache.catalina.util.ServerInfo
-        String command = javaHome + "/bin/java -cp " + tomcatHome + "/lib/catalina.jar org.apache.catalina.util.ServerInfo";
+        final String command =
+                String.format(GET_SERVER_INFO_COMMAND_TEMPLATE, javaHome, tomcatHome);
+
         BufferedReader reader = null;
         final TomcatInfo tomcatInfo = new TomcatInfo();
         tomcatInfo.setPath(tomcatHome);
