@@ -26,7 +26,6 @@ patchPluginXml {
       fixed: unable to add tomcat server when the tomcat home contains space chars. 
    """
 }
-/*
 publishPlugin {
     token intellijPublishToken
-}*/
+}
