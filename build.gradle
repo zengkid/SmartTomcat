@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.intellij' version '0.4.10'
 }
 
-version '3.0.1'
+version '3.0.2'
 
 sourceCompatibility = 1.8
 
@@ -23,10 +23,9 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
-      a quick fixed for supporting 2019.2+ version.
-      <a href="https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/">extracted Java functionality into a separate plugin</a>
-      """
+      fixed: unable to add tomcat server when the tomcat home contains space chars. 
+   """
 }
-//publishPlugin {
-//    token intellijPublishToken
-//}gr
+publishPlugin {
+    token intellijPublishToken
+}
