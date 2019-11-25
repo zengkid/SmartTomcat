@@ -19,7 +19,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
       - name: Upload to release
-        uses: zengkid/upload-to-release@master
+        uses: zengkid/SmartTomcat@master
         with:
           args: build/libs/SmartTomcat-*.jar
         env:
