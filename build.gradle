@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.intellij' version '0.4.10'
 }
 
-version '3.0.2'
+version '3.1.0'
 
 sourceCompatibility = 1.8
 
@@ -16,14 +16,14 @@ dependencies {
 }
 
 intellij {
-    version '2019.2.2'
+    version '2019.3'
     pluginName = 'SmartTomcat'
     plugins 'java'
     updateSinceUntilBuild false
 }
 patchPluginXml {
     changeNotes """
-      fixed: unable to add tomcat server when the tomcat home contains space chars. 
+      fixed 2019.3 version issue: registered as application service, but requested as project one. 
    """
 }
 /*

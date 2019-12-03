@@ -165,7 +165,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
     protected void applyEditorTo(TomcatRunConfiguration tomcatRunConfiguration) throws ConfigurationException {
         TomcatInfo selectedItem = (TomcatInfo) runnerSetting.getTomcatField().getComboBox().getSelectedItem();
         if (selectedItem != null) {
-            TomcatInfoConfigs.getInstance(project).setCurrent(selectedItem);
+            TomcatInfoConfigs.getInstance().setCurrent(selectedItem);
             tomcatRunConfiguration.setTomcatInfo(selectedItem);
         }
         tomcatRunConfiguration.setDocBase(runnerSetting.getDocBaseField().getText());
