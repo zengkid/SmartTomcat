@@ -82,7 +82,7 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
     @Override
     public void readExternal(Element element) throws InvalidDataException {
         super.readExternal(element);
-        this.tomcatInfo = TomcatInfoConfigs.getInstance(getProject()).getCurrent();
+        this.tomcatInfo = TomcatInfoConfigs.getInstance().getCurrent();
 //        this.tomcatInstallation = PropertiesComponent.getInstance().getValue("TOMCAT_INSTALLATION");
 //        this.tomcatInstallation = JDOMExternalizerUtil.readField(element, "TOMCAT_INSTALLATION");
         this.docBase = JDOMExternalizerUtil.readField(element, "DOC_BASE");
@@ -115,7 +115,7 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
     public void writeExternal(Element element) throws WriteExternalException {
         super.writeExternal(element);
 
-        TomcatInfoConfigs.getInstance(getProject()).setCurrent(tomcatInfo);
+        TomcatInfoConfigs.getInstance().setCurrent(tomcatInfo);
 //        JDOMExternalizerUtil.writeField(element, "TOMCAT_INSTALLATION", tomcatInstallation);
         JDOMExternalizerUtil.writeField(element, "DOC_BASE", docBase);
         JDOMExternalizerUtil.writeField(element, "DOC_MODULE_ROOT", moduleName);

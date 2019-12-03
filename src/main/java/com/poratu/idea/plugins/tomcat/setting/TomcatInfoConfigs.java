@@ -67,11 +67,11 @@ public class TomcatInfoConfigs implements PersistentStateComponent<TomcatInfoCon
         return sfec;
     }
 
-    @Nullable
-    public static TomcatInfoConfigs getInstance(Project project) {
-        TomcatInfoConfigs sfec = ServiceManager.getService(project, TomcatInfoConfigs.class);
-        return sfec;
-    }
+//    @Nullable
+//    public static TomcatInfoConfigs getInstance(Project project) {
+//        TomcatInfoConfigs sfec = ServiceManager.getService(project, TomcatInfoConfigs.class);
+//        return sfec;
+//    }
 
     public int getMaxVersion(TomcatInfo tomcatInfo) {
         Optional<TomcatInfo> maxTomcatInfo = tomcatInfos.stream().filter(it ->
