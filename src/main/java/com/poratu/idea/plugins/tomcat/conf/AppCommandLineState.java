@@ -64,7 +64,7 @@ public class AppCommandLineState extends JavaCommandLineState {
 
 
     @Override
-    protected JavaParameters createJavaParameters() throws ExecutionException {
+    protected JavaParameters createJavaParameters() {
         try {
 
             Path tomcatInstallationPath = Paths.get(configuration.getTomcatInfo().getPath());
@@ -116,7 +116,9 @@ public class AppCommandLineState extends JavaCommandLineState {
 
             javaParams.setPassParentEnvs(configuration.getPassParentEnvironmentVariables());
             javaParams.getVMParametersList().addParametersString(vmOptions);
-            javaParams.setEnv(envOptions);
+            if (envOptions != null) {
+                javaParams.setEnv(envOptions);
+            }
             return javaParams;
 
         } catch (Exception e) {
@@ -128,7 +130,7 @@ public class AppCommandLineState extends JavaCommandLineState {
 
     @Nullable
     @Override
-    protected ConsoleView createConsole(@NotNull Executor executor) throws ExecutionException {
+    protected ConsoleView createConsole(@NotNull Executor executor) {
         ConsoleView consoleView = new ServerConsoleView(configuration);
         return consoleView;
     }
