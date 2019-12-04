@@ -15,7 +15,6 @@ import com.intellij.ui.ComboboxWithBrowseButton;
 import com.intellij.ui.DocumentAdapter;
 import com.poratu.idea.plugins.tomcat.setting.RunnerSetting;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
-import com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs;
 import com.poratu.idea.plugins.tomcat.setting.TomcatSettingConfigurable;
 import org.jdesktop.swingx.JXButton;
 import org.jetbrains.annotations.NotNull;
@@ -37,12 +36,10 @@ import java.util.Map;
  */
 public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration> {
     private final Project project;
-    private final TomcatRunConfiguration tomcatRunConfiguration;
     private RunnerSetting runnerSetting;
 
     public TomcatSettingsEditor(TomcatRunConfiguration tomcatRunConfiguration, Project project) {
         runnerSetting = new RunnerSetting(project);
-        this.tomcatRunConfiguration = tomcatRunConfiguration;
         this.project = project;
         super.resetFrom(tomcatRunConfiguration);
     }
@@ -165,7 +162,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
     protected void applyEditorTo(TomcatRunConfiguration tomcatRunConfiguration) throws ConfigurationException {
         TomcatInfo selectedItem = (TomcatInfo) runnerSetting.getTomcatField().getComboBox().getSelectedItem();
         if (selectedItem != null) {
-            TomcatInfoConfigs.getInstance().setCurrent(selectedItem);
             tomcatRunConfiguration.setTomcatInfo(selectedItem);
         }
         tomcatRunConfiguration.setDocBase(runnerSetting.getDocBaseField().getText());
@@ -246,26 +242,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             }
         });
 
-//        docModuleRoot.addBrowseFolderListener("Module Root", "Choose Module Root Folder", project, FileChooserDescriptorFactory.createSingleFolderDescriptor().withRoots(baseDir));
-//        docModuleRoot.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
-//            @Override
-//            protected void textChanged(DocumentEvent documentEvent) {
-//
-//                if (!documentEvent.getType().equals(DocumentEvent.EventType.REMOVE)) {
-//                    String text = docBaseField.getText();
-//                    if (text != null && !text.trim().equals("")) {
-//                        VirtualFile fileByIoFile = LocalFileSystem.getInstance().findFileByIoFile(new File(text));
-//                        Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, project);
-//                        if(module == null) {
-//                            throw new RuntimeException("The Module Root specified is not a module according to Intellij");
-//                        }
-//                    }
-//                }
-//
-//            }
-//        });
-
-//        docModuleRoot.setText(baseDir.getName());
         portField.setValue(8080);
         ajpPort.setValue(8009);
         adminPort.setValue(8005);

@@ -4,7 +4,6 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,15 +26,6 @@ import java.util.Optional;
 public class TomcatInfoConfigs implements PersistentStateComponent<TomcatInfoConfigs> {
 
     private List<TomcatInfo> tomcatInfos = new ArrayList<>();
-    private TomcatInfo current;
-
-    public TomcatInfo getCurrent() {
-        return current;
-    }
-
-    public void setCurrent(TomcatInfo current) {
-        this.current = current;
-    }
 
     public List<TomcatInfo> getTomcatInfos() {
         return tomcatInfos;
