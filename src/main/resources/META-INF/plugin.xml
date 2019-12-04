@@ -1,10 +1,10 @@
 <idea-plugin version="2">
-  <id>com.poratu.idea.plugins.tomcat</id>
-  <name>Smart Tomcat</name>
-  <version>3.1.0</version>
-  <vendor email="zengkid@msn.com">zengkid</vendor>
+    <id>com.poratu.idea.plugins.tomcat</id>
+    <name>Smart Tomcat</name>
+    <version>3.1.0</version>
+    <vendor email="zengkid@msn.com">zengkid</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
       This is for Tomcat Server plugin.
       The SmartTomcat will auto load the Webapp classes and libs from project and module,
       You needn't copy the classes and libs to the WEB-INF/classes and WEB-INF/lib.<br/>
@@ -14,39 +14,38 @@
 
     ]]></description>
 
-  <change-notes><![CDATA[
-      fixed 2019.3 version issue: registered as application service, but requested as project one.
+    <change-notes><![CDATA[
+      1. update current project tomcat selection.
     ]]></change-notes>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="193"/>
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="193"/>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
-  -->
-  <depends>com.intellij.modules.java</depends>
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+    <depends>com.intellij.modules.java</depends>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatSettingConfigurable"/>
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatSettingConfigurable"/>
 
-    <configurationType implementation="com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType"/>
+        <configurationType implementation="com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType"/>
 
-    <applicationService  serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs"/>
-
-
-    <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunner" order="first"/>
-    <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatDebugger" order="last"/>
-
-  </extensions>
-
-  <actions>
-
-    <!-- Add your actions here -->
+        <applicationService serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs"/>
 
 
+        <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunner" order="first"/>
+        <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatDebugger" order="last"/>
 
-  </actions>
+    </extensions>
+
+    <actions>
+
+        <!-- Add your actions here -->
+
+
+    </actions>
 
 </idea-plugin>

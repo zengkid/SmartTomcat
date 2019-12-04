@@ -94,7 +94,7 @@ public class AppCommandLineState extends JavaCommandLineState {
             Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, configuration.getProject());
 
 
-            if(module == null) {
+            if (module == null) {
                 throw new ExecutionException("The Module Root specified is not a module according to Intellij");
             }
 

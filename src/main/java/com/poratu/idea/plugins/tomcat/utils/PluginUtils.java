@@ -20,7 +20,7 @@ public abstract class PluginUtils {
     private static final String GET_SERVER_INFO_COMMAND_TEMPLATE =
             "%s/bin/java -cp \"%s/lib/catalina.jar\" org.apache.catalina.util.ServerInfo";
 
-    public static Sdk getDefaultJDK(){
+    public static Sdk getDefaultJDK() {
         Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
         if (allJdks == null || allJdks.length == 0) {
             throw new RuntimeException("Please setup your project JDK first");

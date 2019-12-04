@@ -43,7 +43,7 @@ public class TomcatInfo {
         TomcatInfo that = (TomcatInfo) o;
 
         if (number != that.number) return false;
-        return name != null ? name.equals(that.name) : that.name == null;
+        return name != null && name.equals(that.name) || name == null && that.name == null;
     }
 
     @Override

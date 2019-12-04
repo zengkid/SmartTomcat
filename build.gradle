@@ -23,7 +23,7 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
-      fixed 2019.3 version issue: registered as application service, but requested as project one. 
+      1.update current project tomcat selection. 
    """
 }
 /*
