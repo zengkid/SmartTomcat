@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.intellij' version '0.4.14'
 }
 
-version '3.1.0'
+version '3.5.0'
 
 sourceCompatibility = 1.8
 
@@ -23,11 +23,9 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
-      1.update current project tomcat selection. 
+      new feature: Additional context parameters in custom context.xml. 
    """
 }
-/*
-publishPlugin {
+/*publishPlugin {
     token intellijPublishToken
-}
-*/
+}*/

@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -170,31 +171,23 @@ public class AppCommandLineState extends JavaCommandLineState {
 
 
         Element contextE = doc.createElement("Context");
+
+
+        String customContext = cfg.getCustomContext();
+        if (StringUtil.isNotEmpty(customContext)) {
+            File customContextFile = new File(customContext);
+            if (customContextFile.exists()) {
+
+                org.w3c.dom.Document customContextDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(customContextFile);
+                contextE = (Element) doc.importNode(customContextDoc.getDocumentElement(), true);
+
+            }
+        }
+
         contextE.setAttribute("docBase", cfg.getDocBase());
         contextE.setAttribute("path", (contextPath.startsWith("/") ? "" : "/") + contextPath);
         hostNode.appendChild(contextE);
 
-        if (!cfg.getClassName().isEmpty()) {
-            Element realmE = doc.createElement("Realm");
-            realmE.setAttribute("className", cfg.getClassName());
-            realmE.setAttribute("dataSourceName", cfg.getDataSourceName());
-            realmE.setAttribute("debug", cfg.getDebug());
-            realmE.setAttribute("digest", cfg.getDigest());
-            realmE.setAttribute("roleNameCol", cfg.getRoleNameCol());
-            realmE.setAttribute("userCredCol", cfg.getUserCredCol());
-            realmE.setAttribute("userNameCol", cfg.getUserNameCol());
-            realmE.setAttribute("userRoleTable", cfg.getUserRoleTable());
-            realmE.setAttribute("userTable", cfg.getUserTable());
-            contextE.appendChild(realmE);
-        }
-
-        if (!cfg.getJndiGlobal().isEmpty()) {
-            Element resourceLinkE = doc.createElement("ResourceLink");
-            resourceLinkE.setAttribute("global", cfg.getJndiGlobal());
-            resourceLinkE.setAttribute("name", cfg.getJndiName());
-            resourceLinkE.setAttribute("type", cfg.getJndiType());
-            contextE.appendChild(resourceLinkE);
-        }
 
         List<String> paths = new ArrayList<>();
         VirtualFile[] classPaths = ModuleRootManager.getInstance(module).orderEntries().withoutSdk().runtimeOnly().productionOnly().getClassesRoots();

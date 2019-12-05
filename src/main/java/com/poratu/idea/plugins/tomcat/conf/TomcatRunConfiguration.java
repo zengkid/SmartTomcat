@@ -25,6 +25,7 @@ import java.util.Map;
 public class TomcatRunConfiguration extends RunConfigurationBase implements RunProfileWithCompileBeforeLaunchOption {
     private TomcatInfo tomcatInfo;
     private String docBase;
+    private String customContext;
     private String moduleName;
     private String contextPath;
     private String port;
@@ -33,19 +34,6 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
     private String vmOptions;
     private Map<String, String> envOptions;
     private Boolean passParentEnvironmentVariables = true;
-    private String className;
-    private String debug;
-    private String digest;
-    private String roleNameCol;
-    private String userCredCol;
-    private String userNameCol;
-    private String userRoleTable;
-    private String userTable;
-    private String jndiGlobal;
-    private String jndiName;
-    private String jndiType;
-    private String dataSourceName;
-
 
     protected TomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
         super(project, factory, name);
@@ -101,6 +89,14 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
 
     public void setModuleName(String moduleName) {
         this.moduleName = moduleName;
+    }
+
+    public String getCustomContext() {
+        return customContext;
+    }
+
+    public void setCustomContext(String customContext) {
+        this.customContext = customContext;
     }
 
     public String getContextPath() {
@@ -167,106 +163,107 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         this.passParentEnvironmentVariables = passParentEnvironmentVariables;
     }
 
-    public String getClassName() {
-        return className;
-    }
+//    public String getClassName() {
+//        return className;
+//    }
+//
+//    public void setClassName(String className) {
+//        this.className = className;
+//    }
+//
+//    public String getDebug() {
+//        return debug;
+//    }
+//
+//    public void setDebug(String debug) {
+//        this.debug = debug;
+//    }
+//
+//    public String getDigest() {
+//        return digest;
+//    }
+//
+//    public void setDigest(String digest) {
+//        this.digest = digest;
+//    }
+//
+//    public String getRoleNameCol() {
+//        return roleNameCol;
+//    }
+//
+//    public void setRoleNameCol(String roleNameCol) {
+//        this.roleNameCol = roleNameCol;
+//    }
+//
+//    public String getUserCredCol() {
+//        return userCredCol;
+//    }
+//
+//    public void setUserCredCol(String userCredCol) {
+//        this.userCredCol = userCredCol;
+//    }
+//
+//    public String getUserNameCol() {
+//        return userNameCol;
+//    }
+//
+//    public void setUserNameCol(String userNameCol) {
+//        this.userNameCol = userNameCol;
+//    }
+//
+//    public String getUserRoleTable() {
+//        return userRoleTable;
+//    }
+//
+//    public void setUserRoleTable(String userRoleTable) {
+//        this.userRoleTable = userRoleTable;
+//    }
+//
+//    public String getUserTable() {
+//        return userTable;
+//    }
+//
+//    public void setUserTable(String userTable) {
+//        this.userTable = userTable;
+//    }
+//
+//    public String getJndiGlobal() {
+//        return jndiGlobal;
+//    }
+//
+//    public void setJndiGlobal(String jndiGlobal) {
+//        this.jndiGlobal = jndiGlobal;
+//    }
+//
+//    public String getJndiName() {
+//        return jndiName;
+//    }
+//
+//    public void setJndiName(String jndiName) {
+//        this.jndiName = jndiName;
+//    }
+//
+//    public String getJndiType() {
+//        return jndiType;
+//    }
+//
+//    public void setJndiType(String jndiType) {
+//        this.jndiType = jndiType;
+//    }
+//
+//    public String getDataSourceName() {
+//        return dataSourceName;
+//    }
+//
+//    public void setDataSourceName(String dataSourceName) {
+//        this.dataSourceName = dataSourceName;
+//    }
 
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public String getDebug() {
-        return debug;
-    }
-
-    public void setDebug(String debug) {
-        this.debug = debug;
-    }
-
-    public String getDigest() {
-        return digest;
-    }
-
-    public void setDigest(String digest) {
-        this.digest = digest;
-    }
-
-    public String getRoleNameCol() {
-        return roleNameCol;
-    }
-
-    public void setRoleNameCol(String roleNameCol) {
-        this.roleNameCol = roleNameCol;
-    }
-
-    public String getUserCredCol() {
-        return userCredCol;
-    }
-
-    public void setUserCredCol(String userCredCol) {
-        this.userCredCol = userCredCol;
-    }
-
-    public String getUserNameCol() {
-        return userNameCol;
-    }
-
-    public void setUserNameCol(String userNameCol) {
-        this.userNameCol = userNameCol;
-    }
-
-    public String getUserRoleTable() {
-        return userRoleTable;
-    }
-
-    public void setUserRoleTable(String userRoleTable) {
-        this.userRoleTable = userRoleTable;
-    }
-
-    public String getUserTable() {
-        return userTable;
-    }
-
-    public void setUserTable(String userTable) {
-        this.userTable = userTable;
-    }
-
-    public String getJndiGlobal() {
-        return jndiGlobal;
-    }
-
-    public void setJndiGlobal(String jndiGlobal) {
-        this.jndiGlobal = jndiGlobal;
-    }
-
-    public String getJndiName() {
-        return jndiName;
-    }
-
-    public void setJndiName(String jndiName) {
-        this.jndiName = jndiName;
-    }
-
-    public String getJndiType() {
-        return jndiType;
-    }
-
-    public void setJndiType(String jndiType) {
-        this.jndiType = jndiType;
-    }
-
-    public String getDataSourceName() {
-        return dataSourceName;
-    }
-
-    public void setDataSourceName(String dataSourceName) {
-        this.dataSourceName = dataSourceName;
-    }
-
-    @NotNull
     @Override
+    @NotNull
     public Module[] getModules() {
         ModuleManager moduleManager = ModuleManager.getInstance(getProject());
-        return moduleManager.getModules();
+        Module[] modules = moduleManager.getModules();
+        return modules;
     }
 }
