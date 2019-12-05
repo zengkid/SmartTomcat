@@ -34,18 +34,8 @@ public class RunnerSetting {
     private EnvironmentVariablesComponent envOptions;
     private JFormattedTextField ajpPort;
     private JFormattedTextField adminPort;
-    private JFormattedTextField className;
-    private JFormattedTextField debug;
-    private JFormattedTextField digest;
-    private JFormattedTextField roleNameCol;
-    private JFormattedTextField userCredCol;
-    private JFormattedTextField userNameCol;
-    private JFormattedTextField userRoleTable;
-    private JFormattedTextField userTable;
-    private JFormattedTextField jndiGlobal;
-    private JFormattedTextField jndiName;
-    private JFormattedTextField jndiType;
-    private JFormattedTextField dataSourceName;
+    private TextFieldWithBrowseButton customContextField;
+
     private Project project;
 
     public RunnerSetting(Project project) {
@@ -92,52 +82,12 @@ public class RunnerSetting {
         return envOptions;
     }
 
-    public JFormattedTextField getClassName() {
-        return className;
+    public TextFieldWithBrowseButton getCustomContextField() {
+        return customContextField;
     }
 
-    public JFormattedTextField getDebug() {
-        return debug;
-    }
-
-    public JFormattedTextField getDigest() {
-        return digest;
-    }
-
-    public JFormattedTextField getRoleNameCol() {
-        return roleNameCol;
-    }
-
-    public JFormattedTextField getUserCredCol() {
-        return userCredCol;
-    }
-
-    public JFormattedTextField getUserNameCol() {
-        return userNameCol;
-    }
-
-    public JFormattedTextField getUserRoleTable() {
-        return userRoleTable;
-    }
-
-    public JFormattedTextField getUserTable() {
-        return userTable;
-    }
-
-    public JFormattedTextField getJndiGlobal() {
-        return jndiGlobal;
-    }
-
-    public JFormattedTextField getJndiName() {
-        return jndiName;
-    }
-
-    public JFormattedTextField getJndiType() {
-        return jndiType;
-    }
-
-    public JFormattedTextField getDataSourceName() {
-        return dataSourceName;
+    public void setCustomContextField(TextFieldWithBrowseButton customContextField) {
+        this.customContextField = customContextField;
     }
 
     private void createUIComponents() {

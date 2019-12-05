@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.poratu.idea.plugins.tomcat</id>
     <name>Smart Tomcat</name>
-    <version>3.1.0</version>
+    <version>3.5.0</version>
     <vendor email="zengkid@msn.com">zengkid</vendor>
 
     <description><![CDATA[
@@ -15,7 +15,7 @@
     ]]></description>
 
     <change-notes><![CDATA[
-      1. update current project tomcat selection.
+        new feature: Additional context parameters in custom context.xml.
     ]]></change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
@@ -26,7 +26,7 @@
     <!-- uncomment to enable plugin in all products
     <depends>com.intellij.modules.lang</depends>
     -->
-    <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatSettingConfigurable"/>
