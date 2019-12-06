@@ -31,13 +31,6 @@ public class TomcatInfoConfigs implements PersistentStateComponent<TomcatInfoCon
         return tomcatInfos;
     }
 
-    public void setTomcatInfos(List<TomcatInfo> tomcatInfos) {
-        this.tomcatInfos = tomcatInfos;
-    }
-
-    public void addTomcatInfo(TomcatInfo tomcatInfo) {
-        this.tomcatInfos.add(tomcatInfo);
-    }
 
     @Nullable
     @Override
@@ -56,12 +49,6 @@ public class TomcatInfoConfigs implements PersistentStateComponent<TomcatInfoCon
         TomcatInfoConfigs sfec = ServiceManager.getService(TomcatInfoConfigs.class);
         return sfec;
     }
-
-//    @Nullable
-//    public static TomcatInfoConfigs getInstance(Project project) {
-//        TomcatInfoConfigs sfec = ServiceManager.getService(project, TomcatInfoConfigs.class);
-//        return sfec;
-//    }
 
     public int getMaxVersion(TomcatInfo tomcatInfo) {
         Optional<TomcatInfo> maxTomcatInfo = tomcatInfos.stream().filter(it ->
