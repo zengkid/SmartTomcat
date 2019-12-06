@@ -14,7 +14,7 @@ import javax.swing.*;
  */
 public class TomcatRunConfigurationType implements ConfigurationType {
 
-    private static final Icon TOMCAT_ICON = IconLoader.getIcon("/icon/tomcat.png");
+    private static final Icon TOMCAT_ICON = IconLoader.getIcon("/icon/tomcat.svg");
 
     @Override
     public String getDisplayName() {
