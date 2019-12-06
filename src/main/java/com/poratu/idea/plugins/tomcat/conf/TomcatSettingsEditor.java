@@ -154,27 +154,12 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
                             customContextField.getTextField().setText(contextFile.getPath());
 
                         }
-//                        if (metaInfo != null) {
-//                            VirtualFile[] children = metaInfo.getChildren();
-//                            if (children != null) {
-//                                for (VirtualFile child : children) {
-//                                    if (StringUtil.equalsIgnoreCase("context.xml", child.getName())) {
-//                                        customContextField.setText(child.getCanonicalPath());
-//                                        customContextField.getTextField().setText(child.getCanonicalPath());
-//                                        break;
-//                                    }
-//                                }
-//                            }
-//                        }
-
 
                     }
                 }
 
             }
         });
-
-//        customContextField.setText();
 
         customContextField.addBrowseFolderListener("Context xml", "Choose custom context xml file", project, FileChooserDescriptorFactory.createSingleFileDescriptor().withRoots(baseDir));
 

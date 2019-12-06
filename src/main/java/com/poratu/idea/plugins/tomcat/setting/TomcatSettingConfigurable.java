@@ -1,7 +1,6 @@
 package com.poratu.idea.plugins.tomcat.setting;
 
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,7 +60,7 @@ public class TomcatSettingConfigurable implements Configurable {
     }
 
     @Override
-    public void apply() throws ConfigurationException {
+    public void apply() {
         TomcatSetting tomcatSetting = TomcatSetting.getInstance();
         JList tomcatList = tomcatSetting.getTomcatList();
         DefaultListModel<TomcatInfo> model = (DefaultListModel) tomcatList.getModel();

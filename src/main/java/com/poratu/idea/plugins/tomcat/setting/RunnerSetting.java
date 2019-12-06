@@ -86,10 +86,6 @@ public class RunnerSetting {
         return customContextField;
     }
 
-    public void setCustomContextField(TextFieldWithBrowseButton customContextField) {
-        this.customContextField = customContextField;
-    }
-
     private void createUIComponents() {
         FileChooserDescriptor fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
 
