@@ -13,7 +13,7 @@ The Tomcat plugin for Intellij IDEA
 ![Smart Tomcat Setting2](https://raw.githubusercontent.com/zengkid/SmartTomcat/master/doc/setting2.png "Smart Tomcat")
 ![Smart Tomcat Setting2](https://raw.githubusercontent.com/zengkid/SmartTomcat/master/doc/setting3.png "Smart Tomcat")
   
-* Run/Debug setup up
+* Run/Debug setup
         
         Navigat Run -> Edit Configrations to Open Run/Debug Configrations. 
         In the Run/Debug Configrations, add new configration, choose Smart Tomcat, 
