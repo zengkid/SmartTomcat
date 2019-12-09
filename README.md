@@ -13,7 +13,7 @@ The Tomcat plugin for Intellij IDEA
 * Run/Debug
         
         Navigat Run -> Edit Configrations to Open Run/Debug Configrations. 
-        In the Run/Debug Configrations, choose Smart Tomcat
+        In the Run/Debug Configrations, add new configration, choose Smart Tomcat, for detail config as below
 
     * Tomcat Server
         
