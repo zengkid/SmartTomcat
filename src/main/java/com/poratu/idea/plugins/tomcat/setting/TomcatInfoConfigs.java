@@ -5,6 +5,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.XCollection;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -18,9 +19,10 @@ import java.util.Optional;
  * Time   : 15:20
  */
 
-@State(name = "TomcatInfoConfigs", storages = {@Storage("smart.tomcat.xml")})
+@State(name = "ServerConfiguration", storages = @Storage("smart.tomcat.xml"))
 public class TomcatInfoConfigs implements PersistentStateComponent<TomcatInfoConfigs> {
 
+    @XCollection(elementTypes = TomcatInfo.class)
     private List<TomcatInfo> tomcatInfos = new ArrayList<>();
 
     public List<TomcatInfo> getTomcatInfos() {
