@@ -18,11 +18,7 @@ import java.util.Optional;
  * Time   : 15:20
  */
 
-@State(
-        name = "TomcatInfoConfigs",
-        storages = {
-                @Storage("TomcatInfoConfigs.xml")}
-)
+@State(name = "TomcatInfoConfigs", storages = {@Storage("smart.tomcat.xml")})
 public class TomcatInfoConfigs implements PersistentStateComponent<TomcatInfoConfigs> {
 
     private List<TomcatInfo> tomcatInfos = new ArrayList<>();
