@@ -6,6 +6,7 @@ import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.stream.Stream;
@@ -16,9 +17,6 @@ import java.util.stream.Stream;
  * Time   : 21:35
  */
 public abstract class PluginUtils {
-
-    private static final String GET_SERVER_INFO_COMMAND_TEMPLATE =
-            "%s/bin/java -cp \"%s/lib/catalina.jar\" org.apache.catalina.util.ServerInfo";
 
     public static Sdk getDefaultJDK() {
         Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
@@ -34,15 +32,17 @@ public abstract class PluginUtils {
     }
 
     public static TomcatInfo getTomcatInfo(String javaHome, String tomcatHome) {
-//        java -cp lib/catalina.jar org.apache.catalina.util.ServerInfo
-        final String command =
-                String.format(GET_SERVER_INFO_COMMAND_TEMPLATE, javaHome, tomcatHome);
-
+        String[] cmd = new String[]{
+                javaHome + "/bin/java",
+                "-cp",
+                "lib/catalina.jar",
+                "org.apache.catalina.util.ServerInfo"
+        };
         BufferedReader reader = null;
         final TomcatInfo tomcatInfo = new TomcatInfo();
         tomcatInfo.setPath(tomcatHome);
         try {
-            Process process = Runtime.getRuntime().exec(command);
+            Process process = Runtime.getRuntime().exec(cmd, null, new File(tomcatHome));
             process.waitFor();
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             Stream<String> lines = reader.lines();
