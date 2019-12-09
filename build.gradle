@@ -24,6 +24,7 @@ intellij {
 patchPluginXml {
     changeNotes """
       new feature: Additional context parameters in custom context.xml. 
+      fixed: 2019.3 storage issue.
    """
 }
 /*publishPlugin {
