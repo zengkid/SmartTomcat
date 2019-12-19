@@ -8,13 +8,22 @@ The Tomcat plugin for Intellij IDEA
 
         Navigate File -> Setting or Ctrl + Alt + S  Open System Settings.
         In the Setting UI, go to Tomcat Server, and then add your tomcat servers, e.g. tomcat6, tomcat8, tomcat9
-        
+
+![Smart Tomcat Setting1](https://raw.githubusercontent.com/zengkid/SmartTomcat/master/doc/setting1.png "Smart Tomcat")
+![Smart Tomcat Setting2](https://raw.githubusercontent.com/zengkid/SmartTomcat/master/doc/setting2.png "Smart Tomcat")
+![Smart Tomcat Setting2](https://raw.githubusercontent.com/zengkid/SmartTomcat/master/doc/setting3.png "Smart Tomcat")
   
-* Run/Debug
+* Run/Debug setup
         
         Navigat Run -> Edit Configrations to Open Run/Debug Configrations. 
-        In the Run/Debug Configrations, add new configration, choose Smart Tomcat, for detail config as below
-
+        In the Run/Debug Configrations, add new configration, choose Smart Tomcat, 
+        for detail config as below
+        
+![Smart Tomcat run1](https://raw.githubusercontent.com/zengkid/SmartTomcat/master/doc/run1.png "Smart Tomcat")
+![Smart Tomcat run2](https://raw.githubusercontent.com/zengkid/SmartTomcat/master/doc/run2.png "Smart Tomcat")
+![Smart Tomcat run3](https://raw.githubusercontent.com/zengkid/SmartTomcat/master/doc/run3.png "Smart Tomcat")
+  
+* Run/Debug config detail
     * Tomcat Server
         
             choose the tomcat server.
