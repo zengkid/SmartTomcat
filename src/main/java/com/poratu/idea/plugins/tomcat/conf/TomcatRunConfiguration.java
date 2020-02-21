@@ -29,7 +29,6 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
     private String moduleName;
     private String contextPath;
     private String port;
-    private String ajpPort;
     private String adminPort;
     private String vmOptions;
     private Map<String, String> envOptions;
@@ -115,13 +114,6 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         this.port = port;
     }
 
-    public String getAjpPort() {
-        return ajpPort;
-    }
-
-    public void setAjpPort(String ajpPort) {
-        this.ajpPort = ajpPort;
-    }
 
     public String getAdminPort() {
         return adminPort;
