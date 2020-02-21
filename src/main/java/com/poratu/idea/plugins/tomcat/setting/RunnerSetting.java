@@ -32,7 +32,6 @@ public class RunnerSetting {
     private JXButton configrationButton;
     private RawCommandLineEditor vmOptons;
     private EnvironmentVariablesComponent envOptions;
-    private JFormattedTextField ajpPort;
     private JFormattedTextField adminPort;
     private TextFieldWithBrowseButton customContextField;
 
@@ -62,9 +61,6 @@ public class RunnerSetting {
         return portField;
     }
 
-    public JFormattedTextField getAjpPort() {
-        return ajpPort;
-    }
 
     public JFormattedTextField getAdminPort() {
         return adminPort;

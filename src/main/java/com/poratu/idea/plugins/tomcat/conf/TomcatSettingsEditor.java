@@ -71,10 +71,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         if (port != null && !"".equals(port.trim())) {
             runnerSetting.getPortField().setText(port);
         }
-        String ajpPort = tomcatRunConfiguration.getAjpPort();
-        if (ajpPort != null && !"".equals(ajpPort.trim())) {
-            runnerSetting.getAjpPort().setText(ajpPort);
-        }
         String adminPort = tomcatRunConfiguration.getAdminPort();
         if (adminPort != null && !"".equals(adminPort.trim())) {
             runnerSetting.getAdminPort().setText(adminPort);
@@ -107,7 +103,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         tomcatRunConfiguration.setCustomContext(runnerSetting.getCustomContextField().getText());
         tomcatRunConfiguration.setContextPath(runnerSetting.getContextPathField().getText());
         tomcatRunConfiguration.setPort(runnerSetting.getPortField().getText());
-        tomcatRunConfiguration.setAjpPort(runnerSetting.getAjpPort().getText());
         tomcatRunConfiguration.setAdminPort(runnerSetting.getAdminPort().getText());
         tomcatRunConfiguration.setVmOptions(runnerSetting.getVmOptons().getText());
         tomcatRunConfiguration.setEnvOptions(runnerSetting.getEnvOptions().getEnvs());
@@ -126,7 +121,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
 
         JTextField contextPathField = runnerSetting.getContextPathField();
         JFormattedTextField portField = runnerSetting.getPortField();
-        JFormattedTextField ajpPort = runnerSetting.getAjpPort();
         JFormattedTextField adminPort = runnerSetting.getAdminPort();
 
         JXButton configrationButton = runnerSetting.getConfigrationButton();
@@ -164,7 +158,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         customContextField.addBrowseFolderListener("Context xml", "Choose custom context xml file", project, FileChooserDescriptorFactory.createSingleFileDescriptor().withRoots(baseDir));
 
         portField.setValue(8080);
-        ajpPort.setValue(8009);
         adminPort.setValue(8005);
         DefaultFormatterFactory tf = new DefaultFormatterFactory();
         NumberFormat format = NumberFormat.getInstance();
@@ -175,7 +168,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         formatter.setMaximum(65535);
         tf.setDefaultFormatter(formatter);
         portField.setFormatterFactory(tf);
-        ajpPort.setFormatterFactory(tf);
         adminPort.setFormatterFactory(tf);
 
         return runnerSetting.getMainPanel();
