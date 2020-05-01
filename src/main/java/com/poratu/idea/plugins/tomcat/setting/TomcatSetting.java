@@ -1,11 +1,11 @@
 package com.poratu.idea.plugins.tomcat.setting;
 
+import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.AnActionButton;
-import com.intellij.ui.AnActionButtonRunnable;
 import com.intellij.ui.ToolbarDecorator;
+import com.intellij.util.ui.JBUI;
 import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 
 import javax.swing.*;
@@ -41,33 +41,32 @@ public class TomcatSetting {
     public void initComponent() {
         if (!inited) {
 
-            ToolbarDecorator decorator = ToolbarDecorator.createDecorator(tomcatList).setAsUsualTopToolbar();
-            decorator.setAddAction(new AnActionButtonRunnable() {
-                @Override
-                public void run(AnActionButton anActionButton) {
+            ToolbarDecorator decorator = ToolbarDecorator.createDecorator(tomcatList)
+                    .setToolbarPosition(ActionToolbarPosition.TOP)
+                    .setPanelBorder(JBUI.Borders.empty());
+            decorator.setAddAction(anActionButton -> {
 
-                    DefaultListModel<TomcatInfo> model = (DefaultListModel<TomcatInfo>) tomcatList.getModel();
+                DefaultListModel<TomcatInfo> model = (DefaultListModel<TomcatInfo>) tomcatList.getModel();
 
-                    VirtualFile virtualFile = FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFolderDescriptor(), null, null);
-                    if (virtualFile == null) { // cancel to choose file
-                        return;
-                    }
-                    String presentableUrl = virtualFile.getPresentableUrl();
-
-
-                    TomcatInfo tomcatInfo = PluginUtils.getTomcatInfo(presentableUrl);
-                    int size = model.size();
-                    if (model.contains(tomcatInfo)) {
-                        TomcatInfo[] infos = new TomcatInfo[size];
-                        model.copyInto(infos);
-                        int maxVersion = TomcatInfoConfigs.getInstance().getMaxVersion(tomcatInfo);
-                        tomcatInfo.setNumber(maxVersion + 1);
-                    }
-                    model.add(size, tomcatInfo);
-                    tomcatList.setSelectedIndex(size);
-
-
+                VirtualFile virtualFile = FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFolderDescriptor(), null, null);
+                if (virtualFile == null) { // cancel to choose file
+                    return;
                 }
+                String presentableUrl = virtualFile.getPresentableUrl();
+
+
+                TomcatInfo tomcatInfo = PluginUtils.getTomcatInfo(presentableUrl);
+                int size = model.size();
+                if (model.contains(tomcatInfo)) {
+                    TomcatInfo[] infos = new TomcatInfo[size];
+                    model.copyInto(infos);
+                    int maxVersion = TomcatInfoConfigs.getInstance().getMaxVersion(tomcatInfo);
+                    tomcatInfo.setNumber(maxVersion + 1);
+                }
+                model.add(size, tomcatInfo);
+                tomcatList.setSelectedIndex(size);
+
+
             });
 
             tomcatListPanel.add(decorator.createPanel(), BorderLayout.CENTER);

@@ -29,4 +29,10 @@ public class TomcatConfigurationFactory extends ConfigurationFactory {
     public String getName() {
         return FACTORY_NAME;
     }
+
+    @NotNull
+    @Override
+    public String getId() {
+        return getName();
+    }
 }
