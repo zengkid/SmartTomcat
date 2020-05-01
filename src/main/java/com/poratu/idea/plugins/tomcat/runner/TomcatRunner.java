@@ -2,7 +2,7 @@ package com.poratu.idea.plugins.tomcat.runner;
 
 import com.intellij.execution.configurations.RunProfile;
 import com.intellij.execution.executors.DefaultRunExecutor;
-import com.intellij.execution.runners.DefaultProgramRunner;
+import com.intellij.execution.impl.DefaultJavaProgramRunner;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * Date   : 2017-02-17
  * Time   : 11:01 AM
  */
-public class TomcatRunner extends DefaultProgramRunner {
+public class TomcatRunner extends DefaultJavaProgramRunner {
     private static final String RUNNER_ID = "SmartTomcatRunner";
 
     @NotNull
