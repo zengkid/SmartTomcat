@@ -169,8 +169,7 @@ public class AppCommandLineState extends JavaCommandLineState {
 
         Element contextE = doc.createElement("Context");
 
-
-        String customContext = cfg.getCustomContext();
+        String customContext = cfg.getDocBase() + "/META-INF/context.xml";
         if (StringUtil.isNotEmpty(customContext)) {
             File customContextFile = new File(customContext);
             if (customContextFile.exists()) {

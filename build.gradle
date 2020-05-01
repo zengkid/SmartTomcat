@@ -1,9 +1,9 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.14'
+    id 'org.jetbrains.intellij' version '0.4.18'
 }
 
-version '3.5.0'
+version '3.6.1'
 
 sourceCompatibility = 1.8
 
@@ -16,14 +16,16 @@ dependencies {
 }
 
 intellij {
-    version '2019.3'
+    version '2019.3.3'
     pluginName = 'SmartTomcat'
     plugins 'java'
     updateSinceUntilBuild false
 }
 patchPluginXml {
     changeNotes """
-      new feature: Additional context parameters in custom context.xml. 
+      3.6.1: 1.auto load webapp/META-INF/context instead of  manual choose context.xml  
+             2.bug fixed  
+      3.6.0: remove ajp port.
       fixed: 2019.3 storage issue.
    """
 }

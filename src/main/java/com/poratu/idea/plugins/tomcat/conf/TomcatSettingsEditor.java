@@ -56,12 +56,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             runnerSetting.getDocBaseField().getTextField().setText(docBase);
         }
 
-        String customContext = tomcatRunConfiguration.getCustomContext();
-        if (customContext != null && !"".equals(customContext.trim())) {
-
-            runnerSetting.getCustomContextField().setText(customContext);
-            runnerSetting.getCustomContextField().getTextField().setText(customContext);
-        }
 
         String contextPath = tomcatRunConfiguration.getContextPath();
         if (contextPath != null && !"".equals(contextPath.trim())) {
@@ -100,7 +94,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             tomcatRunConfiguration.setTomcatInfo(selectedItem);
         }
         tomcatRunConfiguration.setDocBase(runnerSetting.getDocBaseField().getText());
-        tomcatRunConfiguration.setCustomContext(runnerSetting.getCustomContextField().getText());
         tomcatRunConfiguration.setContextPath(runnerSetting.getContextPathField().getText());
         tomcatRunConfiguration.setPort(runnerSetting.getPortField().getText());
         tomcatRunConfiguration.setAdminPort(runnerSetting.getAdminPort().getText());
@@ -117,7 +110,6 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
 
         ComboboxWithBrowseButton tomcatField = runnerSetting.getTomcatField();
         TextFieldWithBrowseButton docBaseField = runnerSetting.getDocBaseField();
-        TextFieldWithBrowseButton customContextField = runnerSetting.getCustomContextField();
 
         JTextField contextPathField = runnerSetting.getContextPathField();
         JFormattedTextField portField = runnerSetting.getPortField();
@@ -141,21 +133,11 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
                         Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, project);
                         String contextPath = module == null ? "/" : "/" + module.getName();
                         contextPathField.setText(contextPath);
-
-                        File contextFile = new File(text + "/META-INF/context.xml");
-                        if (contextFile.exists()) {
-                            customContextField.setText(contextFile.getPath());
-                            customContextField.getTextField().setText(contextFile.getPath());
-
-                        }
-
                     }
                 }
 
             }
         });
-
-        customContextField.addBrowseFolderListener("Context xml", "Choose custom context xml file", project, FileChooserDescriptorFactory.createSingleFileDescriptor().withRoots(baseDir));
 
         portField.setValue(8080);
         adminPort.setValue(8005);
