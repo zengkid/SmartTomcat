@@ -25,7 +25,6 @@ import java.util.Map;
 public class TomcatRunConfiguration extends RunConfigurationBase implements RunProfileWithCompileBeforeLaunchOption {
     private TomcatInfo tomcatInfo;
     private String docBase;
-    private String customContext;
     private String moduleName;
     private String contextPath;
     private String port;
@@ -88,14 +87,6 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
 
     public void setModuleName(String moduleName) {
         this.moduleName = moduleName;
-    }
-
-    public String getCustomContext() {
-        return customContext;
-    }
-
-    public void setCustomContext(String customContext) {
-        this.customContext = customContext;
     }
 
     public String getContextPath() {

@@ -33,7 +33,6 @@ public class RunnerSetting {
     private RawCommandLineEditor vmOptons;
     private EnvironmentVariablesComponent envOptions;
     private JFormattedTextField adminPort;
-    private TextFieldWithBrowseButton customContextField;
 
     private Project project;
 
@@ -76,10 +75,6 @@ public class RunnerSetting {
 
     public EnvironmentVariablesComponent getEnvOptions() {
         return envOptions;
-    }
-
-    public TextFieldWithBrowseButton getCustomContextField() {
-        return customContextField;
     }
 
     private void createUIComponents() {
