@@ -22,19 +22,16 @@ import java.util.List;
  * Time   : 00:13
  */
 public class RunnerSetting {
+    private final Project project;
     private JPanel mainPanel;
     private ComboboxWithBrowseButton tomcatField;
     private TextFieldWithBrowseButton docBaseField;
     private JTextField contextPathField;
     private JFormattedTextField portField;
-
-
     private JXButton configrationButton;
     private RawCommandLineEditor vmOptons;
     private EnvironmentVariablesComponent envOptions;
     private JFormattedTextField adminPort;
-
-    private Project project;
 
     public RunnerSetting(Project project) {
         this.project = project;

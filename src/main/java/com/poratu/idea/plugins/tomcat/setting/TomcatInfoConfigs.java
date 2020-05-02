@@ -23,12 +23,17 @@ import java.util.Optional;
 public class TomcatInfoConfigs implements PersistentStateComponent<TomcatInfoConfigs> {
 
     @XCollection(elementTypes = TomcatInfo.class)
-    private List<TomcatInfo> tomcatInfos = new ArrayList<>();
+    private final List<TomcatInfo> tomcatInfos = new ArrayList<>();
+
+    @Nullable
+    public static TomcatInfoConfigs getInstance() {
+        TomcatInfoConfigs sfec = ServiceManager.getService(TomcatInfoConfigs.class);
+        return sfec;
+    }
 
     public List<TomcatInfo> getTomcatInfos() {
         return tomcatInfos;
     }
-
 
     @Nullable
     @Override
@@ -40,12 +45,6 @@ public class TomcatInfoConfigs implements PersistentStateComponent<TomcatInfoCon
     public void loadState(TomcatInfoConfigs tomcatInfoConfigs) {
         XmlSerializerUtil.copyBean(tomcatInfoConfigs, this);
 
-    }
-
-    @Nullable
-    public static TomcatInfoConfigs getInstance() {
-        TomcatInfoConfigs sfec = ServiceManager.getService(TomcatInfoConfigs.class);
-        return sfec;
     }
 
     public int getMaxVersion(TomcatInfo tomcatInfo) {
