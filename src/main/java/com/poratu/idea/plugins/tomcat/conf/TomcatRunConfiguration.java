@@ -7,7 +7,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
@@ -73,11 +72,7 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
             Module[] modules = moduleManager.getModules();
 
             for (Module module : modules) {
-
-
-                ModifiableRootModel modifiableModel = ModuleRootManager.getInstance(module).getModifiableModel();
-                VirtualFile[] sourceRoots = modifiableModel.getSourceRoots(false);
-
+                VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots(false);
                 Optional<VirtualFile> webinfFile = Stream.of(sourceRoots).flatMap(f ->
                         Stream.of(f.getParent().getChildren()).filter(c -> {
                             Path path = Paths.get(c.getCanonicalPath(), "WEB-INF");
