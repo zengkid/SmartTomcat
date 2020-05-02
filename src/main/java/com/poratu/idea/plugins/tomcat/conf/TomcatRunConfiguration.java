@@ -7,15 +7,22 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Author : zengkid
@@ -51,6 +58,55 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
 
     @Override
     public void checkConfiguration() {
+
+    }
+
+    @Override
+    public void onNewConfigurationCreated() {
+        super.onNewConfigurationCreated();
+
+        String webapp = null;
+        try {
+            Project project = getProject();
+
+            ModuleManager moduleManager = ModuleManager.getInstance(project);
+            Module[] modules = moduleManager.getModules();
+
+            for (Module module : modules) {
+
+
+                ModifiableRootModel modifiableModel = ModuleRootManager.getInstance(module).getModifiableModel();
+                VirtualFile[] sourceRoots = modifiableModel.getSourceRoots(false);
+
+                Optional<VirtualFile> webinfFile = Stream.of(sourceRoots).flatMap(f ->
+                        Stream.of(f.getParent().getChildren()).filter(c -> {
+                            Path path = Paths.get(c.getCanonicalPath(), "WEB-INF");
+                            return path.toFile().exists();
+                        })
+                ).distinct().findFirst();
+
+
+                if (webinfFile.isPresent()) {
+                    webapp = webinfFile.get().getCanonicalPath();
+                } else {
+                    String moduleFilePath = module.getModuleFilePath();
+                    Path path = Paths.get(moduleFilePath).getParent().resolve("WEB-INF");
+                    boolean exists = path.toFile().exists();
+                    if (exists) {
+                        webapp = path.toAbsolutePath().toString();
+                    }
+                }
+
+                if (webapp != null) {
+                    docBase = webapp;
+                    moduleName = module.getName();
+                    contextPath = "/" + module.getName();
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            //do nothing.
+        }
 
     }
 

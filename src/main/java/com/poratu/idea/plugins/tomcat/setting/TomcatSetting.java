@@ -19,6 +19,7 @@ import java.awt.*;
  * Time   : 13:40
  */
 public class TomcatSetting {
+    private static final TomcatSetting tomcatSetting = new TomcatSetting();
     private JPanel mainPanel;
     private JList tomcatList;
     private JPanel tomcatListPanel;
@@ -26,8 +27,6 @@ public class TomcatSetting {
     private JTextField tomcatNameField;
     private JTextField tomcatVersionField;
     private JTextField tomcatServerField;
-    private static TomcatSetting tomcatSetting = new TomcatSetting();
-
     private boolean inited = false;
 
     private TomcatSetting() {

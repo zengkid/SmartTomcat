@@ -1,12 +1,14 @@
 package com.poratu.idea.plugins.tomcat.conf;
 
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -34,7 +36,7 @@ import java.util.Map;
  */
 public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration> {
     private final Project project;
-    private RunnerSetting runnerSetting;
+    private final RunnerSetting runnerSetting;
 
     public TomcatSettingsEditor(TomcatRunConfiguration tomcatRunConfiguration, Project project) {
         runnerSetting = new RunnerSetting(project);
@@ -120,7 +122,9 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
 
 
         VirtualFile baseDir = VirtualFileManager.getInstance().getFileSystem("file").findFileByPath(project.getBasePath());
-        docBaseField.addBrowseFolderListener("webapp", "Choose Web Folder", project, FileChooserDescriptorFactory.createSingleFolderDescriptor().withRoots(baseDir));
+
+        FileChooserDescriptor chooserDescriptor = new IgnoreOutputFileChooserDescriptor(project).withRoots(baseDir);
+        docBaseField.addBrowseFolderListener("webapp", "Choose Web Folder", project, chooserDescriptor);
         docBaseField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(DocumentEvent documentEvent) {
@@ -153,6 +157,33 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         adminPort.setFormatterFactory(tf);
 
         return runnerSetting.getMainPanel();
+    }
+
+    class IgnoreOutputFileChooserDescriptor extends FileChooserDescriptor {
+        private Project project;
+
+        public IgnoreOutputFileChooserDescriptor(Project project) {
+            super(false, true, false, false, false, false);
+            this.project = project;
+        }
+
+        @Override
+        public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
+
+            ModuleManager moduleManager = ModuleManager.getInstance(project);
+            Module[] modules = moduleManager.getModules();
+
+            for (Module module : modules) {
+                VirtualFile[] excludeRoots = ModuleRootManager.getInstance(module).getModifiableModel().getExcludeRoots();
+                for (VirtualFile excludeFile : excludeRoots) {
+                    if (excludeFile.getCanonicalPath().equals(file.getCanonicalPath())) {
+                        return false;
+                    }
+                }
+
+            }
+            return super.isFileVisible(file, showHiddenFiles);
+        }
     }
 
 }

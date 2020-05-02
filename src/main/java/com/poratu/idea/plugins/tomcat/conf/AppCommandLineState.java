@@ -35,6 +35,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -231,7 +232,7 @@ public class AppCommandLineState extends JavaCommandLineState {
 
         Source source = new DOMSource(doc);
         StreamResult result = new StreamResult(new OutputStreamWriter(new FileOutputStream(serverXml.toFile()),
-                "UTF-8"));
+                StandardCharsets.UTF_8));
         Transformer xformer = TransformerFactory.newInstance().newTransformer();
         xformer.transform(source, result);
 
