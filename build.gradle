@@ -16,7 +16,7 @@ dependencies {
 }
 
 intellij {
-    version '2019.3.3'
+    version '2020.1.1'
     pluginName = 'SmartTomcat'
     plugins 'java'
     updateSinceUntilBuild false
@@ -30,6 +30,12 @@ patchPluginXml {
       3.support from idea 171+ version
    """
 }
+
+//tasks.withType(JavaCompile) {
+//    options.compilerArgs << '-Xlint:unchecked'
+//    options.deprecation = true
+//}
+
 /*publishPlugin {
     token intellijPublishToken
 }*/

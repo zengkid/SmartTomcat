@@ -174,7 +174,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             Module[] modules = moduleManager.getModules();
 
             for (Module module : modules) {
-                VirtualFile[] excludeRoots = ModuleRootManager.getInstance(module).getModifiableModel().getExcludeRoots();
+                VirtualFile[] excludeRoots = ModuleRootManager.getInstance(module).getExcludeRoots();
                 for (VirtualFile excludeFile : excludeRoots) {
                     if (excludeFile.getCanonicalPath().equals(file.getCanonicalPath())) {
                         return false;
