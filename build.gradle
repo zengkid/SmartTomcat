@@ -23,7 +23,7 @@ intellij {
 }
 patchPluginXml {
     version '3.6.2'
-    sinceBuild '171'
+    sinceBuild '193'
     changeNotes """
       1.auto load webapp/META-INF/context instead of  manual choose context.xml
       2.bug fixed
