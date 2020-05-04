@@ -3,6 +3,7 @@ package com.poratu.idea.plugins.tomcat.conf;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtil;
@@ -14,12 +15,14 @@ import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
+import com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -29,19 +32,24 @@ import java.util.stream.Stream;
  * Date   : 2/16/2017
  * Time   : 3:14 PM
  */
-public class TomcatRunConfiguration extends RunConfigurationBase implements RunProfileWithCompileBeforeLaunchOption {
+public class TomcatRunConfiguration extends LocatableConfigurationBase implements RunProfileWithCompileBeforeLaunchOption {
     private TomcatInfo tomcatInfo;
     private String docBase;
     private String moduleName;
     private String contextPath;
-    private String port;
-    private String adminPort;
+    private String port = "8080";
+    private String adminPort = "8005";
     private String vmOptions;
     private Map<String, String> envOptions;
     private Boolean passParentEnvironmentVariables = true;
 
     protected TomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
         super(project, factory, name);
+        TomcatInfoConfigs applicationService = ServiceManager.getService(TomcatInfoConfigs.class);
+        List<TomcatInfo> tomcatInfos = applicationService.getTomcatInfos();
+        if (!tomcatInfos.isEmpty()) {
+            this.tomcatInfo = tomcatInfos.get(0);
+        }
     }
 
     @NotNull
@@ -182,101 +190,6 @@ public class TomcatRunConfiguration extends RunConfigurationBase implements RunP
         this.passParentEnvironmentVariables = passParentEnvironmentVariables;
     }
 
-//    public String getClassName() {
-//        return className;
-//    }
-//
-//    public void setClassName(String className) {
-//        this.className = className;
-//    }
-//
-//    public String getDebug() {
-//        return debug;
-//    }
-//
-//    public void setDebug(String debug) {
-//        this.debug = debug;
-//    }
-//
-//    public String getDigest() {
-//        return digest;
-//    }
-//
-//    public void setDigest(String digest) {
-//        this.digest = digest;
-//    }
-//
-//    public String getRoleNameCol() {
-//        return roleNameCol;
-//    }
-//
-//    public void setRoleNameCol(String roleNameCol) {
-//        this.roleNameCol = roleNameCol;
-//    }
-//
-//    public String getUserCredCol() {
-//        return userCredCol;
-//    }
-//
-//    public void setUserCredCol(String userCredCol) {
-//        this.userCredCol = userCredCol;
-//    }
-//
-//    public String getUserNameCol() {
-//        return userNameCol;
-//    }
-//
-//    public void setUserNameCol(String userNameCol) {
-//        this.userNameCol = userNameCol;
-//    }
-//
-//    public String getUserRoleTable() {
-//        return userRoleTable;
-//    }
-//
-//    public void setUserRoleTable(String userRoleTable) {
-//        this.userRoleTable = userRoleTable;
-//    }
-//
-//    public String getUserTable() {
-//        return userTable;
-//    }
-//
-//    public void setUserTable(String userTable) {
-//        this.userTable = userTable;
-//    }
-//
-//    public String getJndiGlobal() {
-//        return jndiGlobal;
-//    }
-//
-//    public void setJndiGlobal(String jndiGlobal) {
-//        this.jndiGlobal = jndiGlobal;
-//    }
-//
-//    public String getJndiName() {
-//        return jndiName;
-//    }
-//
-//    public void setJndiName(String jndiName) {
-//        this.jndiName = jndiName;
-//    }
-//
-//    public String getJndiType() {
-//        return jndiType;
-//    }
-//
-//    public void setJndiType(String jndiType) {
-//        this.jndiType = jndiType;
-//    }
-//
-//    public String getDataSourceName() {
-//        return dataSourceName;
-//    }
-//
-//    public void setDataSourceName(String dataSourceName) {
-//        this.dataSourceName = dataSourceName;
-//    }
 
     @Override
     @NotNull
