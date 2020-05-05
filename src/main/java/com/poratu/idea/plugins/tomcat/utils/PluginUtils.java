@@ -1,7 +1,6 @@
 package com.poratu.idea.plugins.tomcat.utils;
 
-import com.intellij.openapi.projectRoots.ProjectJdkTable;
-import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.util.JdkBundle;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import org.apache.commons.lang.StringUtils;
 
@@ -18,17 +17,14 @@ import java.util.stream.Stream;
  */
 public abstract class PluginUtils {
 
-    public static Sdk getDefaultJDK() {
-        Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
-        if (allJdks == null || allJdks.length == 0) {
-            throw new RuntimeException("Please setup your project JDK first");
-        }
-        Sdk jdk = allJdks[0];
-        return jdk;
+    public static String getJavaHome() {
+        JdkBundle jdkBundle = JdkBundle.createBoot();
+        String javahome = jdkBundle.getLocation().getAbsolutePath();
+        return javahome;
     }
 
     public static TomcatInfo getTomcatInfo(String tomcatHome) {
-        return getTomcatInfo(getDefaultJDK().getHomePath(), tomcatHome);
+        return getTomcatInfo(getJavaHome(), tomcatHome);
     }
 
     public static TomcatInfo getTomcatInfo(String javaHome, String tomcatHome) {
