@@ -22,12 +22,13 @@ intellij {
     updateSinceUntilBuild false
 }
 patchPluginXml {
-    version '3.6.2'
     sinceBuild '171'
     changeNotes """
-      1.auto load webapp/META-INF/context instead of  manual choose context.xml
-      2.bug fixed
-      3.support from idea 171+ version
+    <ul>
+        <li>1.auto load webapp/META-INF/context instead of manual choose context.xml</li>
+        <li>2.support from idea 171+ version</li>
+        <li>3.enhancement and bug fixed</li>
+    </ul>
    """
 }
 
