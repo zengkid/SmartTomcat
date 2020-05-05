@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.intellij' version '0.4.18'
 }
 
-version '3.6.2'
+version '3.7.0'
 
 sourceCompatibility = 1.8
 
@@ -22,12 +22,12 @@ intellij {
     updateSinceUntilBuild false
 }
 patchPluginXml {
-    version '3.6.2'
     sinceBuild '193'
     changeNotes """
-      1.auto load webapp/META-INF/context instead of  manual choose context.xml
-      2.bug fixed
-      3.support from idea 171+ version
+     <ul>
+      <li>1.auto set default run/debug config value when create tomcat run/debug</li>
+      <li>2.show tomcat run/debug menu when right click webapp folder</li>
+     </ul>
    """
 }
 
