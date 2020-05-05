@@ -26,38 +26,41 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
     @Override
     protected boolean setupConfigurationFromContext(@NotNull TomcatRunConfiguration configuration, @NotNull ConfigurationContext context, @NotNull Ref<PsiElement> sourceElement) {
 
-        Module module = context.getModule();
-        Optional<VirtualFile> webModule = getWebModule(module);
+        boolean result = isConfigurationFromContext(configuration, context);
 
-        boolean isWebModule = webModule.isPresent();
-        if (isWebModule) {
-
-            VirtualFile virtualFile = webModule.get();
+        if (result) {
+            VirtualFile virtualFile = context.getLocation().getVirtualFile();
+            Module module = context.getModule();
             configuration.setName(module.getName());
             configuration.setDocBase(virtualFile.getCanonicalPath());
             configuration.setContextPath("/" + module.getName());
             configuration.setModuleName(module.getName());
 
-            ConfigurationFactory configurationFactory = getConfigurationFactory();
             final RunnerAndConfigurationSettings settings =
-                    RunManager.getInstance(context.getProject()).createConfiguration(configuration, configurationFactory);
-
-            settings.setName(configuration.getName() + " in " + module.getName());
+                    RunManager.getInstance(context.getProject()).createConfiguration(configuration, getConfigurationFactory());
+            settings.setName(module.getName() + " in SmartTomcat");
         }
-
-        return isWebModule;
+        return false;
     }
 
 
     @Override
     public boolean isConfigurationFromContext(@NotNull TomcatRunConfiguration configuration, @NotNull ConfigurationContext context) {
+        boolean result = false;
 
-        Module module = context.getModule();
-        Optional<VirtualFile> webModule = getWebModule(module);
-
-
-        boolean present = webModule.isPresent();
-        return present;
+        VirtualFile vf = context.getLocation().getVirtualFile();
+        if (vf != null && vf.isDirectory()) {
+            Module module = context.getModule();
+            Optional<VirtualFile> webModule = getWebModule(module);
+            boolean isWebModule = webModule.isPresent();
+            if (isWebModule) {
+                VirtualFile virtualFile = webModule.get();
+                if (vf.getCanonicalPath().equals(virtualFile.getCanonicalPath())) {
+                    result = true;
+                }
+            }
+        }
+        return result;
     }
 
     @NotNull
