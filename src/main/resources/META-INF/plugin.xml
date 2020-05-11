@@ -1,7 +1,6 @@
 <idea-plugin>
     <id>com.poratu.idea.plugins.tomcat</id>
     <name>Smart Tomcat</name>
-    <version>3.6.1</version>
     <vendor email="zengkid@msn.com">zengkid</vendor>
 
     <description><![CDATA[
@@ -13,10 +12,6 @@
       The Smart Tomcat support Tomcat 6+ <br/>
 
     ]]></description>
-
-    <change-notes><![CDATA[
-        new feature: Additional context parameters in custom context.xml.
-    ]]></change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
     <idea-version since-build="193"/>
