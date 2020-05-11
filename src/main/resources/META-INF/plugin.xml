@@ -19,7 +19,7 @@
     ]]></change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="191"/>
+    <idea-version since-build="193"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -33,10 +33,11 @@
 
         <configurationType implementation="com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType"/>
 
+        <runConfigurationProducer implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunConfigurationProducer" order="last"/>
+
         <applicationService serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs"/>
 
 
-        <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunner" order="first"/>
         <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatDebugger" order="last"/>
 
     </extensions>
