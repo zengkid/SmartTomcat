@@ -1,5 +1,7 @@
 package com.poratu.idea.plugins.tomcat.utils;
 
+import com.intellij.openapi.projectRoots.ProjectJdkTable;
+import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.util.JdkBundle;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import org.apache.commons.lang.StringUtils;
@@ -18,16 +20,28 @@ import java.util.stream.Stream;
 public abstract class PluginUtils {
 
     public static String getJavaHome() {
-        JdkBundle jdkBundle = JdkBundle.createBoot();
-        String javahome = jdkBundle.getLocation().getAbsolutePath();
+        Sdk sdk = getProjectJDK();
+        String javahome;
+        if (sdk == null) {
+            JdkBundle jdkBundle = JdkBundle.createBoot();
+            javahome = jdkBundle.getLocation().getAbsolutePath();
+        } else {
+            javahome = sdk.getHomePath();
+        }
         return javahome;
+    }
+
+    private static Sdk getProjectJDK() {
+        Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
+        Sdk jdk = allJdks.length == 0 ? null : allJdks[0];
+        return jdk;
     }
 
     public static TomcatInfo getTomcatInfo(String tomcatHome) {
         return getTomcatInfo(getJavaHome(), tomcatHome);
     }
 
-    public static TomcatInfo getTomcatInfo(String javaHome, String tomcatHome) {
+    private static TomcatInfo getTomcatInfo(String javaHome, String tomcatHome) {
         String[] cmd = new String[]{
                 javaHome + "/bin/java",
                 "-cp",
@@ -52,11 +66,9 @@ public abstract class PluginUtils {
                 }
 
             });
-
             reader.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
 
         } finally {
@@ -79,7 +91,5 @@ public abstract class PluginUtils {
             result = strings[1].trim();
         }
         return result;
-
-
     }
 }

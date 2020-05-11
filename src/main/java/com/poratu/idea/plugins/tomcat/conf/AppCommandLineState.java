@@ -116,11 +116,12 @@ public class AppCommandLineState extends JavaCommandLineState {
             updateServerConf(tomcatVersion, module, confPath, contextPath, configuration);
 
 
+
             javaParams.setPassParentEnvs(configuration.getPassParentEnvironmentVariables());
-            javaParams.getVMParametersList().addParametersString(vmOptions);
             if (envOptions != null) {
                 javaParams.setEnv(envOptions);
             }
+            javaParams.getVMParametersList().addParametersString(vmOptions);
             return javaParams;
 
         } catch (Exception e) {
