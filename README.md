@@ -74,9 +74,9 @@ The Tomcat plugin for Intellij IDEA
             
             default value is 8080
             
-    * AJP Port
+    * ~~AJP Port~~
     
-            default value is 8009
+         ~~default value is 8009~~
     
     * Admin Port
     
