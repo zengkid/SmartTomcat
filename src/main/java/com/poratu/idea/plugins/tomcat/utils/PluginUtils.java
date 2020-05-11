@@ -2,6 +2,7 @@ package com.poratu.idea.plugins.tomcat.utils;
 
 import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.util.JdkBundle;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import org.apache.commons.lang.StringUtils;
 
@@ -18,20 +19,21 @@ import java.util.stream.Stream;
  */
 public abstract class PluginUtils {
 
-    public static Sdk getDefaultJDK() {
+    private static String getJavaHome() {
         Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
-        if (allJdks == null || allJdks.length == 0) {
-            throw new RuntimeException("Please setup your project JDK first");
+        String javahome = allJdks.length == 0 ? null : allJdks[0].getHomePath();
+        if (StringUtils.isEmpty(javahome)) { //project sdk still not setting.
+            JdkBundle jdkBundle = JdkBundle.createBoot();
+            javahome = jdkBundle.getLocation().getAbsolutePath();
         }
-        Sdk jdk = allJdks[0];
-        return jdk;
+        return javahome;
     }
 
     public static TomcatInfo getTomcatInfo(String tomcatHome) {
-        return getTomcatInfo(getDefaultJDK().getHomePath(), tomcatHome);
+        return getTomcatInfo(getJavaHome(), tomcatHome);
     }
 
-    public static TomcatInfo getTomcatInfo(String javaHome, String tomcatHome) {
+    private static TomcatInfo getTomcatInfo(String javaHome, String tomcatHome) {
         String[] cmd = new String[]{
                 javaHome + "/bin/java",
                 "-cp",
