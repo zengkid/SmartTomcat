@@ -81,7 +81,6 @@ public abstract class PluginUtils {
             }
         }
         return tomcatInfo;
-
     }
 
     private static String getValue(String s) {

@@ -40,7 +40,7 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
                     RunManager.getInstance(context.getProject()).createConfiguration(configuration, getConfigurationFactory());
             settings.setName(module.getName() + " in SmartTomcat");
         }
-        return false;
+        return result;
     }
 
 

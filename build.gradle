@@ -27,6 +27,7 @@ patchPluginXml {
      <ul>
       <li>1.auto set default run/debug config value when create tomcat run/debug</li>
       <li>2.show tomcat run/debug menu when right click webapp folder</li>
+      <li>3.use project jdk as default instead of idea bundle jdk</li>
      </ul>
    """
 }
