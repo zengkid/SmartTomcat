@@ -116,7 +116,6 @@ public class AppCommandLineState extends JavaCommandLineState {
             updateServerConf(tomcatVersion, module, confPath, contextPath, configuration);
 
 
-
             javaParams.setPassParentEnvs(configuration.getPassParentEnvironmentVariables());
             if (envOptions != null) {
                 javaParams.setEnv(envOptions);
@@ -168,17 +167,18 @@ public class AppCommandLineState extends JavaCommandLineState {
         portShutdown.setAttribute("port", cfg.getAdminPort());
         portE.setAttribute("port", cfg.getPort());
 
-
         Element contextE = doc.createElement("Context");
-
-        String customContext = cfg.getDocBase() + "/META-INF/context.xml";
-        if (StringUtil.isNotEmpty(customContext)) {
-            File customContextFile = new File(customContext);
+        String customContext = cfg.getDocBase() + "/META-INF/context_local.xml";
+        File customContextFile = new File(customContext);
+        if (customContextFile.exists()) {
+            org.w3c.dom.Document customContextDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(customContextFile);
+            contextE = (Element) doc.importNode(customContextDoc.getDocumentElement(), true);
+        } else {
+            customContext = cfg.getDocBase() + "/META-INF/context.xml";
+            customContextFile = new File(customContext);
             if (customContextFile.exists()) {
-
                 org.w3c.dom.Document customContextDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(customContextFile);
                 contextE = (Element) doc.importNode(customContextDoc.getDocumentElement(), true);
-
             }
         }
 
