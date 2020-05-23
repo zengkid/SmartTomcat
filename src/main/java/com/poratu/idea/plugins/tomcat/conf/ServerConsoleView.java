@@ -28,10 +28,12 @@ public class ServerConsoleView extends ConsoleViewImpl implements ConsoleView {
     @Override
     public void print(@NotNull String s, @NotNull ConsoleViewContentType contentType) {
         super.print(s, contentType);
-        if (!printStarted && s.contains("Server startup in")) {
-            String url = "http://localhost" + (configuration.getPort().equals("80") ? "" : ":" + configuration.getPort()) + configuration.getContextPath();
-            super.print(url + "\n", contentType);
-            printStarted = true;
+        if (!printStarted) {
+            if (s.contains("Server startup in") || s.contains("后服务器启动")) {
+                String url = "http://localhost" + (configuration.getPort().equals("80") ? "" : ":" + configuration.getPort()) + configuration.getContextPath();
+                super.print(url + "\n", contentType);
+                printStarted = true;
+            }
         }
     }
 }
