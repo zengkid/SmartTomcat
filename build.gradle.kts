@@ -32,6 +32,7 @@ tasks {
     }
 }
 tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml") {
+    sinceBuild("193")
     changeNotes("""
       <ul>
       <li>1.auto load context_local.xml instead of context.xml if context_local.xml exists</li>
