@@ -13,10 +13,13 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType;
+import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
+import com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -29,6 +32,14 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
         boolean result = isConfigurationFromContext(configuration, context);
 
         if (result) {
+            List<TomcatInfo> tomcatInfos = TomcatInfoConfigs.getInstance().getTomcatInfos();
+            if (tomcatInfos != null && tomcatInfos.size() > 0) {
+                TomcatInfo tomcatInfo = tomcatInfos.get(0);
+                configuration.setTomcatInfo(tomcatInfo);
+            } else  {
+                throw new RuntimeException("Not found any Tomcat Server, please add Tomcat Server first.");
+            }
+
             VirtualFile virtualFile = context.getLocation().getVirtualFile();
             Module module = context.getModule();
             configuration.setName(module.getName());
