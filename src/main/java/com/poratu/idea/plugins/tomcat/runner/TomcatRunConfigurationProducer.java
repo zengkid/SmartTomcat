@@ -62,12 +62,14 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
         VirtualFile vf = context.getLocation().getVirtualFile();
         if (vf != null && vf.isDirectory()) {
             Module module = context.getModule();
-            Optional<VirtualFile> webModule = getWebModule(module);
-            boolean isWebModule = webModule.isPresent();
-            if (isWebModule) {
-                VirtualFile virtualFile = webModule.get();
-                if (vf.getCanonicalPath().equals(virtualFile.getCanonicalPath())) {
-                    result = true;
+            if (module != null) {
+                Optional<VirtualFile> webModule = getWebModule(module);
+                boolean isWebModule = webModule.isPresent();
+                if (isWebModule) {
+                    VirtualFile virtualFile = webModule.get();
+                    if (vf.getCanonicalPath().equals(virtualFile.getCanonicalPath())) {
+                        result = true;
+                    }
                 }
             }
         }
