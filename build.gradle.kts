@@ -6,7 +6,7 @@ plugins {
     kotlin("jvm") version "1.3.72"
 }
 
-version = "3.7.1"
+version = "3.7.2"
 
 repositories {
     mavenCentral()
@@ -37,8 +37,7 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
     sinceBuild("193")
     changeNotes("""
       <ul>
-      <li>1.auto load context_local.xml instead of context.xml if context_local.xml exists</li>
-      <li>2.bug fixed</li>
+      <li>1.bug fixed</li>
      </ul>
       """)
 }
