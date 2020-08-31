@@ -7,14 +7,12 @@ import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Element;
@@ -70,7 +68,7 @@ public class AppCommandLineState extends JavaCommandLineState {
         try {
 
             Path tomcatInstallationPath = Paths.get(configuration.getTomcatInfo().getPath());
-            String moduleRoot = configuration.getModuleName();
+            Module module = configuration.getModule();
             String contextPath = configuration.getContextPath();
             String tomcatVersion = configuration.getTomcatInfo().getVersion();
             String vmOptions = configuration.getVmOptions();
@@ -91,17 +89,11 @@ public class AppCommandLineState extends JavaCommandLineState {
             addBinFolder(tomcatInstallationPath, javaParams);
             addLibFolder(tomcatInstallationPath, javaParams);
 
-            File file = new File(configuration.getDocBase());
-            VirtualFile fileByIoFile = LocalFileSystem.getInstance().findFileByIoFile(file);
-            Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, configuration.getProject());
-
-
             if (module == null) {
                 throw new ExecutionException("The Module Root specified is not a module according to Intellij");
             }
 
-            String userHome = System.getProperty("user.home");
-            Path workPath = Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
+            Path workPath = PluginUtils.getWorkPath(configuration);
             Path confPath = workPath.resolve("conf");
             if (!confPath.toFile().exists()) {
                 confPath.toFile().mkdirs();

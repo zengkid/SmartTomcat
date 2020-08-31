@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 public class TomcatRunConfiguration extends LocatableConfigurationBase implements RunProfileWithCompileBeforeLaunchOption {
     private TomcatInfo tomcatInfo;
     private String docBase;
-    private String moduleName;
+    private Module module;
     private String contextPath;
     private String port = "8080";
     private String adminPort = "8005";
@@ -89,8 +89,8 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
             if (webinfFile.isPresent()) {
                 VirtualFile file = webinfFile.get();
                 docBase = file.getCanonicalPath();
-                moduleName = ModuleUtil.findModuleForFile(file, project).getName();
-                contextPath = "/" + moduleName;
+                module = ModuleUtil.findModuleForFile(file, project);
+                contextPath = "/" + module.getName();
             }
         } catch (Exception e) {
             //do nothing.
@@ -125,12 +125,12 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
         this.docBase = docBase;
     }
 
-    public String getModuleName() {
-        return moduleName;
+    public Module getModule() {
+        return module;
     }
 
-    public void setModuleName(String moduleName) {
-        this.moduleName = moduleName;
+    public void setModule(Module module) {
+        this.module = module;
     }
 
     public String getContextPath() {
