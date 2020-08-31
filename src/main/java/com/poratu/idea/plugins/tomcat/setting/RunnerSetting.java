@@ -3,6 +3,7 @@ package com.poratu.idea.plugins.tomcat.setting;
 import com.intellij.execution.configuration.EnvironmentVariablesComponent;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -32,6 +33,7 @@ public class RunnerSetting {
     private RawCommandLineEditor vmOptons;
     private EnvironmentVariablesComponent envOptions;
     private JFormattedTextField adminPort;
+    private Module module;
 
     public RunnerSetting(Project project) {
         this.project = project;
@@ -112,5 +114,11 @@ public class RunnerSetting {
         });
     }
 
+    public Module getModule() {
+        return module;
+    }
 
+    public void setModule(Module module) {
+        this.module = module;
+    }
 }

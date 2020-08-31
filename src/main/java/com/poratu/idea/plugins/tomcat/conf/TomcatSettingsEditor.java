@@ -96,6 +96,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
             tomcatRunConfiguration.setTomcatInfo(selectedItem);
         }
         tomcatRunConfiguration.setDocBase(runnerSetting.getDocBaseField().getText());
+        tomcatRunConfiguration.setModule(runnerSetting.getModule());
         tomcatRunConfiguration.setContextPath(runnerSetting.getContextPathField().getText());
         tomcatRunConfiguration.setPort(runnerSetting.getPortField().getText());
         tomcatRunConfiguration.setAdminPort(runnerSetting.getAdminPort().getText());
@@ -137,6 +138,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
                         Module module = ModuleUtilCore.findModuleForFile(fileByIoFile, project);
                         String contextPath = module == null ? "/" : "/" + module.getName();
                         contextPathField.setText(contextPath);
+                        runnerSetting.setModule(module);
                     }
                 }
 
