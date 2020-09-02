@@ -37,7 +37,8 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
     sinceBuild("193")
     changeNotes("""
       <ul>
-      <li>1. print console log to a log file</li>
+      <li>1. save console log to a file</li>
+      <li>2. fixed bugs</li>
      </ul>
       """)
 }
