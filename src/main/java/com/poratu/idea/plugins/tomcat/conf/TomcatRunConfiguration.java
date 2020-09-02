@@ -1,6 +1,9 @@
 package com.poratu.idea.plugins.tomcat.conf;
 
+import com.intellij.diagnostic.logging.LogConfigurationPanel;
+import com.intellij.execution.ExecutionBundle;
 import com.intellij.execution.Executor;
+import com.intellij.execution.JavaRunConfigurationExtensionManager;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.components.ServiceManager;
@@ -8,6 +11,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.options.SettingsEditorGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
@@ -56,7 +60,12 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
     @Override
     public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
         Project project = getProject();
-        return new TomcatSettingsEditor(this, project);
+        TomcatSettingsEditor tomcatSetting = new TomcatSettingsEditor(this, project);
+        SettingsEditorGroup<TomcatRunConfiguration> group = new SettingsEditorGroup<>();
+        group.addEditor(ExecutionBundle.message("run.configuration.configuration.tab.title"), tomcatSetting);
+        JavaRunConfigurationExtensionManager.getInstance().appendEditors(this, group);
+        group.addEditor(ExecutionBundle.message("logs.tab.title"), new LogConfigurationPanel<>());
+        return group;
     }
 
     @Override
