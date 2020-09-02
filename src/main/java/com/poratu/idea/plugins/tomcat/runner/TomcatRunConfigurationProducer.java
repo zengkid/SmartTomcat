@@ -36,7 +36,7 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
             if (tomcatInfos != null && tomcatInfos.size() > 0) {
                 TomcatInfo tomcatInfo = tomcatInfos.get(0);
                 configuration.setTomcatInfo(tomcatInfo);
-            } else  {
+            } else {
                 throw new RuntimeException("Not found any Tomcat Server, please add Tomcat Server first.");
             }
 
