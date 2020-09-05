@@ -37,22 +37,17 @@ import java.util.stream.Stream;
  * Time   : 3:14 PM
  */
 public class TomcatRunConfiguration extends LocatableConfigurationBase implements RunProfileWithCompileBeforeLaunchOption {
-    private TomcatInfo tomcatInfo;
-    private String docBase;
     private Module module;
-    private String contextPath;
-    private String port = "8080";
-    private String adminPort = "8005";
-    private String vmOptions;
-    private Map<String, String> envOptions;
-    private Boolean passParentEnvironmentVariables = true;
+    private TomcatOptionRunConfigurationOptions options;
+
 
     protected TomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
         super(project, factory, name);
         TomcatInfoConfigs applicationService = ServiceManager.getService(TomcatInfoConfigs.class);
         List<TomcatInfo> tomcatInfos = applicationService.getTomcatInfos();
         if (!tomcatInfos.isEmpty()) {
-            this.tomcatInfo = tomcatInfos.get(0);
+            options = getOptions();
+            options.setTomcatInfo(tomcatInfos.get(0));
         }
     }
 
@@ -97,9 +92,9 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
 
             if (webinfFile.isPresent()) {
                 VirtualFile file = webinfFile.get();
-                docBase = file.getCanonicalPath();
+                options.setDocBase(file.getCanonicalPath());
                 module = ModuleUtil.findModuleForFile(file, project);
-                contextPath = "/" + module.getName();
+                options.setContextPath("/" + module.getName());
             }
         } catch (Exception e) {
             //do nothing.
@@ -116,22 +111,14 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
     @Override
     public void readExternal(Element element) throws InvalidDataException {
         super.readExternal(element);
-        XmlSerializer.deserializeInto(this, element);
+        XmlSerializer.deserializeInto(options, element);
 
     }
 
     @Override
     public void writeExternal(Element element) throws WriteExternalException {
         super.writeExternal(element);
-        XmlSerializer.serializeInto(this, element);
-    }
-
-    public String getDocBase() {
-        return docBase;
-    }
-
-    public void setDocBase(String docBase) {
-        this.docBase = docBase;
+        XmlSerializer.serializeInto(options, element);
     }
 
     public Module getModule() {
@@ -140,6 +127,121 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
 
     public void setModule(Module module) {
         this.module = module;
+    }
+
+
+    public TomcatInfo getTomcatInfo() {
+        return options.getTomcatInfo();
+    }
+
+    public void setTomcatInfo(TomcatInfo tomcatInfo) {
+        options.setTomcatInfo(tomcatInfo);
+    }
+
+    @Override
+    @NotNull
+    public Module[] getModules() {
+        ModuleManager moduleManager = ModuleManager.getInstance(getProject());
+        Module[] modules = moduleManager.getModules();
+        return modules;
+    }
+
+    @NotNull
+    @Override
+    protected TomcatOptionRunConfigurationOptions getOptions() {
+        options = (TomcatOptionRunConfigurationOptions) super.getOptions();
+        return options;
+    }
+
+    @NotNull
+    @Override
+    protected Class<? extends TomcatOptionRunConfigurationOptions> getDefaultOptionsClass() {
+        return TomcatOptionRunConfigurationOptions.class;
+    }
+
+
+    public String getDocBase() {
+        return options.getDocBase();
+    }
+
+    public void setDocBase(String docBase) {
+        options.setDocBase(docBase);
+    }
+
+    public String getContextPath() {
+        return options.getContextPath();
+    }
+
+    public void setContextPath(String contextPath) {
+        options.setContextPath(contextPath);
+    }
+
+    public String getPort() {
+        return options.getPort();
+    }
+
+    public void setPort(String port) {
+        options.setPort(port);
+    }
+
+    public String getAdminPort() {
+        return options.getAdminPort();
+    }
+
+    public void setAdminPort(String adminPort) {
+        options.setAdminPort(adminPort);
+    }
+
+    public String getVmOptions() {
+        return options.getVmOptions();
+    }
+
+    public void setVmOptions(String vmOptions) {
+        options.setVmOptions(vmOptions);
+    }
+
+    public Map<String, String> getEnvOptions() {
+        return options.getEnvOptions();
+    }
+
+    public void setEnvOptions(Map<String, String> envOptions) {
+        options.setEnvOptions(envOptions);
+    }
+
+    public Boolean getPassParentEnvironmentVariables() {
+        return options.getPassParentEnvironmentVariables();
+    }
+
+    public void setPassParentEnvironmentVariables(Boolean passParentEnvironmentVariables) {
+        options.setPassParentEnvironmentVariables(passParentEnvironmentVariables);
+    }
+}
+
+class TomcatOptionRunConfigurationOptions extends LocatableRunConfigurationOptions {
+    private TomcatInfo tomcatInfo;
+
+    private String docBase;
+    private String contextPath;
+    private String port = "8080";
+    private String adminPort = "8005";
+    private String vmOptions;
+    private Map<String, String> envOptions;
+    private Boolean passParentEnvironmentVariables = true;
+
+    public TomcatInfo getTomcatInfo() {
+        return tomcatInfo;
+    }
+
+    public void setTomcatInfo(TomcatInfo tomcatInfo) {
+        this.tomcatInfo = tomcatInfo;
+    }
+
+    public String getDocBase() {
+        return docBase;
+    }
+
+    public void setDocBase(String docBase) {
+        this.docBase = docBase;
     }
 
     public String getContextPath() {
@@ -158,21 +260,12 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
         this.port = port;
     }
 
-
     public String getAdminPort() {
         return adminPort;
     }
 
     public void setAdminPort(String adminPort) {
         this.adminPort = adminPort;
-    }
-
-    public TomcatInfo getTomcatInfo() {
-        return tomcatInfo;
-    }
-
-    public void setTomcatInfo(TomcatInfo tomcatInfo) {
-        this.tomcatInfo = tomcatInfo;
     }
 
     public String getVmOptions() {
@@ -198,13 +291,5 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
     public void setPassParentEnvironmentVariables(Boolean passParentEnvironmentVariables) {
         this.passParentEnvironmentVariables = passParentEnvironmentVariables;
     }
-
-
-    @Override
-    @NotNull
-    public Module[] getModules() {
-        ModuleManager moduleManager = ModuleManager.getInstance(getProject());
-        Module[] modules = moduleManager.getModules();
-        return modules;
-    }
 }
+
