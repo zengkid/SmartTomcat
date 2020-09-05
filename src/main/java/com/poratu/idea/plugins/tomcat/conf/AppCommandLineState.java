@@ -96,7 +96,7 @@ public class AppCommandLineState extends JavaCommandLineState {
             Path workPath = PluginUtils.getWorkPath(configuration);
             Path confPath = workPath.resolve("conf");
             if (!confPath.toFile().exists()) {
-                confPath.toFile().mkdirs();
+               boolean r = confPath.toFile().mkdirs();
             }
 
 
@@ -112,7 +112,8 @@ public class AppCommandLineState extends JavaCommandLineState {
             if (envOptions != null) {
                 javaParams.setEnv(envOptions);
             }
-            javaParams.getVMParametersList().addParametersString(vmOptions);
+            String options = "-Duser.language=en -Duser.region=US " + vmOptions; //set en_US as default
+            javaParams.getVMParametersList().addParametersString(options);
             return javaParams;
 
         } catch (Exception e) {
@@ -125,8 +126,7 @@ public class AppCommandLineState extends JavaCommandLineState {
     @Nullable
     @Override
     protected ConsoleView createConsole(@NotNull Executor executor) {
-        ConsoleView consoleView = new ServerConsoleView(configuration);
-        return consoleView;
+        return new ServerConsoleView(configuration);
     }
 
     private void updateServerConf(String tomcatVersion, Module module, Path confPath, String contextPath, TomcatRunConfiguration cfg) throws Exception {
@@ -187,7 +187,7 @@ public class AppCommandLineState extends JavaCommandLineState {
                 paths.add(classPath);
             }
             int index = tomcatVersion.indexOf(".");
-            int version = Integer.valueOf(tomcatVersion.substring(0, index));
+            int version = Integer.parseInt(tomcatVersion.substring(0, index));
 
 
             if (version >= 8) { //for tomcat8
@@ -217,7 +217,7 @@ public class AppCommandLineState extends JavaCommandLineState {
             } else if (version >= 6) { //for tomcat6-7
                 Element loaderE = doc.createElement("Loader");
                 loaderE.setAttribute("className", "org.apache.catalina.loader.VirtualWebappLoader");
-                loaderE.setAttribute("virtualClasspath", paths.stream().collect(Collectors.joining(";")));
+                loaderE.setAttribute("virtualClasspath", String.join(";", paths));
                 contextE.appendChild(loaderE);
             }
         }
