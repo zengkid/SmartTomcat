@@ -45,8 +45,8 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
         super(project, factory, name);
         TomcatInfoConfigs applicationService = ServiceManager.getService(TomcatInfoConfigs.class);
         List<TomcatInfo> tomcatInfos = applicationService.getTomcatInfos();
+        options = getOptions();
         if (!tomcatInfos.isEmpty()) {
-            options = getOptions();
             options.setTomcatInfo(tomcatInfos.get(0));
         }
     }
