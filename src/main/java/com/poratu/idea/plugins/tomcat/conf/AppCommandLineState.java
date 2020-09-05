@@ -96,7 +96,7 @@ public class AppCommandLineState extends JavaCommandLineState {
             Path workPath = PluginUtils.getWorkPath(configuration);
             Path confPath = workPath.resolve("conf");
             if (!confPath.toFile().exists()) {
-               boolean r = confPath.toFile().mkdirs();
+               confPath.toFile().mkdirs();
             }
 
 
