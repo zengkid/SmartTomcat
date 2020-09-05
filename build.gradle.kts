@@ -19,7 +19,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2020.1.1"
+    version = "2020.2.1"
     setPlugins("java")
     pluginName = "SmartTomcat"
     updateSinceUntilBuild = false
