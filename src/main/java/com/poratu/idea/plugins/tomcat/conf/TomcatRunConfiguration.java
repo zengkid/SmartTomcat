@@ -16,6 +16,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
@@ -24,6 +25,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -122,6 +124,10 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
     }
 
     public Module getModule() {
+        if (module == null) {
+            VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByIoFile(new File(options.getDocBase()));
+            module = ModuleUtil.findModuleForFile(virtualFile, this.getProject());
+        }
         return module;
     }
 
