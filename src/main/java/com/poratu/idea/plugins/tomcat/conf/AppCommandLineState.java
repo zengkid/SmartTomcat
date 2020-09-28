@@ -40,7 +40,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Author : zengkid
@@ -68,22 +67,17 @@ public class AppCommandLineState extends JavaCommandLineState {
         try {
 
             Path tomcatInstallationPath = Paths.get(configuration.getTomcatInfo().getPath());
+            Project project = this.configuration.getProject();
             Module module = configuration.getModule();
             String contextPath = configuration.getContextPath();
             String tomcatVersion = configuration.getTomcatInfo().getVersion();
             String vmOptions = configuration.getVmOptions();
             Map<String, String> envOptions = configuration.getEnvOptions();
 
-            Project project = this.configuration.getProject();
-
             JavaParameters javaParams = new JavaParameters();
-
-
             ProjectRootManager manager = ProjectRootManager.getInstance(project);
             javaParams.setJdk(manager.getProjectSdk());
-
             javaParams.setDefaultCharset(project);
-
             javaParams.setMainClass(TOMCAT_MAIN_CLASS);
             javaParams.getProgramParametersList().add("start");
             addBinFolder(tomcatInstallationPath, javaParams);
@@ -96,7 +90,7 @@ public class AppCommandLineState extends JavaCommandLineState {
             Path workPath = PluginUtils.getWorkPath(configuration);
             Path confPath = workPath.resolve("conf");
             if (!confPath.toFile().exists()) {
-               confPath.toFile().mkdirs();
+                confPath.toFile().mkdirs();
             }
 
 

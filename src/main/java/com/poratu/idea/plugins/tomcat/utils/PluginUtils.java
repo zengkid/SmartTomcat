@@ -1,5 +1,7 @@
 package com.poratu.idea.plugins.tomcat.utils;
 
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.util.JdkBundle;
@@ -98,7 +100,9 @@ public abstract class PluginUtils {
     public static Path getWorkPath(TomcatRunConfiguration configuration) {
 
         String userHome = System.getProperty("user.home");
-        Path workPath = Paths.get(userHome, ".SmartTomcat", configuration.getProject().getName(), configuration.getModule().getName());
+        Project project = configuration.getProject();
+        Module module = configuration.getModule();
+        Path workPath = Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
 
         return workPath;
     }

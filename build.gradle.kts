@@ -6,7 +6,7 @@ plugins {
     kotlin("jvm") version "1.3.72"
 }
 
-version = "3.8.0"
+version = "3.8.1"
 
 repositories {
     mavenCentral()
@@ -19,7 +19,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2020.2.1"
+    version = "2020.2.2"
     setPlugins("java")
     pluginName = "SmartTomcat"
     updateSinceUntilBuild = false
@@ -37,8 +37,7 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
     sinceBuild("193")
     changeNotes("""
       <ul>
-      <li>1. save console log to a file</li>
-      <li>2. fixed bugs</li>
+      <li>fixed no special module with re-open project</li>
      </ul>
       """)
 }
