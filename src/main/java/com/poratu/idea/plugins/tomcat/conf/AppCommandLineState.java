@@ -106,8 +106,8 @@ public class AppCommandLineState extends JavaCommandLineState {
             if (envOptions != null) {
                 javaParams.setEnv(envOptions);
             }
-            String options = "-Duser.language=en -Duser.region=US " + vmOptions; //set en_US as default
-            javaParams.getVMParametersList().addParametersString(options);
+
+            javaParams.getVMParametersList().addParametersString(vmOptions);
             return javaParams;
 
         } catch (Exception e) {

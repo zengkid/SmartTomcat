@@ -6,7 +6,7 @@ plugins {
     kotlin("jvm") version "1.3.72"
 }
 
-version = "3.8.1"
+version = "3.8.2"
 
 repositories {
     mavenCentral()
@@ -37,7 +37,7 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
     sinceBuild("193")
     changeNotes("""
       <ul>
-      <li>fixed no special module with re-open project</li>
+      <li>remove default en_US JVM options</li>
      </ul>
       """)
 }
