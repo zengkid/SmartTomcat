@@ -1,7 +1,7 @@
 val intellijPublishToken: String by project
 
 plugins {
-    id("org.jetbrains.intellij") version "0.4.24"
+    id("org.jetbrains.intellij") version "0.5.0"
     java
     kotlin("jvm") version "1.3.72"
 }
