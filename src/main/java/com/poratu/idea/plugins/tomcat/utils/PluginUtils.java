@@ -58,7 +58,10 @@ public abstract class PluginUtils {
         tomcatInfo.setPath(tomcatHome);
         try {
             Process process = Runtime.getRuntime().exec(cmd, null, new File(tomcatHome));
-            process.waitFor();
+            int result = process.waitFor();
+            if (result != 0) {
+                throw new RuntimeException("tomcat path [" + tomcatHome + "] is incorrect!");
+            }
             reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             Stream<String> lines = reader.lines();
             lines.forEach(s -> {
