@@ -37,7 +37,8 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
     sinceBuild("193")
     changeNotes("""
       <ul>
-      <li>remove default en_US JVM options</li>
+      <li>1.remove default en_US JVM options</li>
+      <li>2.throw exception when adding tomcat path is incorrect</li>
      </ul>
       """)
 }
