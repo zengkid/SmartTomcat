@@ -7,14 +7,14 @@ import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.util.JdkBundle;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
-import org.apache.commons.lang.StringUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.jar.JarFile;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 
 /**
@@ -38,8 +38,7 @@ public abstract class PluginUtils {
 
     private static Sdk getProjectJDK() {
         Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
-        Sdk jdk = allJdks.length == 0 ? null : allJdks[0];
-        return jdk;
+        return allJdks.length == 0 ? null : allJdks[0];
     }
 
     public static TomcatInfo getTomcatInfo(String tomcatHome) {
@@ -76,8 +75,7 @@ public abstract class PluginUtils {
         String userHome = System.getProperty("user.home");
         Project project = configuration.getProject();
         Module module = configuration.getModule();
-        Path workPath = Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
 
-        return workPath;
+        return Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
     }
 }
