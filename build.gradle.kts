@@ -38,7 +38,7 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
     changeNotes("""
       <ul>
       <li>1.remove default en_US JVM options</li>
-      <li>2.throw exception when adding tomcat path is incorrect</li>
+      <li>2.load property file instead of executing java cmd to get tomcat info</li>
      </ul>
       """)
 }
