@@ -17,6 +17,12 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
+      - name: Upload to artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: vyos-lts
+          path: 'build/libs/SmartTomcat-*.jar'  
+        
       - name: Upload to releasex
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
