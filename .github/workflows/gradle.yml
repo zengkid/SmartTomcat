@@ -15,7 +15,10 @@ jobs:
           java-version: 1.8
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: | 
+         ./gradlew build
+         pwd
+         ls build/libs/SmartTomcat-*.jar
 
       - name: Upload to artifacts
         uses: actions/upload-artifact@v1
