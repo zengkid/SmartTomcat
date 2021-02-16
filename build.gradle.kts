@@ -1,12 +1,12 @@
 val intellijPublishToken: String by project
 
 plugins {
-    id("org.jetbrains.intellij") version "0.5.0"
+    id("org.jetbrains.intellij") version "0.6.5"
     java
     kotlin("jvm") version "1.3.72"
 }
 
-version = "3.8.2"
+version = "3.8.3"
 
 repositories {
     mavenCentral()
@@ -24,6 +24,7 @@ intellij {
     pluginName = "SmartTomcat"
     updateSinceUntilBuild = false
 }
+
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -37,11 +38,14 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
     sinceBuild("193")
     changeNotes("""
       <ul>
-      <li>1.remove default en_US JVM options</li>
-      <li>2.load property file instead of executing java cmd to get tomcat info</li>
+      <li>update version to 3.8.3</li>
      </ul>
       """)
 }
+
+//tasks.getByName<org.jetbrains.intellij.tasks.RunPluginVerifierTask>("runPluginVerifier") {
+// ideVersions("2022.1")
+//}
 
 tasks.getByName<org.jetbrains.intellij.tasks.PublishTask>("publishPlugin") {
     token(intellijPublishToken)

@@ -24,17 +24,17 @@ import java.util.zip.ZipEntry;
  */
 public abstract class PluginUtils {
 
-    public static String getJavaHome() {
-        Sdk sdk = getProjectJDK();
-        String javahome;
-        if (sdk == null) {
-            JdkBundle jdkBundle = JdkBundle.createBoot();
-            javahome = jdkBundle.getLocation().getAbsolutePath();
-        } else {
-            javahome = sdk.getHomePath();
-        }
-        return javahome;
-    }
+//    public static String getJavaHome() {
+//        Sdk sdk = getProjectJDK();
+//        String javahome;
+//        if (sdk == null) {
+//            JdkBundle jdkBundle = JdkBundle.createBoot();
+//            javahome = jdkBundle.getLocation().getAbsolutePath();
+//        } else {
+//            javahome = sdk.getHomePath();
+//        }
+//        return javahome;
+//    }
 
     private static Sdk getProjectJDK() {
         Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
