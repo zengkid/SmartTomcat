@@ -20,8 +20,6 @@ jobs:
       - name: Build with Gradle
         run: | 
          ./gradlew build
-         pwd
-         ls build/libs/SmartTomcat-*.jar
        
       - name: Upload to releasex
         uses: softprops/action-gh-release@v1
