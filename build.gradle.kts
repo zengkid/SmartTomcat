@@ -1,4 +1,3 @@
-val intellijPublishToken: String by project
 
 plugins {
     id("org.jetbrains.intellij") version "0.6.5"
@@ -48,5 +47,5 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
 //}
 
 tasks.getByName<org.jetbrains.intellij.tasks.PublishTask>("publishPlugin") {
-    token(intellijPublishToken)
+    token(System.getenv("intellijPublishToken"))
 }
