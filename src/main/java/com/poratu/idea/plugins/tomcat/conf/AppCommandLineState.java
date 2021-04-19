@@ -50,6 +50,7 @@ import java.util.Map;
 public class AppCommandLineState extends JavaCommandLineState {
 
     private static final String TOMCAT_MAIN_CLASS = "org.apache.catalina.startup.Bootstrap";
+    private static final String PARAM_LOGGING_MANAGER = "-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager";
     private TomcatRunConfiguration configuration;
 
     protected AppCommandLineState(@NotNull ExecutionEnvironment environment) {
@@ -107,7 +108,8 @@ public class AppCommandLineState extends JavaCommandLineState {
                 javaParams.setEnv(envOptions);
             }
 
-            javaParams.getVMParametersList().addParametersString(vmOptions);
+            String loggingConfig = "-Djava.util.logging.config.file=" + confPath.resolve("logging.properties");
+            javaParams.getVMParametersList().addAll(loggingConfig, PARAM_LOGGING_MANAGER, vmOptions);
             return javaParams;
 
         } catch (Exception e) {
