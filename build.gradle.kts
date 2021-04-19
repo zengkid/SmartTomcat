@@ -5,7 +5,7 @@ plugins {
     kotlin("jvm") version "1.3.72"
 }
 
-version = "3.8.3"
+version = "3.8.4"
 
 repositories {
     mavenCentral()
@@ -37,7 +37,8 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
     sinceBuild("193")
     changeNotes("""
       <ul>
-      <li>update version to 3.8.3</li>
+      <li>update version to 3.8.4</li>
+      <li>Add support for the tomcat logging</li>
      </ul>
       """)
 }
