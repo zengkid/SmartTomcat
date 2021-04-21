@@ -109,7 +109,8 @@ public class AppCommandLineState extends JavaCommandLineState {
             }
 
             String loggingConfig = "-Djava.util.logging.config.file=" + confPath.resolve("logging.properties");
-            javaParams.getVMParametersList().addAll(loggingConfig, PARAM_LOGGING_MANAGER, vmOptions);
+            javaParams.getVMParametersList().addAll(loggingConfig, PARAM_LOGGING_MANAGER);
+            javaParams.getVMParametersList().addParametersString(vmOptions);
             return javaParams;
 
         } catch (Exception e) {
