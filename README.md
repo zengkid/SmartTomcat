@@ -1,5 +1,11 @@
 # SmartTomcat
+<!-- Plugin description -->
 The Tomcat plugin for Intellij IDEA
+
+The SmartTomcat will auto load the Webapp classes and libs from project and module, You needn't copy the classes and libs to the WEB-INF/classes and WEB-INF/lib.
+The Smart Tomcat plugin will auto config the classpath for tomcat server.
+The Smart Tomcat support Tomcat 6+
+<!-- Plugin description end -->
 
 [![Actions Status](https://github.com/zengkid/SmartTomcat/workflows/Java%20CI/badge.svg)](https://github.com/zengkid/SmartTomcat/actions)
 
