@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.CollectionComboBoxModel;
-import com.intellij.ui.ComboboxWithBrowseButton;
 import com.intellij.ui.RawCommandLineEditor;
 import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jdesktop.swingx.JXButton;
