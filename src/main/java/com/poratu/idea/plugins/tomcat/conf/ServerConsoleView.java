@@ -23,7 +23,8 @@ public class ServerConsoleView extends ConsoleViewImpl implements ConsoleView {
     public void print(@NotNull String s, @NotNull ConsoleViewContentType contentType) {
         super.print(s, contentType);
         if (!printStarted) {
-            if (s.contains("org.apache.catalina.startup.Catalina start")) {
+            if (s.contains("org.apache.catalina.startup.Catalina start")
+             || s.contains("org.apache.catalina.startup.Catalina.start")) {
                 String url = "http://localhost" + (configuration.getPort().equals("80") ? "" : ":" + configuration.getPort()) + configuration.getContextPath();
                 super.print(url + "\n", contentType);
                 printStarted = true;
