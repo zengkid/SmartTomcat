@@ -4,10 +4,8 @@ rootProject.name = "SmartTomcat"
 
 pluginManagement {
     repositories {
-        maven {
-            setUrl("https://maven.aliyun.com/nexus/content/repositories/gradle-plugin")
-        }
         mavenCentral()
         gradlePluginPortal()
+        maven("https://maven.aliyun.com/nexus/content/repositories/gradle-plugin")
     }
 }
