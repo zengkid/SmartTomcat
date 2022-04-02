@@ -1,6 +1,11 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.1.0]
+### Changed 
+- fixed defects
+- Dependencies - upgrade `org.jetbrains.intellij` to `1.5.2`
+
 ## [4.0.0]
 ### Added
 - changelog.md

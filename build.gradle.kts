@@ -4,7 +4,7 @@ fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.3.0"
+    id("org.jetbrains.intellij") version "1.5.2"
     id("org.jetbrains.changelog") version "1.3.1"
 }
 
@@ -13,9 +13,9 @@ version = properties("pluginVersion")
 
 // Configure project's dependencies
 repositories {
-    maven {
-        setUrl("https://maven.aliyun.com/repository/public/")
-    }
+    maven("https://www.jetbrains.com/intellij-repository/releases")
+    maven("https://www.jetbrains.com/intellij-repository/snapshots")
+    maven("https://maven.aliyun.com/repository/public/")
     mavenCentral()
 }
 

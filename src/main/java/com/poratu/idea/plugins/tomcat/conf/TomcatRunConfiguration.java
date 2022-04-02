@@ -6,6 +6,7 @@ import com.intellij.execution.Executor;
 import com.intellij.execution.JavaRunConfigurationExtensionManager;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -45,7 +46,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
 
     protected TomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
         super(project, factory, name);
-        TomcatInfoConfigs applicationService = ServiceManager.getService(TomcatInfoConfigs.class);
+        TomcatInfoConfigs applicationService = ApplicationManager.getApplication().getService(TomcatInfoConfigs.class);
         List<TomcatInfo> tomcatInfos = applicationService.getTomcatInfos();
         options = getOptions();
         if (!tomcatInfos.isEmpty()) {
