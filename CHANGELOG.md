@@ -1,6 +1,11 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.2.0]
+### Changed
+- IDEA - upgrade intellij platformVersion to latestVersion `2202.2+`
+- Dependencies - upgrade `org.jetbrains.intellij` to `1.6.0`
+
 ## [4.1.0]
 ### Changed 
 - fixed defects
