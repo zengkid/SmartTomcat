@@ -4,6 +4,8 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.JavaCommandLineState;
 import com.intellij.execution.configurations.JavaParameters;
+import com.intellij.execution.process.KillableProcessHandler;
+import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.module.Module;
@@ -65,6 +67,15 @@ public class AppCommandLineState extends JavaCommandLineState {
         this.configuration = configuration;
     }
 
+    @Override
+    @NotNull
+    protected OSProcessHandler startProcess() throws ExecutionException {
+        OSProcessHandler progressHandler = super.startProcess();
+        if (progressHandler instanceof KillableProcessHandler) {
+            ((KillableProcessHandler) progressHandler).setShouldKillProcessSoftly(true);
+        }
+        return progressHandler;
+    }
 
     @Override
     protected JavaParameters createJavaParameters() {
