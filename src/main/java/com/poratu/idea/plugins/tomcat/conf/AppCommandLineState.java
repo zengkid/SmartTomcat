@@ -1,5 +1,6 @@
 package com.poratu.idea.plugins.tomcat.conf;
 
+import com.intellij.debugger.settings.DebuggerSettings;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.JavaCommandLineState;
@@ -72,7 +73,8 @@ public class AppCommandLineState extends JavaCommandLineState {
     protected OSProcessHandler startProcess() throws ExecutionException {
         OSProcessHandler progressHandler = super.startProcess();
         if (progressHandler instanceof KillableProcessHandler) {
-            ((KillableProcessHandler) progressHandler).setShouldKillProcessSoftly(true);
+            boolean shouldKillSoftly = !DebuggerSettings.getInstance().KILL_PROCESS_IMMEDIATELY;
+            ((KillableProcessHandler) progressHandler).setShouldKillProcessSoftly(shouldKillSoftly);
         }
         return progressHandler;
     }
