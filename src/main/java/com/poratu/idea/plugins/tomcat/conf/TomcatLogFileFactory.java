@@ -2,8 +2,10 @@ package com.poratu.idea.plugins.tomcat.conf;
 
 import com.intellij.execution.configurations.LogFileOptions;
 import com.intellij.execution.configurations.PredefinedLogFile;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class TomcatLogFileFactory {
 
@@ -31,8 +33,9 @@ public class TomcatLogFileFactory {
         return id;
     }
 
-    public LogFileOptions createOptions(PredefinedLogFile file, Path logsDirPath) {
-        return new LogFileOptions(file.getId() + " Log", logsDirPath.resolve(filename) + ".*", file.isEnabled());
+    public LogFileOptions createOptions(PredefinedLogFile file, @Nullable Path logsDirPath) {
+        Path logsPath = logsDirPath == null ? Paths.get("logs") : logsDirPath;
+        return new LogFileOptions(file.getId() + " Log", logsPath.resolve(filename) + ".*", file.isEnabled());
     }
 
     public PredefinedLogFile createPredefinedLogFile() {

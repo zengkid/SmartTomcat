@@ -104,7 +104,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
                 throw new ExecutionException("The Module Root specified is not a module according to Intellij");
             }
 
-            Path workPath = PluginUtils.getWorkPath(configuration);
+            Path workPath = PluginUtils.getWorkingPath(configuration);
             Path confPath = workPath.resolve("conf");
             if (!confPath.toFile().exists()) {
                 confPath.toFile().mkdirs();

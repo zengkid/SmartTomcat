@@ -163,10 +163,13 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         createPredefinedLogFiles().forEach(this::addPredefinedLogFile);
     }
 
+    @Nullable
     public Module getModule() {
         if (module == null) {
-            VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByIoFile(new File(tomcatOptions.getDocBase()));
-            module = ModuleUtilCore.findModuleForFile(Objects.requireNonNull(virtualFile), this.getProject());
+            if (tomcatOptions.getDocBase() != null) {
+                VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByIoFile(new File(tomcatOptions.getDocBase()));
+                module = ModuleUtilCore.findModuleForFile(Objects.requireNonNull(virtualFile), this.getProject());
+            }
         }
         return module;
     }
@@ -262,6 +265,7 @@ class TomcatRunConfigurationOptions {
         this.tomcatInfo = tomcatInfo;
     }
 
+    @Nullable
     public String getDocBase() {
         return docBase;
     }

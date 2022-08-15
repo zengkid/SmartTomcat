@@ -6,6 +6,7 @@ import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,16 +70,26 @@ public abstract class PluginUtils {
         return tomcatInfo;
     }
 
-    public static Path getWorkPath(TomcatRunConfiguration configuration) {
+    @Nullable
+    public static Path getWorkingPath(TomcatRunConfiguration configuration) {
 
         String userHome = System.getProperty("user.home");
         Project project = configuration.getProject();
         Module module = configuration.getModule();
 
+        if (module == null) {
+            return null;
+        }
+
         return Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
     }
 
+    @Nullable
     public static Path getTomcatLogsDirPath(TomcatRunConfiguration configuration) {
-        return getWorkPath(configuration).resolve("logs");
+        Path workingDir = getWorkingPath(configuration);
+        if (workingDir != null) {
+            return workingDir.resolve("logs");
+        }
+        return null;
     }
 }
