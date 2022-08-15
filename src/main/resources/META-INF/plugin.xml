@@ -32,8 +32,8 @@
 
         <applicationService serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs"/>
 
-
-        <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatDebugger" order="last"/>
+        <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunner"/>
+        <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatDebugger"/>
 
     </extensions>
 
