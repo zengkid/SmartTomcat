@@ -10,12 +10,11 @@ import com.intellij.execution.configurations.LocatableRunConfigurationOptions;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.configurations.RunProfileWithCompileBeforeLaunchOption;
-import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.options.SettingsEditorGroup;
 import com.intellij.openapi.project.Project;
@@ -36,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -45,7 +45,7 @@ import java.util.stream.Stream;
  * Time   : 3:14 PM
  */
 public class TomcatRunConfiguration extends LocatableConfigurationBase<TomcatRunConfigurationOptions> implements RunProfileWithCompileBeforeLaunchOption {
-    private Module module;
+    private transient Module module;
 
     protected TomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
         super(project, factory, name);
@@ -69,16 +69,6 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<TomcatRun
     }
 
     @Override
-    public void checkSettingsBeforeRun() throws RuntimeConfigurationException {
-        super.checkSettingsBeforeRun();
-    }
-
-    @Override
-    public void checkConfiguration() {
-
-    }
-
-    @Override
     public void onNewConfigurationCreated() {
         super.onNewConfigurationCreated();
 
@@ -98,7 +88,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<TomcatRun
             if (webinfFile.isPresent()) {
                 VirtualFile file = webinfFile.get();
                 getOptions().setDocBase(file.getCanonicalPath());
-                module = ModuleUtil.findModuleForFile(file, project);
+                module = ModuleUtilCore.findModuleForFile(file, project);
                 getOptions().setContextPath("/" + module.getName());
             }
         } catch (Exception e) {
@@ -114,14 +104,14 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<TomcatRun
     }
 
     @Override
-    public void readExternal(Element element) throws InvalidDataException {
+    public void readExternal(@NotNull Element element) throws InvalidDataException {
         super.readExternal(element);
         XmlSerializer.deserializeInto(getOptions(), element);
 
     }
 
     @Override
-    public void writeExternal(Element element) throws WriteExternalException {
+    public void writeExternal(@NotNull Element element) throws WriteExternalException {
         super.writeExternal(element);
         XmlSerializer.serializeInto(getOptions(), element);
     }
@@ -129,7 +119,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<TomcatRun
     public Module getModule() {
         if (module == null) {
             VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByIoFile(new File(getOptions().getDocBase()));
-            module = ModuleUtil.findModuleForFile(virtualFile, this.getProject());
+            module = ModuleUtilCore.findModuleForFile(Objects.requireNonNull(virtualFile), this.getProject());
         }
         return module;
     }
@@ -148,11 +138,9 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<TomcatRun
     }
 
     @Override
-    @NotNull
-    public Module[] getModules() {
+    public Module @NotNull [] getModules() {
         ModuleManager moduleManager = ModuleManager.getInstance(getProject());
-        Module[] modules = moduleManager.getModules();
-        return modules;
+        return moduleManager.getModules();
     }
 
     @NotNull
@@ -226,6 +214,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<TomcatRun
 }
 
 class TomcatRunConfigurationOptions extends LocatableRunConfigurationOptions {
+
     private TomcatInfo tomcatInfo;
 
     private String docBase;
@@ -299,5 +288,6 @@ class TomcatRunConfigurationOptions extends LocatableRunConfigurationOptions {
     public void setPassParentEnvironmentVariables(Boolean passParentEnvironmentVariables) {
         this.passParentEnvironmentVariables = passParentEnvironmentVariables;
     }
+
 }
 
