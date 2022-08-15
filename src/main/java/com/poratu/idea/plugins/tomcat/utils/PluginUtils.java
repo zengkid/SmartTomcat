@@ -77,4 +77,8 @@ public abstract class PluginUtils {
 
         return Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
     }
+
+    public static Path getTomcatLogsDirPath(TomcatRunConfiguration configuration) {
+        return getWorkPath(configuration).resolve("logs");
+    }
 }
