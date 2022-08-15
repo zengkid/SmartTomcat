@@ -4,10 +4,15 @@ import com.intellij.diagnostic.logging.LogConfigurationPanel;
 import com.intellij.execution.ExecutionBundle;
 import com.intellij.execution.Executor;
 import com.intellij.execution.JavaRunConfigurationExtensionManager;
-import com.intellij.execution.configurations.*;
+import com.intellij.execution.configurations.ConfigurationFactory;
+import com.intellij.execution.configurations.LocatableConfigurationBase;
+import com.intellij.execution.configurations.LocatableRunConfigurationOptions;
+import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.execution.configurations.RunProfileState;
+import com.intellij.execution.configurations.RunProfileWithCompileBeforeLaunchOption;
+import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtil;
@@ -39,18 +44,15 @@ import java.util.stream.Stream;
  * Date   : 2/16/2017
  * Time   : 3:14 PM
  */
-public class TomcatRunConfiguration extends LocatableConfigurationBase implements RunProfileWithCompileBeforeLaunchOption {
+public class TomcatRunConfiguration extends LocatableConfigurationBase<TomcatRunConfigurationOptions> implements RunProfileWithCompileBeforeLaunchOption {
     private Module module;
-    private TomcatOptionRunConfigurationOptions options;
-
 
     protected TomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
         super(project, factory, name);
         TomcatInfoConfigs applicationService = ApplicationManager.getApplication().getService(TomcatInfoConfigs.class);
         List<TomcatInfo> tomcatInfos = applicationService.getTomcatInfos();
-        options = getOptions();
         if (!tomcatInfos.isEmpty()) {
-            options.setTomcatInfo(tomcatInfos.get(0));
+            getOptions().setTomcatInfo(tomcatInfos.get(0));
         }
     }
 
@@ -95,9 +97,9 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
 
             if (webinfFile.isPresent()) {
                 VirtualFile file = webinfFile.get();
-                options.setDocBase(file.getCanonicalPath());
+                getOptions().setDocBase(file.getCanonicalPath());
                 module = ModuleUtil.findModuleForFile(file, project);
-                options.setContextPath("/" + module.getName());
+                getOptions().setContextPath("/" + module.getName());
             }
         } catch (Exception e) {
             //do nothing.
@@ -114,19 +116,19 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
     @Override
     public void readExternal(Element element) throws InvalidDataException {
         super.readExternal(element);
-        XmlSerializer.deserializeInto(options, element);
+        XmlSerializer.deserializeInto(getOptions(), element);
 
     }
 
     @Override
     public void writeExternal(Element element) throws WriteExternalException {
         super.writeExternal(element);
-        XmlSerializer.serializeInto(options, element);
+        XmlSerializer.serializeInto(getOptions(), element);
     }
 
     public Module getModule() {
         if (module == null) {
-            VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByIoFile(new File(options.getDocBase()));
+            VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByIoFile(new File(getOptions().getDocBase()));
             module = ModuleUtil.findModuleForFile(virtualFile, this.getProject());
         }
         return module;
@@ -138,11 +140,11 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
 
 
     public TomcatInfo getTomcatInfo() {
-        return options.getTomcatInfo();
+        return getOptions().getTomcatInfo();
     }
 
     public void setTomcatInfo(TomcatInfo tomcatInfo) {
-        options.setTomcatInfo(tomcatInfo);
+        getOptions().setTomcatInfo(tomcatInfo);
     }
 
     @Override
@@ -155,76 +157,75 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase implement
 
     @NotNull
     @Override
-    protected TomcatOptionRunConfigurationOptions getOptions() {
-        options = (TomcatOptionRunConfigurationOptions) super.getOptions();
-        return options;
+    protected TomcatRunConfigurationOptions getOptions() {
+        return (TomcatRunConfigurationOptions) super.getOptions();
     }
 
     @NotNull
     @Override
-    protected Class<? extends TomcatOptionRunConfigurationOptions> getDefaultOptionsClass() {
-        return TomcatOptionRunConfigurationOptions.class;
+    protected Class<? extends TomcatRunConfigurationOptions> getDefaultOptionsClass() {
+        return TomcatRunConfigurationOptions.class;
     }
 
 
     public String getDocBase() {
-        return options.getDocBase();
+        return getOptions().getDocBase();
     }
 
     public void setDocBase(String docBase) {
-        options.setDocBase(docBase);
+        getOptions().setDocBase(docBase);
     }
 
     public String getContextPath() {
-        return options.getContextPath();
+        return getOptions().getContextPath();
     }
 
     public void setContextPath(String contextPath) {
-        options.setContextPath(contextPath);
+        getOptions().setContextPath(contextPath);
     }
 
     public String getPort() {
-        return options.getPort();
+        return getOptions().getPort();
     }
 
     public void setPort(String port) {
-        options.setPort(port);
+        getOptions().setPort(port);
     }
 
     public String getAdminPort() {
-        return options.getAdminPort();
+        return getOptions().getAdminPort();
     }
 
     public void setAdminPort(String adminPort) {
-        options.setAdminPort(adminPort);
+        getOptions().setAdminPort(adminPort);
     }
 
     public String getVmOptions() {
-        return options.getVmOptions();
+        return getOptions().getVmOptions();
     }
 
     public void setVmOptions(String vmOptions) {
-        options.setVmOptions(vmOptions);
+        getOptions().setVmOptions(vmOptions);
     }
 
     public Map<String, String> getEnvOptions() {
-        return options.getEnvOptions();
+        return getOptions().getEnvOptions();
     }
 
     public void setEnvOptions(Map<String, String> envOptions) {
-        options.setEnvOptions(envOptions);
+        getOptions().setEnvOptions(envOptions);
     }
 
     public Boolean getPassParentEnvironmentVariables() {
-        return options.getPassParentEnvironmentVariables();
+        return getOptions().getPassParentEnvironmentVariables();
     }
 
     public void setPassParentEnvironmentVariables(Boolean passParentEnvironmentVariables) {
-        options.setPassParentEnvironmentVariables(passParentEnvironmentVariables);
+        getOptions().setPassParentEnvironmentVariables(passParentEnvironmentVariables);
     }
 }
 
-class TomcatOptionRunConfigurationOptions extends LocatableRunConfigurationOptions {
+class TomcatRunConfigurationOptions extends LocatableRunConfigurationOptions {
     private TomcatInfo tomcatInfo;
 
     private String docBase;
