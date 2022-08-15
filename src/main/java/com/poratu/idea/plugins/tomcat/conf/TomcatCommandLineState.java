@@ -50,7 +50,7 @@ import java.util.Map;
  * Time   : 11:10 AM
  */
 
-public class AppCommandLineState extends JavaCommandLineState {
+public class TomcatCommandLineState extends JavaCommandLineState {
 
     private static final String TOMCAT_MAIN_CLASS = "org.apache.catalina.startup.Bootstrap";
     private static final String PARAM_CATALINA_HOME = "-Dcatalina.home=%s";
@@ -59,11 +59,11 @@ public class AppCommandLineState extends JavaCommandLineState {
     private static final String PARAM_LOGGING_MANAGER = "-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager";
     private TomcatRunConfiguration configuration;
 
-    protected AppCommandLineState(@NotNull ExecutionEnvironment environment) {
+    protected TomcatCommandLineState(@NotNull ExecutionEnvironment environment) {
         super(environment);
     }
 
-    protected AppCommandLineState(ExecutionEnvironment environment, TomcatRunConfiguration configuration) {
+    protected TomcatCommandLineState(ExecutionEnvironment environment, TomcatRunConfiguration configuration) {
         this(environment);
         this.configuration = configuration;
     }

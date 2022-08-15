@@ -129,7 +129,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
     @Nullable
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) {
-        return new AppCommandLineState(executionEnvironment, this);
+        return new TomcatCommandLineState(executionEnvironment, this);
     }
 
     @Override
