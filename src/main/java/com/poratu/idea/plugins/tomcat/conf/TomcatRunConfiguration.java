@@ -51,17 +51,17 @@ import java.util.stream.Stream;
  */
 public class TomcatRunConfiguration extends LocatableConfigurationBase<LocatableRunConfigurationOptions> implements RunProfileWithCompileBeforeLaunchOption {
 
-    private static final List<TomcatLogFileFactory> factories = Arrays.asList(
-            new TomcatLogFileFactory(TomcatLogFileFactory.TOMCAT_LOCALHOST_LOG_ID, "localhost", true),
-            new TomcatLogFileFactory(TomcatLogFileFactory.TOMCAT_CATALINA_LOG_ID, "catalina", true),
-            new TomcatLogFileFactory(TomcatLogFileFactory.TOMCAT_ACCESS_LOG_ID, "localhost_access_log"),
-            new TomcatLogFileFactory(TomcatLogFileFactory.TOMCAT_MANAGER_LOG_ID, "manager"),
-            new TomcatLogFileFactory(TomcatLogFileFactory.TOMCAT_HOST_MANAGER_LOG_ID, "host-manager")
+    private static final List<TomcatLogFile> tomcatLogFiles = Arrays.asList(
+            new TomcatLogFile(TomcatLogFile.TOMCAT_LOCALHOST_LOG_ID, "localhost", true),
+            new TomcatLogFile(TomcatLogFile.TOMCAT_CATALINA_LOG_ID, "catalina", true),
+            new TomcatLogFile(TomcatLogFile.TOMCAT_ACCESS_LOG_ID, "localhost_access_log"),
+            new TomcatLogFile(TomcatLogFile.TOMCAT_MANAGER_LOG_ID, "manager"),
+            new TomcatLogFile(TomcatLogFile.TOMCAT_HOST_MANAGER_LOG_ID, "host-manager")
     );
 
     private static List<PredefinedLogFile> createPredefinedLogFiles() {
-        return factories.stream()
-                .map(TomcatLogFileFactory::createPredefinedLogFile)
+        return tomcatLogFiles.stream()
+                .map(TomcatLogFile::createPredefinedLogFile)
                 .collect(Collectors.toList());
     }
 
@@ -134,9 +134,9 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
     @Override
     public @Nullable LogFileOptions getOptionsForPredefinedLogFile(PredefinedLogFile file) {
-        for (TomcatLogFileFactory factory : factories) {
-            if (factory.getId().equals(file.getId())) {
-                return factory.createOptions(file, PluginUtils.getTomcatLogsDirPath(this));
+        for (TomcatLogFile logFile : tomcatLogFiles) {
+            if (logFile.getId().equals(file.getId())) {
+                return logFile.createLogFileOptions(file, PluginUtils.getTomcatLogsDirPath(this));
             }
         }
 
