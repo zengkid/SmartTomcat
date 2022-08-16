@@ -1,8 +1,10 @@
 package com.poratu.idea.plugins.tomcat.conf;
 
-import com.intellij.execution.configurations.ConfigurationFactory;
-import com.intellij.execution.configurations.ConfigurationType;
+import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.execution.configurations.SimpleConfigurationType;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.openapi.util.NotNullLazyValue;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -12,33 +14,20 @@ import javax.swing.*;
  * Date   : 2/16/2017
  * Time   : 3:11 PM
  */
-public class TomcatRunConfigurationType implements ConfigurationType {
+public class TomcatRunConfigurationType extends SimpleConfigurationType {
 
-    private static final Icon TOMCAT_ICON = IconLoader.findIcon("/icon/tomcat.svg", TomcatRunConfigurationType.class);
+    private static final Icon TOMCAT_ICON = IconLoader.getIcon("/icon/tomcat.svg", TomcatRunConfigurationType.class);
 
-    @Override
-    public String getDisplayName() {
-        return "Smart Tomcat";
+    protected TomcatRunConfigurationType() {
+        super("com.poratu.idea.plugins.tomcat",
+                "Smart Tomcat",
+                "Configuration to run Tomcat server",
+                NotNullLazyValue.createValue(() -> TOMCAT_ICON));
     }
 
     @Override
-    public String getConfigurationTypeDescription() {
-        return "Smart Tomcat";
+    public @NotNull RunConfiguration createTemplateConfiguration(@NotNull Project project) {
+        return new TomcatRunConfiguration(project, this, "");
     }
 
-    @Override
-    public Icon getIcon() {
-        return TOMCAT_ICON;
-    }
-
-    @NotNull
-    @Override
-    public String getId() {
-        return "com.poratu.idea.plugins.tomcat";
-    }
-
-    @Override
-    public ConfigurationFactory[] getConfigurationFactories() {
-        return new ConfigurationFactory[]{new TomcatConfigurationFactory(this)};
-    }
 }
