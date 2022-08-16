@@ -48,6 +48,7 @@ tasks {
     }
 
     patchPluginXml {
+        pluginId.set(prop("pluginGroup"))
         version.set(prop("pluginVersion"))
         sinceBuild.set(prop("pluginSinceBuild"))
         untilBuild.set(prop("pluginUntilBuild"))
@@ -65,7 +66,7 @@ tasks {
             }.joinToString("\n").run { markdownToHTML(this) }
         )
 
-//         Get the latest available change notes from the changelog file
+        // Get the latest available change notes from the changelog file
         changeNotes.set(provider {
             changelog.run {
                 getOrNull(prop("pluginVersion")) ?: getLatest()
