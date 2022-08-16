@@ -18,6 +18,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -34,7 +35,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -82,17 +82,29 @@ public class TomcatCommandLineState extends JavaCommandLineState {
     @Override
     protected JavaParameters createJavaParameters() {
         try {
+            Path workingPath = PluginUtils.getWorkingPath(configuration);
+            Module module = configuration.getModule();
+            if (workingPath == null || module == null) {
+                throw new ExecutionException("The Module Root specified is not a module according to Intellij");
+            }
 
             Path tomcatInstallationPath = Paths.get(configuration.getTomcatInfo().getPath());
             Project project = this.configuration.getProject();
-            Module module = configuration.getModule();
             String contextPath = configuration.getContextPath();
             String tomcatVersion = configuration.getTomcatInfo().getVersion();
             String vmOptions = configuration.getVmOptions();
             Map<String, String> envOptions = configuration.getEnvOptions();
 
-            JavaParameters javaParams = new JavaParameters();
+            // copy the Tomcat configuration files to the working directory
+            Path confPath = workingPath.resolve("conf");
+            Files.createDirectories(confPath);
+            FileUtil.copyFileOrDir(tomcatInstallationPath.resolve("conf").toFile(), confPath.toFile());
+            updateServerConf(tomcatVersion, module, confPath, contextPath, configuration);
+
             ProjectRootManager manager = ProjectRootManager.getInstance(project);
+
+            JavaParameters javaParams = new JavaParameters();
+            javaParams.setWorkingDirectory(workingPath.toFile());
             javaParams.setJdk(manager.getProjectSdk());
             javaParams.setDefaultCharset(project);
             javaParams.setMainClass(TOMCAT_MAIN_CLASS);
@@ -100,41 +112,21 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             addBinFolder(tomcatInstallationPath, javaParams);
             addLibFolder(tomcatInstallationPath, javaParams);
 
-            if (module == null) {
-                throw new ExecutionException("The Module Root specified is not a module according to Intellij");
-            }
-
-            Path workPath = PluginUtils.getWorkingPath(configuration);
-            Path confPath = workPath.resolve("conf");
-            if (!confPath.toFile().exists()) {
-                confPath.toFile().mkdirs();
-            }
-
-
-            FileUtil.copyFileOrDir(tomcatInstallationPath.resolve("conf").toFile(), confPath.toFile());
-
-            javaParams.setWorkingDirectory(workPath.toFile());
-
-
-            updateServerConf(tomcatVersion, module, confPath, contextPath, configuration);
-
-
             javaParams.setPassParentEnvs(configuration.getPassParentEnvironmentVariables());
             if (envOptions != null) {
                 javaParams.setEnv(envOptions);
             }
 
+            String catalinaHome = String.format(PARAM_CATALINA_HOME, workingPath);
+            String catalinaBase = String.format(PARAM_CATALINA_BASE, workingPath);
             String loggingConfig = String.format(PARAM_LOGGING_CONFIG, confPath.resolve("logging.properties"));
-            String catalinaHome = String.format(PARAM_CATALINA_HOME, workPath);
-            String catalinaBase = String.format(PARAM_CATALINA_BASE, workPath);
             javaParams.getVMParametersList().addAll(catalinaHome, catalinaBase, loggingConfig, PARAM_LOGGING_MANAGER);
             javaParams.getVMParametersList().addParametersString(vmOptions);
+
             return javaParams;
-
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
-
 
     }
 
@@ -145,13 +137,11 @@ public class TomcatCommandLineState extends JavaCommandLineState {
     }
 
     private void updateServerConf(String tomcatVersion, Module module, Path confPath, String contextPath, TomcatRunConfiguration cfg) throws Exception {
-
         Path serverXml = confPath.resolve("server.xml");
-
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        org.w3c.dom.Document doc = builder.parse(serverXml.toUri().toString());
+        Document doc = builder.parse(serverXml.toUri().toString());
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
         XPathExpression exprConnectorShutdown = xpath.compile("/Server[@shutdown='SHUTDOWN']");
@@ -193,17 +183,15 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         contextE.setAttribute("path", (contextPath.startsWith("/") ? "" : "/") + contextPath);
         hostNode.appendChild(contextE);
 
-
         List<String> paths = new ArrayList<>();
         VirtualFile[] classPaths = ModuleRootManager.getInstance(module).orderEntries().withoutSdk().runtimeOnly().productionOnly().getClassesRoots();
-        if (classPaths != null && classPaths.length > 0) {
+        if (classPaths.length > 0) {
             for (VirtualFile path : classPaths) {
                 String classPath = path.getPresentableUrl();
                 paths.add(classPath);
             }
             int index = tomcatVersion.indexOf(".");
             int version = Integer.parseInt(tomcatVersion.substring(0, index));
-
 
             if (version >= 8) { //for tomcat8
 
@@ -237,14 +225,11 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             }
         }
 
-
         Source source = new DOMSource(doc);
-        StreamResult result = new StreamResult(new OutputStreamWriter(new FileOutputStream(serverXml.toFile()),
+        StreamResult result = new StreamResult(new OutputStreamWriter(Files.newOutputStream(serverXml),
                 StandardCharsets.UTF_8));
         Transformer xformer = TransformerFactory.newInstance().newTransformer();
         xformer.transform(source, result);
-
-
     }
 
     private void addBinFolder(Path tomcatInstallation, JavaParameters javaParams) throws ExecutionException {
