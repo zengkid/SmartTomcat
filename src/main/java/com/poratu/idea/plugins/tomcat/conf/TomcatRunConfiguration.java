@@ -53,8 +53,8 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
     private static final List<TomcatLogFile> tomcatLogFiles = Arrays.asList(
             new TomcatLogFile(TomcatLogFile.TOMCAT_LOCALHOST_LOG_ID, "localhost", true),
-            new TomcatLogFile(TomcatLogFile.TOMCAT_CATALINA_LOG_ID, "catalina", true),
-            new TomcatLogFile(TomcatLogFile.TOMCAT_ACCESS_LOG_ID, "localhost_access_log"),
+            new TomcatLogFile(TomcatLogFile.TOMCAT_ACCESS_LOG_ID, "localhost_access_log", true),
+            new TomcatLogFile(TomcatLogFile.TOMCAT_CATALINA_LOG_ID, "catalina"),
             new TomcatLogFile(TomcatLogFile.TOMCAT_MANAGER_LOG_ID, "manager"),
             new TomcatLogFile(TomcatLogFile.TOMCAT_HOST_MANAGER_LOG_ID, "host-manager")
     );
