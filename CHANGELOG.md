@@ -1,6 +1,13 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.3.0]
+
+- Added support for redirecting the Tomcat logs to console.
+- Added support for exiting the Tomcat process gracefully when stopping
+- Fixed the incorrect path of the Tomcat logs
+- Improved the TomcatRunner
+
 ## [4.2.0]
 ### Changed
 - IDEA - upgrade intellij platformVersion to latestVersion `2202.2+`
