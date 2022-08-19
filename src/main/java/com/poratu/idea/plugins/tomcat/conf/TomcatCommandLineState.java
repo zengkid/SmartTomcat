@@ -5,6 +5,7 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.JavaCommandLineState;
 import com.intellij.execution.configurations.JavaParameters;
+import com.intellij.execution.configurations.ParametersList;
 import com.intellij.execution.process.KillableProcessHandler;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
@@ -53,10 +54,11 @@ import java.util.Map;
 public class TomcatCommandLineState extends JavaCommandLineState {
 
     private static final String TOMCAT_MAIN_CLASS = "org.apache.catalina.startup.Bootstrap";
-    private static final String PARAM_CATALINA_HOME = "-Dcatalina.home=%s";
-    private static final String PARAM_CATALINA_BASE = "-Dcatalina.base=%s";
-    private static final String PARAM_LOGGING_CONFIG = "-Djava.util.logging.config.file=%s";
-    private static final String PARAM_LOGGING_MANAGER = "-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager";
+    private static final String PARAM_CATALINA_HOME = "catalina.home";
+    private static final String PARAM_CATALINA_BASE = "catalina.base";
+    private static final String PARAM_LOGGING_CONFIG = "java.util.logging.config.file";
+    private static final String PARAM_LOGGING_MANAGER = "java.util.logging.manager";
+    private static final String PARAM_LOGGING_MANAGER_VALUE = "org.apache.juli.ClassLoaderLogManager";
     private TomcatRunConfiguration configuration;
 
     protected TomcatCommandLineState(@NotNull ExecutionEnvironment environment) {
@@ -117,11 +119,12 @@ public class TomcatCommandLineState extends JavaCommandLineState {
                 javaParams.setEnv(envOptions);
             }
 
-            String catalinaHome = String.format(PARAM_CATALINA_HOME, workingPath);
-            String catalinaBase = String.format(PARAM_CATALINA_BASE, workingPath);
-            String loggingConfig = String.format(PARAM_LOGGING_CONFIG, confPath.resolve("logging.properties"));
-            javaParams.getVMParametersList().addAll(catalinaHome, catalinaBase, loggingConfig, PARAM_LOGGING_MANAGER);
-            javaParams.getVMParametersList().addParametersString(vmOptions);
+            ParametersList vmParams = javaParams.getVMParametersList();
+            vmParams.addParametersString(vmOptions);
+            vmParams.defineProperty(PARAM_CATALINA_HOME, workingPath.toString());
+            vmParams.defineProperty(PARAM_CATALINA_BASE, workingPath.toString());
+            vmParams.defineProperty(PARAM_LOGGING_CONFIG, confPath.resolve("logging.properties").toString());
+            vmParams.defineProperty(PARAM_LOGGING_MANAGER, PARAM_LOGGING_MANAGER_VALUE);
 
             return javaParams;
         } catch (Exception e) {
