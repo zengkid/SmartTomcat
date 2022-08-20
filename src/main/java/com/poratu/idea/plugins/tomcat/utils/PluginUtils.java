@@ -8,6 +8,13 @@ import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import org.jetbrains.annotations.Nullable;
 
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,5 +98,28 @@ public abstract class PluginUtils {
             return workingDir.resolve("logs");
         }
         return null;
+    }
+
+    @SuppressWarnings("HttpUrlsUsage")
+    public static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+        dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        dbf.setExpandEntityReferences(false);
+
+        return dbf.newDocumentBuilder();
+    }
+
+    public static Transformer createTransformer() throws TransformerConfigurationException {
+        TransformerFactory factory = TransformerFactory.newInstance();
+
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
+        return factory.newTransformer();
     }
 }
