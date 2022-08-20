@@ -56,6 +56,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
     private static final String TOMCAT_MAIN_CLASS = "org.apache.catalina.startup.Bootstrap";
     private static final String PARAM_CATALINA_HOME = "catalina.home";
     private static final String PARAM_CATALINA_BASE = "catalina.base";
+    private static final String PARAM_CATALINA_TMPDIR= "java.io.tmpdir";
     private static final String PARAM_LOGGING_CONFIG = "java.util.logging.config.file";
     private static final String PARAM_LOGGING_MANAGER = "java.util.logging.manager";
     private static final String PARAM_LOGGING_MANAGER_VALUE = "org.apache.juli.ClassLoaderLogManager";
@@ -123,6 +124,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             vmParams.addParametersString(vmOptions);
             vmParams.defineProperty(PARAM_CATALINA_HOME, tomcatInstallationPath.toString());
             vmParams.defineProperty(PARAM_CATALINA_BASE, workingPath.toString());
+            vmParams.defineProperty(PARAM_CATALINA_TMPDIR, workingPath.resolve("temp").toString());
             vmParams.defineProperty(PARAM_LOGGING_CONFIG, confPath.resolve("logging.properties").toString());
             vmParams.defineProperty(PARAM_LOGGING_MANAGER, PARAM_LOGGING_MANAGER_VALUE);
 
