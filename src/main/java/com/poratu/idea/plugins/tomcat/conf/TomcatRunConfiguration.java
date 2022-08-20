@@ -14,6 +14,7 @@ import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.configurations.RunProfileWithCompileBeforeLaunchOption;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtilCore;
@@ -23,7 +24,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
-import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
@@ -33,13 +34,11 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -165,10 +164,14 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
     @Nullable
     public Module getModule() {
-        if (module == null) {
-            if (tomcatOptions.getDocBase() != null) {
-                VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByIoFile(new File(tomcatOptions.getDocBase()));
-                module = ModuleUtilCore.findModuleForFile(Objects.requireNonNull(virtualFile), this.getProject());
+        if (module != null) {
+            return module;
+        }
+
+        if (tomcatOptions.getDocBase() != null) {
+            VirtualFile virtualFile = VfsUtil.findFile(Paths.get(tomcatOptions.getDocBase()), true);
+            if (virtualFile != null) {
+                module = ReadAction.compute(() -> ModuleUtilCore.findModuleForFile(virtualFile, getProject()));
             }
         }
         return module;
