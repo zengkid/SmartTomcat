@@ -7,7 +7,7 @@ The Smart Tomcat plugin will auto config the classpath for tomcat server.
 The Smart Tomcat support Tomcat 6+
 <!-- Plugin description end -->
 
-[![Actions Status](https://github.com/zengkid/SmartTomcat/workflows/Java%20CI/badge.svg)](https://github.com/zengkid/SmartTomcat/actions)
+[![build](https://github.com/zengkid/SmartTomcat/actions/workflows/build.yml/badge.svg)](https://github.com/zengkid/SmartTomcat/actions/workflows/build.yml)
 
 ### User Guide
 * Tomcat Server Setting
