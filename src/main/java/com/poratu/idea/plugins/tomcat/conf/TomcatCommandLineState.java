@@ -3,6 +3,7 @@ package com.poratu.idea.plugins.tomcat.conf;
 import com.intellij.debugger.settings.DebuggerSettings;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
+import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.JavaCommandLineState;
 import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.ParametersList;
@@ -53,10 +54,17 @@ import java.util.Map;
 
 public class TomcatCommandLineState extends JavaCommandLineState {
 
+    private static final String JDK_JAVA_OPTIONS = "JDK_JAVA_OPTIONS";
+    private static final String ENV_JDK_JAVA_OPTIONS = "--add-opens=java.base/java.lang=ALL-UNNAMED " +
+            "--add-opens=java.base/java.io=ALL-UNNAMED " +
+            "--add-opens=java.base/java.util=ALL-UNNAMED " +
+            "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED " +
+            "--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED";
+
     private static final String TOMCAT_MAIN_CLASS = "org.apache.catalina.startup.Bootstrap";
     private static final String PARAM_CATALINA_HOME = "catalina.home";
     private static final String PARAM_CATALINA_BASE = "catalina.base";
-    private static final String PARAM_CATALINA_TMPDIR= "java.io.tmpdir";
+    private static final String PARAM_CATALINA_TMPDIR = "java.io.tmpdir";
     private static final String PARAM_LOGGING_CONFIG = "java.util.logging.config.file";
     private static final String PARAM_LOGGING_MANAGER = "java.util.logging.manager";
     private static final String PARAM_LOGGING_MANAGER_VALUE = "org.apache.juli.ClassLoaderLogManager";
@@ -69,6 +77,16 @@ public class TomcatCommandLineState extends JavaCommandLineState {
     protected TomcatCommandLineState(ExecutionEnvironment environment, TomcatRunConfiguration configuration) {
         this(environment);
         this.configuration = configuration;
+    }
+
+    @Override
+    protected GeneralCommandLine createCommandLine() throws ExecutionException {
+        GeneralCommandLine commandLine = super.createCommandLine();
+
+        // Set JDK_JAVA_OPTIONS
+        String originalJdkJavaOptions = commandLine.getEnvironment().get(JDK_JAVA_OPTIONS);
+        String jdkJavaOptions = originalJdkJavaOptions == null ? ENV_JDK_JAVA_OPTIONS : originalJdkJavaOptions + " " + ENV_JDK_JAVA_OPTIONS;
+        return commandLine.withEnvironment(JDK_JAVA_OPTIONS, jdkJavaOptions);
     }
 
     @Override
