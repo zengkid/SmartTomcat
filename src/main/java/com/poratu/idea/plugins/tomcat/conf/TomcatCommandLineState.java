@@ -11,7 +11,6 @@ import com.intellij.execution.process.KillableProcessHandler;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.ConsoleView;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.OrderEnumerator;
@@ -52,8 +51,6 @@ import java.util.Map;
  */
 
 public class TomcatCommandLineState extends JavaCommandLineState {
-
-    private static final Logger LOG = Logger.getInstance(TomcatCommandLineState.class);
 
     private static final String JDK_JAVA_OPTIONS = "JDK_JAVA_OPTIONS";
     private static final String ENV_JDK_JAVA_OPTIONS = "--add-opens=java.base/java.lang=ALL-UNNAMED " +
@@ -117,24 +114,26 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             String vmOptions = configuration.getVmOptions();
             Map<String, String> envOptions = configuration.getEnvOptions();
 
-            // copy the Tomcat configuration files to the working directory
+            // Copy the Tomcat configuration files to the working directory
             Path confPath = workingPath.resolve("conf");
+            FileUtil.delete(confPath);
             FileUtil.createDirectory(confPath.toFile());
-            FileUtil.copyFileOrDir(tomcatInstallationPath.resolve("conf").toFile(), confPath.toFile());
+            FileUtil.copyDir(tomcatInstallationPath.resolve("conf").toFile(), confPath.toFile());
 
             updateServerConf(confPath, configuration);
             createContextFile(tomcatVersion, module, confPath, configuration.getDocBase(), contextPath);
+            deleteTomcatWorkFiles(workingPath);
 
             ProjectRootManager manager = ProjectRootManager.getInstance(project);
 
             JavaParameters javaParams = new JavaParameters();
+            javaParams.setDefaultCharset(project);
             javaParams.setWorkingDirectory(workingPath.toFile());
             javaParams.setJdk(manager.getProjectSdk());
-            javaParams.setDefaultCharset(project);
+            javaParams.getClassPath().add(tomcatInstallationPath.resolve("bin/bootstrap.jar").toFile());
+            javaParams.getClassPath().add(tomcatInstallationPath.resolve("bin/tomcat-juli.jar").toFile());
             javaParams.setMainClass(TOMCAT_MAIN_CLASS);
             javaParams.getProgramParametersList().add("start");
-            addJarsInFolder(tomcatInstallationPath.resolve("bin"), javaParams);
-            addJarsInFolder(tomcatInstallationPath.resolve("lib"), javaParams);
 
             javaParams.setPassParentEnvs(configuration.getPassParentEnvironmentVariables());
             if (envOptions != null) {
@@ -196,16 +195,8 @@ public class TomcatCommandLineState extends JavaCommandLineState {
     private void createContextFile(String tomcatVersion, Module module, Path confPath, String docBase, String contextPath)
             throws ParserConfigurationException, IOException, SAXException, TransformerException {
         String normalizedContextPath = StringUtil.trimStart(contextPath, "/");
-        Path catalinaContextPath = confPath.resolve("Catalina");
-        Path contextFilesDir = catalinaContextPath.resolve("localhost");
+        Path contextFilesDir = confPath.resolve("Catalina/localhost");
         Path contextFilePath = contextFilesDir.resolve(normalizedContextPath + ".xml");
-
-        try {
-            // Delete `conf/Catalina` folder to clean up any existing context files
-            FileUtil.delete(catalinaContextPath);
-        } catch (IOException e) {
-            LOG.warn("Could not delete " + catalinaContextPath.toAbsolutePath(), e);
-        }
 
         // Create `conf/Catalina/localhost` folder
         FileUtil.createDirectory(contextFilesDir.toFile());
@@ -224,6 +215,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
         root.setAttribute("docBase", docBase);
         root.setAttribute("path", "/" + normalizedContextPath);
+        root.setAttribute("reloadable", "true");
 
         Element resources = collectResources(doc, module, tomcatVersion);
         if (resources != null) {
@@ -239,11 +231,12 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
     @Nullable
     private Path findContextFileInApp() {
-        if (configuration.getDocBase() == null) {
+        String docBase = configuration.getDocBase();
+        if (docBase == null) {
             return null;
         }
 
-        Path metaInf = Paths.get(configuration.getDocBase()).resolve("META-INF");
+        Path metaInf = Paths.get(docBase).resolve("META-INF");
         Path contextLocalFile = metaInf.resolve("context_local.xml");
         Path contextFile = metaInf.resolve("context.xml");
 
@@ -257,7 +250,8 @@ public class TomcatCommandLineState extends JavaCommandLineState {
     }
 
     private Element collectResources(Document doc, @NotNull Module module, String tomcatVersion) {
-        int majorVersion = Integer.parseInt(StringUtil.substringBefore(tomcatVersion, "."));
+        String majorVersionStr = tomcatVersion.split("\\.")[0];
+        int majorVersion = Integer.parseInt(majorVersionStr);
         PathsList pathsList = OrderEnumerator.orderEntries(module)
                 .withoutSdk().runtimeOnly().productionOnly().getPathsList();
 
@@ -288,7 +282,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         if (majorVersion >= 6) {
             Element loader = doc.createElement("Loader");
             loader.setAttribute("className", "org.apache.catalina.loader.VirtualWebappLoader");
-            loader.setAttribute("virtualClasspath", pathsList.getPathsString());
+            loader.setAttribute("virtualClasspath", StringUtil.join(pathsList.getPathList(), ";"));
 
             return loader;
         }
@@ -296,17 +290,15 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         return null;
     }
 
-    private void addJarsInFolder(Path folder, JavaParameters javaParams) throws ExecutionException {
-        // Dynamically adds the tomcat jars to the classpath
-        if (!Files.exists(folder)) {
-            throw new ExecutionException("The Tomcat installation configured doesn't contains a " + folder.getFileName() + " folder");
-        }
-        String[] jars = folder.toFile().list((dir, name) -> name.endsWith(".jar"));
-
-        assert jars != null;
-        for (String jarFile : jars) {
-            javaParams.getClassPath().add(folder.resolve(jarFile).toFile().getAbsolutePath());
-        }
+    private void deleteTomcatWorkFiles(Path tomcatHome) {
+        Path tomcatWorkPath = tomcatHome.resolve("work/Catalina/localhost");
+        FileUtil.processFilesRecursively(tomcatWorkPath.toFile(), file -> {
+            // Delete the work files except the session persistence files
+            if (file.isFile() && !file.getName().endsWith(".ser")) {
+                FileUtil.delete(file);
+            }
+            return true;
+        });
     }
 
 }
