@@ -142,7 +142,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
             ParametersList vmParams = javaParams.getVMParametersList();
             vmParams.addParametersString(vmOptions);
-            vmParams.defineProperty(PARAM_CATALINA_HOME, tomcatInstallationPath.toString());
+            vmParams.addProperty(PARAM_CATALINA_HOME, tomcatInstallationPath.toString());
             vmParams.defineProperty(PARAM_CATALINA_BASE, workingPath.toString());
             vmParams.defineProperty(PARAM_CATALINA_TMPDIR, workingPath.resolve("temp").toString());
             vmParams.defineProperty(PARAM_LOGGING_CONFIG, confPath.resolve("logging.properties").toString());
