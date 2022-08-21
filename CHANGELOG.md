@@ -1,6 +1,13 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.3.1]
+
+- Support Tomcat 6 and 7
+- Use separate context file to deploy webapps (#89)
+- Fixed IDEA warning during startup
+- Fixed the wrong `catalina.home` value
+
 ## [4.3.0]
 
 - Added support for redirecting the Tomcat logs to console.
