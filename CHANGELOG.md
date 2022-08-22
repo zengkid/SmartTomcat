@@ -1,6 +1,10 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.3.2]
+
+- Fix the bug where the `temp` folder is not created
+
 ## [4.3.1]
 
 - Support Tomcat 6 and 7
