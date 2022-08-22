@@ -119,6 +119,8 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             FileUtil.delete(confPath);
             FileUtil.createDirectory(confPath.toFile());
             FileUtil.copyDir(tomcatInstallationPath.resolve("conf").toFile(), confPath.toFile());
+            // create the temp folder
+            FileUtil.createDirectory(workingPath.resolve("temp").toFile());
 
             updateServerConf(confPath, configuration);
             createContextFile(tomcatVersion, module, confPath, configuration.getDocBase(), contextPath);
