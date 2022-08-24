@@ -9,7 +9,6 @@ import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.RawCommandLineEditor;
-import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jdesktop.swingx.JXButton;
 import org.jetbrains.annotations.NotNull;
 
@@ -82,7 +81,7 @@ public class RunnerSetting {
         tomcatField = new ComboboxWithBrowseButton();
         JComboBox<TomcatInfo> comboBox = tomcatField.getComboBox();
 
-        List<TomcatInfo> tomcatInfos = TomcatInfoConfigs.getInstance().getTomcatInfos();
+        List<TomcatInfo> tomcatInfos = TomcatServerManagerState.getInstance().getTomcatInfos();
         CollectionComboBoxModel<TomcatInfo> aModel = new CollectionComboBoxModel<>(tomcatInfos);
         comboBox.setModel(aModel);
 
@@ -93,22 +92,17 @@ public class RunnerSetting {
             }
 
             public void setText(JComboBox comboBox, @NotNull String text) {
-//                comboBox.getEditor().setItem(text);
-                TomcatInfo tomcatInfo = PluginUtils.getTomcatInfo(text);
+                TomcatInfo tomcatInfo = TomcatServerManagerState.createTomcatInfo(text);
 
-                if (tomcatInfo != null) {
+                CollectionComboBoxModel<TomcatInfo> model = (CollectionComboBoxModel) comboBox.getModel();
 
-                    CollectionComboBoxModel<TomcatInfo> model = (CollectionComboBoxModel) comboBox.getModel();
-
-                    if (model.contains(tomcatInfo)) {
-                        int maxVersion = TomcatInfoConfigs.getInstance().getMaxVersion(tomcatInfo);
-                        tomcatInfo.setNumber(maxVersion + 1);
-                    }
-
-                    model.add(model.getSize(), tomcatInfo);
-                    model.setSelectedItem(tomcatInfo);
-
+                if (model.contains(tomcatInfo)) {
+                    int maxVersion = TomcatServerManagerState.getInstance().getMaxVersion(tomcatInfo);
+                    tomcatInfo.setNumber(maxVersion + 1);
                 }
+
+                model.add(model.getSize(), tomcatInfo);
+                model.setSelectedItem(tomcatInfo);
             }
         });
     }

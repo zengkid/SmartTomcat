@@ -9,10 +9,10 @@
     <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatSettingConfigurable"/>
+        <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable" />
+        <applicationService serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState"/>
         <configurationType implementation="com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType"/>
         <runConfigurationProducer implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunConfigurationProducer" order="last"/>
-        <applicationService serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs"/>
         <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunner"/>
         <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatDebugger"/>
     </extensions>

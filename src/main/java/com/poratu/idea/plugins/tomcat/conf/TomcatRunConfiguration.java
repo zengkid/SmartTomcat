@@ -28,7 +28,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.xmlb.XmlSerializer;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
-import com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs;
+import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
 import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -70,7 +70,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
     protected TomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
         super(project, factory, name);
-        TomcatInfoConfigs applicationService = ApplicationManager.getApplication().getService(TomcatInfoConfigs.class);
+        TomcatServerManagerState applicationService = ApplicationManager.getApplication().getService(TomcatServerManagerState.class);
         List<TomcatInfo> tomcatInfos = applicationService.getTomcatInfos();
         if (!tomcatInfos.isEmpty()) {
             tomcatOptions.setTomcatInfo(tomcatInfos.get(0));

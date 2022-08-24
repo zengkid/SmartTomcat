@@ -14,7 +14,7 @@ import com.intellij.psi.PsiElement;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
-import com.poratu.idea.plugins.tomcat.setting.TomcatInfoConfigs;
+import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
@@ -32,7 +32,7 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
         boolean result = isConfigurationFromContext(configuration, context);
 
         if (result) {
-            List<TomcatInfo> tomcatInfos = TomcatInfoConfigs.getInstance().getTomcatInfos();
+            List<TomcatInfo> tomcatInfos = TomcatServerManagerState.getInstance().getTomcatInfos();
             if (tomcatInfos != null && tomcatInfos.size() > 0) {
                 TomcatInfo tomcatInfo = tomcatInfos.get(0);
                 configuration.setTomcatInfo(tomcatInfo);

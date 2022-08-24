@@ -2,10 +2,9 @@ package com.poratu.idea.plugins.tomcat.utils;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.ProjectJdkTable;
-import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.util.text.StringUtil;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
-import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.xml.XMLConstants;
@@ -15,66 +14,46 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Properties;
-import java.util.jar.JarFile;
-import java.util.zip.ZipEntry;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Author : zengkid
  * Date   : 2017-03-06
  * Time   : 21:35
  */
-public abstract class PluginUtils {
+public final class PluginUtils {
 
-//    public static String getJavaHome() {
-//        Sdk sdk = getProjectJDK();
-//        String javahome;
-//        if (sdk == null) {
-//            JdkBundle jdkBundle = JdkBundle.createBoot();
-//            javahome = jdkBundle.getLocation().getAbsolutePath();
-//        } else {
-//            javahome = sdk.getHomePath();
-//        }
-//        return javahome;
-//    }
-
-    private static Sdk getProjectJDK() {
-        Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
-        return allJdks.length == 0 ? null : allJdks[0];
+    private PluginUtils() {
     }
 
-    public static TomcatInfo getTomcatInfo(String tomcatHome) {
-        final TomcatInfo tomcatInfo = new TomcatInfo();
-        tomcatInfo.setPath(tomcatHome);
-
-        try {
-            File jarFile = new File(tomcatHome, "lib/catalina.jar");
-            if (!jarFile.exists()) {
-                throw new RuntimeException("tomcat path [" + tomcatHome + "] is incorrect!");
-            }
-            try (JarFile jar = new JarFile(jarFile)) {
-                ZipEntry entry = jar.getEntry("org/apache/catalina/util/ServerInfo.properties");
-
-                Properties p = new Properties();
-                try (InputStream is = jar.getInputStream(entry)) {
-                    p.load(is);
+    /**
+     * Generate a sequent name based on the existing names
+     * @param existingNames existing names, e.g. ["tomcat 7", "tomcat 8", "tomcat 9"]
+     * @param preferredName preferred name, e.g. "tomcat 8"
+     * @return sequent name, e.g. "tomcat 8 (2)"
+     */
+    @NotNull
+    public static String generateSequentName(@NotNull List<String> existingNames, @NotNull String preferredName) {
+        int maxSequent = 0;
+        for (String existingName : existingNames) {
+            Pattern pattern = Pattern.compile("^" + StringUtil.escapeToRegexp(preferredName) + "(?:\\s\\((\\d+)\\))?$");
+            Matcher matcher = pattern.matcher(existingName);
+            if (matcher.matches()) {
+                String seq = matcher.group(1);
+                if (seq == null) {
+                    // No sequent implies that the sequent is 1
+                    maxSequent = 1;
+                } else {
+                    maxSequent = Math.max(maxSequent, Integer.parseInt(seq));
                 }
-
-                String serverInfo = p.getProperty("server.info");
-                String serverNumber = p.getProperty("server.number");
-                tomcatInfo.setName(serverInfo);
-                tomcatInfo.setVersion(serverNumber);
             }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
-        return tomcatInfo;
+
+        return maxSequent == 0 ? preferredName : preferredName + " (" + (maxSequent + 1) + ")";
     }
 
     @Nullable

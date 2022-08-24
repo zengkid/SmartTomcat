@@ -17,7 +17,7 @@ import com.intellij.ui.DocumentAdapter;
 import com.poratu.idea.plugins.tomcat.setting.ComboboxWithBrowseButton;
 import com.poratu.idea.plugins.tomcat.setting.RunnerSetting;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
-import com.poratu.idea.plugins.tomcat.setting.TomcatSettingConfigurable;
+import com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable;
 import org.jdesktop.swingx.JXButton;
 import org.jetbrains.annotations.NotNull;
 
@@ -119,7 +119,7 @@ public class TomcatSettingsEditor extends SettingsEditor<TomcatRunConfiguration>
         JFormattedTextField adminPort = runnerSetting.getAdminPort();
 
         JXButton configrationButton = runnerSetting.getConfigrationButton();
-        configrationButton.addActionListener(e -> ShowSettingsUtil.getInstance().showSettingsDialog(project, TomcatSettingConfigurable.class));
+        configrationButton.addActionListener(e -> ShowSettingsUtil.getInstance().showSettingsDialog(project, TomcatServersConfigurable.class));
 
 
         VirtualFile baseDir = VirtualFileManager.getInstance().getFileSystem("file").findFileByPath(project.getBasePath());
