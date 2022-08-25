@@ -1,6 +1,12 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.3.3]
+
+- Improve Tomcat server management
+- Remove unnecessary `path` in Tomcat context file
+- Handle exceptions in older IDE versions
+
 ## [4.3.2]
 
 - Fix the bug where the `temp` folder is not created
