@@ -83,11 +83,15 @@ public final class PluginUtils {
     public static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
-        dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        try {
+            dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        } catch (IllegalArgumentException ignored) {
+        }
+
         dbf.setExpandEntityReferences(false);
 
         return dbf.newDocumentBuilder();

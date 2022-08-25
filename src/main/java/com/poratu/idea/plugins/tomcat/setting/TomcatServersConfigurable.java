@@ -42,7 +42,8 @@ public class TomcatServersConfigurable extends MasterDetailsComponent {
     protected @Nullable List<AnAction> createActions(boolean fromPopup) {
         List<AnAction> actions = new ArrayList<>();
         actions.add(new AddTomcatAction());
-        actions.add(new MyDeleteAction((Predicate<Object[]>) null));
+        // noinspection MissingRecentApi - the inspection of the next line is incorrect. It is available in 193+, actually
+        actions.add(new MyDeleteAction());
         return actions;
     }
 
