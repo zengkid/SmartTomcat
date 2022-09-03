@@ -46,7 +46,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
 
     TomcatRunnerSettingsForm(Project project) {
         this.project = project;
-        JButton configurationButton = new JButton("Configuration");
+        JButton configurationButton = new JButton("Configure...");
         configurationButton.addActionListener(e -> PluginUtils.openTomcatConfiguration());
 
         tomcatField.add(tomcatComboBox, BorderLayout.CENTER);
