@@ -202,32 +202,30 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
         DocumentBuilder builder = PluginUtils.createDocumentBuilder();
         Document doc = builder.newDocument();
-        Element root;
+        Element contextRoot = createContextElement(doc, builder);
 
-        Path contextFile = findContextFileInApp();
-        if (contextFile == null) {
-            root = doc.createElement("Context");
-        } else {
-            Element contextEl = builder.parse(contextFile.toFile()).getDocumentElement();
-            root = (Element) doc.importNode(contextEl, true);
-        }
+        contextRoot.setAttribute("docBase", docBase);
+        contextRoot.setAttribute("reloadable", "true");
 
-        root.setAttribute("docBase", docBase);
-        root.setAttribute("reloadable", "true");
-
-        Element resources = collectResources(doc, module, tomcatVersion);
-        if (resources != null) {
-            root.appendChild(resources);
-        }
-
-        doc.appendChild(root);
+        collectResources(doc, contextRoot, module, tomcatVersion);
+        doc.appendChild(contextRoot);
 
         DOMSource source = new DOMSource(doc);
         StreamResult result = new StreamResult(contextFilePath.toFile());
         PluginUtils.createTransformer().transform(source, result);
     }
 
-    @Nullable
+    private Element createContextElement(Document doc, DocumentBuilder builder) throws IOException, SAXException {
+        Path contextFile = findContextFileInApp();
+
+        if (contextFile == null) {
+            return doc.createElement("Context");
+        }
+
+        Element contextEl = builder.parse(contextFile.toFile()).getDocumentElement();
+        return (Element) doc.importNode(contextEl, true);
+    }
+
     private Path findContextFileInApp() {
         String docBase = configuration.getDocBase();
         if (docBase == null) {
@@ -247,18 +245,18 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         }
     }
 
-    private Element collectResources(Document doc, @NotNull Module module, String tomcatVersion) {
+    private void collectResources(Document doc, Element contextRoot, Module module, String tomcatVersion) {
         String majorVersionStr = tomcatVersion.split("\\.")[0];
         int majorVersion = Integer.parseInt(majorVersionStr);
         PathsList pathsList = OrderEnumerator.orderEntries(module)
                 .withoutSdk().runtimeOnly().productionOnly().getPathsList();
 
         if (pathsList.isEmpty()) {
-            return null;
+            return;
         }
 
         if (majorVersion >= 8) {
-            Element resources = doc.createElement("Resources");
+            Element resources = createResourcesElementIfNecessary(doc, contextRoot);
             pathsList.getVirtualFiles().forEach(file -> {
                 Element res;
                 if (file.isDirectory()) {
@@ -273,19 +271,23 @@ public class TomcatCommandLineState extends JavaCommandLineState {
                 res.setAttribute("base", file.getPath());
                 resources.appendChild(res);
             });
-
-            return resources;
-        }
-
-        if (majorVersion >= 6) {
+        } else if (majorVersion >= 6) {
             Element loader = doc.createElement("Loader");
             loader.setAttribute("className", "org.apache.catalina.loader.VirtualWebappLoader");
             loader.setAttribute("virtualClasspath", StringUtil.join(pathsList.getPathList(), ";"));
-
-            return loader;
+            contextRoot.appendChild(loader);
+        } else {
+            throw new RuntimeException("Unsupported Tomcat version: " + tomcatVersion);
         }
+    }
 
-        return null;
+    private Element createResourcesElementIfNecessary(Document doc, Element contextRoot) {
+        Element resources = (Element) contextRoot.getElementsByTagName("Resources").item(0);
+        if (resources == null) {
+            resources = doc.createElement("Resources");
+            contextRoot.appendChild(resources);
+        }
+        return resources;
     }
 
     private void deleteTomcatWorkFiles(Path tomcatHome) {
