@@ -1,5 +1,6 @@
 package com.poratu.idea.plugins.tomcat.conf;
 
+import com.intellij.configurationStore.XmlSerializer;
 import com.intellij.diagnostic.logging.LogConfigurationPanel;
 import com.intellij.execution.ExecutionBundle;
 import com.intellij.execution.Executor;
@@ -12,6 +13,8 @@ import com.intellij.execution.configurations.PredefinedLogFile;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.configurations.RunProfileWithCompileBeforeLaunchOption;
+import com.intellij.execution.configurations.RuntimeConfigurationError;
+import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
@@ -21,12 +24,12 @@ import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.options.SettingsEditorGroup;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.xmlb.XmlSerializer;
+import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
 import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
@@ -34,14 +37,12 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
+import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Author : zengkid
@@ -66,8 +67,6 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
     private TomcatRunConfigurationOptions tomcatOptions = new TomcatRunConfigurationOptions();
 
-    private transient Module module;
-
     protected TomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
         super(project, factory, name);
         TomcatServerManagerState applicationService = ApplicationManager.getApplication().getService(TomcatServerManagerState.class);
@@ -82,12 +81,32 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
     @Override
     public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
         Project project = getProject();
-        TomcatSettingsEditor tomcatSetting = new TomcatSettingsEditor(this, project);
         SettingsEditorGroup<TomcatRunConfiguration> group = new SettingsEditorGroup<>();
+        TomcatRunnerSettingsEditor tomcatSetting = new TomcatRunnerSettingsEditor(project);
+
         group.addEditor(ExecutionBundle.message("run.configuration.configuration.tab.title"), tomcatSetting);
-        JavaRunConfigurationExtensionManager.getInstance().appendEditors(this, group);
         group.addEditor(ExecutionBundle.message("logs.tab.title"), new LogConfigurationPanel<>());
+        JavaRunConfigurationExtensionManager.getInstance().appendEditors(this, group);
         return group;
+    }
+
+    @Override
+    public void checkConfiguration() throws RuntimeConfigurationException {
+        if (tomcatOptions.getTomcatInfo() == null) {
+            throw new RuntimeConfigurationError("Tomcat server is not selected");
+        }
+
+        if (StringUtil.isEmpty(tomcatOptions.getDocBase())) {
+            throw new RuntimeConfigurationError("Deployment directory cannot be empty");
+        }
+
+        if (StringUtil.isEmpty(tomcatOptions.getContextPath())) {
+            throw new RuntimeConfigurationError("Context path cannot be empty");
+        }
+
+        if (tomcatOptions.getPort() == null || tomcatOptions.getAdminPort() == null) {
+            throw new RuntimeConfigurationError("Port cannot be empty");
+        }
     }
 
     @Override
@@ -96,22 +115,15 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
         try {
             Project project = getProject();
+            List<VirtualFile> webRoots = PluginUtils.findWebRoots(project);
 
-            ProjectRootManager rootManager = ProjectRootManager.getInstance(project);
-            VirtualFile[] sourceRoots = rootManager.getContentSourceRoots();
-
-            Optional<VirtualFile> webinfFile = Stream.of(sourceRoots).map(VirtualFile::getParent).distinct().flatMap(f ->
-                    Stream.of(f.getChildren()).filter(c -> {
-                        Path path = Paths.get(c.getCanonicalPath(), "WEB-INF");
-                        return path.toFile().exists();
-                    })).distinct().findFirst();
-
-
-            if (webinfFile.isPresent()) {
-                VirtualFile file = webinfFile.get();
-                tomcatOptions.setDocBase(file.getCanonicalPath());
-                module = ModuleUtilCore.findModuleForFile(file, project);
-                tomcatOptions.setContextPath("/" + module.getName());
+            if (!webRoots.isEmpty()) {
+                VirtualFile webRoot = webRoots.get(0);
+                tomcatOptions.setDocBase(webRoot.getPath());
+                Module module = ModuleUtilCore.findModuleForFile(webRoot, project);
+                if (module != null) {
+                    tomcatOptions.setContextPath("/" + module.getName());
+                }
             }
         } catch (Exception e) {
             //do nothing.
@@ -145,7 +157,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
     @Override
     public void readExternal(@NotNull Element element) throws InvalidDataException {
         super.readExternal(element);
-        XmlSerializer.deserializeInto(tomcatOptions, element);
+        XmlSerializer.deserializeInto(element, tomcatOptions);
 
         if (getAllLogFiles().isEmpty()) {
             addPredefinedTomcatLogFiles();
@@ -155,7 +167,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
     @Override
     public void writeExternal(@NotNull Element element) throws WriteExternalException {
         super.writeExternal(element);
-        XmlSerializer.serializeInto(tomcatOptions, element);
+        XmlSerializer.serializeObjectInto(tomcatOptions, element);
     }
 
     private void addPredefinedTomcatLogFiles() {
@@ -164,10 +176,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
     @Nullable
     public Module getModule() {
-        if (module != null) {
-            return module;
-        }
-
+        Module module = null;
         if (tomcatOptions.getDocBase() != null) {
             VirtualFile virtualFile = VfsUtil.findFile(Paths.get(tomcatOptions.getDocBase()), true);
             if (virtualFile != null) {
@@ -175,10 +184,6 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
             }
         }
         return module;
-    }
-
-    public void setModule(Module module) {
-        this.module = module;
     }
 
     public TomcatInfo getTomcatInfo() {
@@ -205,19 +210,19 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         tomcatOptions.setContextPath(contextPath);
     }
 
-    public String getPort() {
+    public Integer getPort() {
         return tomcatOptions.getPort();
     }
 
-    public void setPort(String port) {
+    public void setPort(Integer port) {
         tomcatOptions.setPort(port);
     }
 
-    public String getAdminPort() {
+    public Integer getAdminPort() {
         return tomcatOptions.getAdminPort();
     }
 
-    public void setAdminPort(String adminPort) {
+    public void setAdminPort(Integer adminPort) {
         tomcatOptions.setAdminPort(adminPort);
     }
 
@@ -237,92 +242,96 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         tomcatOptions.setEnvOptions(envOptions);
     }
 
-    public Boolean getPassParentEnvironmentVariables() {
-        return tomcatOptions.getPassParentEnvironmentVariables();
+    public Boolean isPassParentEnvs() {
+        return tomcatOptions.isPassParentEnvs();
     }
 
-    public void setPassParentEnvironmentVariables(Boolean passParentEnvironmentVariables) {
-        tomcatOptions.setPassParentEnvironmentVariables(passParentEnvironmentVariables);
+    public void setPassParentEnvironmentVariables(Boolean passParentEnvs) {
+        tomcatOptions.setPassParentEnvs(passParentEnvs);
     }
 
-}
-
-
-class TomcatRunConfigurationOptions {
-
-    private TomcatInfo tomcatInfo;
-
-    private String docBase;
-    private String contextPath;
-    private String port = "8080";
-    private String adminPort = "8005";
-    private String vmOptions;
-    private Map<String, String> envOptions;
-    private Boolean passParentEnvironmentVariables = true;
-
-    public TomcatInfo getTomcatInfo() {
-        return tomcatInfo;
+    @Override
+    public RunConfiguration clone() {
+        TomcatRunConfiguration configuration = (TomcatRunConfiguration) super.clone();
+        configuration.tomcatOptions = XmlSerializerUtil.createCopy(tomcatOptions);
+        return configuration;
     }
 
-    public void setTomcatInfo(TomcatInfo tomcatInfo) {
-        this.tomcatInfo = tomcatInfo;
-    }
+    private static class TomcatRunConfigurationOptions implements Serializable {
+        private TomcatInfo tomcatInfo;
 
-    @Nullable
-    public String getDocBase() {
-        return docBase;
-    }
+        private String docBase;
+        private String contextPath;
+        private Integer port = 8080;
+        private Integer adminPort = 8005;
+        private String vmOptions;
+        private Map<String, String> envOptions;
+        private Boolean passParentEnvs = true;
 
-    public void setDocBase(String docBase) {
-        this.docBase = docBase;
-    }
+        public TomcatInfo getTomcatInfo() {
+            return tomcatInfo;
+        }
 
-    public String getContextPath() {
-        return contextPath;
-    }
+        public void setTomcatInfo(TomcatInfo tomcatInfo) {
+            this.tomcatInfo = tomcatInfo;
+        }
 
-    public void setContextPath(String contextPath) {
-        this.contextPath = contextPath;
-    }
+        @Nullable
+        public String getDocBase() {
+            return docBase;
+        }
 
-    public String getPort() {
-        return port;
-    }
+        public void setDocBase(String docBase) {
+            this.docBase = docBase;
+        }
 
-    public void setPort(String port) {
-        this.port = port;
-    }
+        public String getContextPath() {
+            return contextPath;
+        }
 
-    public String getAdminPort() {
-        return adminPort;
-    }
+        public void setContextPath(String contextPath) {
+            this.contextPath = contextPath;
+        }
 
-    public void setAdminPort(String adminPort) {
-        this.adminPort = adminPort;
-    }
+        public Integer getPort() {
+            return port;
+        }
 
-    public String getVmOptions() {
-        return vmOptions;
-    }
+        public void setPort(Integer port) {
+            this.port = port;
+        }
 
-    public void setVmOptions(String vmOptions) {
-        this.vmOptions = vmOptions;
-    }
+        public Integer getAdminPort() {
+            return adminPort;
+        }
 
-    public Map<String, String> getEnvOptions() {
-        return envOptions;
-    }
+        public void setAdminPort(Integer adminPort) {
+            this.adminPort = adminPort;
+        }
 
-    public void setEnvOptions(Map<String, String> envOptions) {
-        this.envOptions = envOptions;
-    }
+        public String getVmOptions() {
+            return vmOptions;
+        }
 
-    public Boolean getPassParentEnvironmentVariables() {
-        return passParentEnvironmentVariables;
-    }
+        public void setVmOptions(String vmOptions) {
+            this.vmOptions = vmOptions;
+        }
 
-    public void setPassParentEnvironmentVariables(Boolean passParentEnvironmentVariables) {
-        this.passParentEnvironmentVariables = passParentEnvironmentVariables;
+        public Map<String, String> getEnvOptions() {
+            return envOptions;
+        }
+
+        public void setEnvOptions(Map<String, String> envOptions) {
+            this.envOptions = envOptions;
+        }
+
+        public Boolean isPassParentEnvs() {
+            return passParentEnvs;
+        }
+
+        public void setPassParentEnvs(Boolean passParentEnvs) {
+            this.passParentEnvs = passParentEnvs;
+        }
     }
 
 }

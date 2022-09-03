@@ -35,7 +35,8 @@ public class ServerConsoleView extends ConsoleViewImpl {
 
         if (s.contains("org.apache.catalina.startup.Catalina start")
                 || s.contains("org.apache.catalina.startup.Catalina.start")) {
-            String url = "http://localhost" + (configuration.getPort().equals("80") ? "" : ":" + configuration.getPort()) + configuration.getContextPath();
+            boolean isDefaultPort = Integer.valueOf(80).equals(configuration.getPort());
+            String url = "http://localhost" + (isDefaultPort ? "" : ":" + configuration.getPort()) + configuration.getContextPath();
             super.print(url + "\n", contentType);
             printStarted = true;
         }

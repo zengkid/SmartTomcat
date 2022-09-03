@@ -2,8 +2,6 @@ package com.poratu.idea.plugins.tomcat.setting;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.fileChooser.FileChooser;
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.MasterDetailsComponent;
@@ -15,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * Author : zengkid
@@ -84,6 +81,7 @@ public class TomcatServersConfigurable extends MasterDetailsComponent {
 
     @Override
     protected boolean wasObjectStored(Object editableObject) {
+        // noinspection SuspiciousMethodCalls
         return TomcatServerManagerState.getInstance().getTomcatInfos().contains(editableObject);
     }
 
@@ -114,11 +112,7 @@ public class TomcatServersConfigurable extends MasterDetailsComponent {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFolderDescriptor(), null, null, file -> {
-                TomcatInfo tomcatInfo = TomcatServerManagerState.createTomcatInfo(file.getPath(), this::createUniqueName);
-                tomcatInfo.setName(tomcatInfo.getName());
-                addNode(tomcatInfo, true);
-            });
+            PluginUtils.chooseTomcat(this::createUniqueName, tomcatInfo -> addNode(tomcatInfo, true));
         }
 
         private String createUniqueName(String preferredName) {

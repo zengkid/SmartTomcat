@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public class TomcatDebugger extends GenericDebuggerRunner {
     private static final String RUNNER_ID = "SmartTomcatDebugger";
 
+    @Override
     @NotNull
     public String getRunnerId() {
         return RUNNER_ID;

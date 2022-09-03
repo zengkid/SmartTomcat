@@ -45,7 +45,6 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
             configuration.setName(module.getName());
             configuration.setDocBase(virtualFile.getCanonicalPath());
             configuration.setContextPath("/" + module.getName());
-            configuration.setModule(module);
 
             final RunnerAndConfigurationSettings settings =
                     RunManager.getInstance(context.getProject()).createConfiguration(configuration, getConfigurationFactory());

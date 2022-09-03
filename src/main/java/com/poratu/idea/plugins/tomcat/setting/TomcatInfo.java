@@ -1,15 +1,17 @@
 package com.poratu.idea.plugins.tomcat.setting;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 /**
  * Author : zengkid
  * Date   : 2017-03-05
  * Time   : 16:17
  */
-public class TomcatInfo {
+public class TomcatInfo implements Serializable {
     private String name;
     private String version;
     private String path;
-    private int number;
 
     public String getName() {
         return name;
@@ -39,30 +41,17 @@ public class TomcatInfo {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         TomcatInfo that = (TomcatInfo) o;
-
-        if (number != that.number) return false;
-        return name != null && name.equals(that.name) || name == null && that.name == null;
+        return Objects.equals(name, that.name) && Objects.equals(version, that.version) && Objects.equals(path, that.path);
     }
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + number;
-        return result;
+        return Objects.hash(name, version, path);
     }
 
     @Override
     public String toString() {
-        return name + (number > 0 ? "(" + number + ")" : "");
-    }
-
-    public int getNumber() {
-        return number;
-    }
-
-    public void setNumber(int number) {
-        this.number = number;
+        return name;
     }
 }

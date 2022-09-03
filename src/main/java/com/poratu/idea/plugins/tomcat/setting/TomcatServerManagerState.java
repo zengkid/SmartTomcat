@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.XCollection;
 import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -56,24 +56,15 @@ public class TomcatServerManagerState implements PersistentStateComponent<Tomcat
         XmlSerializerUtil.copyBean(tomcatSettingsState, this);
     }
 
-    public int getMaxVersion(TomcatInfo tomcatInfo) {
-        Optional<TomcatInfo> maxTomcatInfo = tomcatInfos.stream().filter(it ->
-                it.getName().equals(tomcatInfo.getName()) && it.getNumber() == tomcatInfo.getNumber()).max(Comparator.comparingInt(TomcatInfo::getNumber));
-        int max = 0;
-        if (maxTomcatInfo.isPresent()) {
-            max = maxTomcatInfo.get().getNumber();
-        }
-        return max;
-    }
-
-    public static TomcatInfo createTomcatInfo(String tomcatHome) {
+    public static Optional<TomcatInfo> createTomcatInfo(String tomcatHome) {
         return createTomcatInfo(tomcatHome, TomcatServerManagerState::generateTomcatName);
     }
 
-    public static TomcatInfo createTomcatInfo(String tomcatHome, UnaryOperator<String> nameGenerator) {
+    public static Optional<TomcatInfo> createTomcatInfo(String tomcatHome, UnaryOperator<String> nameGenerator) {
         File jarFile = Paths.get(tomcatHome, "lib/catalina.jar").toFile();
         if (!jarFile.exists()) {
-            throw new RuntimeException("tomcat path [" + tomcatHome + "] is incorrect!");
+            Messages.showErrorDialog("Can not find catalina.jar in " + tomcatHome, "Error");
+            return Optional.empty();
         }
 
         final TomcatInfo tomcatInfo = new TomcatInfo();
@@ -87,13 +78,15 @@ public class TomcatServerManagerState implements PersistentStateComponent<Tomcat
             }
             String serverInfo = p.getProperty("server.info");
             String serverNumber = p.getProperty("server.number");
-            tomcatInfo.setName(nameGenerator.apply(serverInfo));
+            String name = nameGenerator == null ? generateTomcatName(serverInfo) : nameGenerator.apply(serverInfo);
+            tomcatInfo.setName(name);
             tomcatInfo.setVersion(serverNumber);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            Messages.showErrorDialog("Can not read server version in " + tomcatHome, "Error");
+            return Optional.empty();
         }
 
-        return tomcatInfo;
+        return Optional.of(tomcatInfo);
     }
 
     private static String generateTomcatName(String name) {

@@ -1,11 +1,21 @@
 package com.poratu.idea.plugins.tomcat.utils;
 
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleFileIndex;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
+import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
+import com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -14,11 +24,17 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Author : zengkid
@@ -26,18 +42,20 @@ import java.util.regex.Pattern;
  * Time   : 21:35
  */
 public final class PluginUtils {
+    private static final int MIN_PORT_VALUE = 0;
+    private static final int MAX_PORT_VALUE = 65535;
 
     private PluginUtils() {
     }
 
     /**
      * Generate a sequent name based on the existing names
+     *
      * @param existingNames existing names, e.g. ["tomcat 7", "tomcat 8", "tomcat 9"]
      * @param preferredName preferred name, e.g. "tomcat 8"
      * @return sequent name, e.g. "tomcat 8 (2)"
      */
-    @NotNull
-    public static String generateSequentName(@NotNull List<String> existingNames, @NotNull String preferredName) {
+    public static String generateSequentName(List<String> existingNames, String preferredName) {
         int maxSequent = 0;
         for (String existingName : existingNames) {
             Pattern pattern = Pattern.compile("^" + StringUtil.escapeToRegexp(preferredName) + "(?:\\s\\((\\d+)\\))?$");
@@ -56,7 +74,21 @@ public final class PluginUtils {
         return maxSequent == 0 ? preferredName : preferredName + " (" + (maxSequent + 1) + ")";
     }
 
-    @Nullable
+    public static void chooseTomcat(Consumer<TomcatInfo> callback) {
+        chooseTomcat(null, callback);
+    }
+
+    public static void chooseTomcat(UnaryOperator<String> nameGenerator, Consumer<TomcatInfo> callback) {
+        FileChooserDescriptor descriptor = FileChooserDescriptorFactory
+                .createSingleFolderDescriptor()
+                .withTitle("Select Tomcat Server")
+                .withDescription("Select the directory of the Tomcat Server");
+
+        FileChooser.chooseFile(descriptor, null, null, file -> TomcatServerManagerState
+                .createTomcatInfo(file.getPath(), nameGenerator)
+                .ifPresent(callback));
+    }
+
     public static Path getWorkingPath(TomcatRunConfiguration configuration) {
 
         String userHome = System.getProperty("user.home");
@@ -70,7 +102,6 @@ public final class PluginUtils {
         return Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
     }
 
-    @Nullable
     public static Path getTomcatLogsDirPath(TomcatRunConfiguration configuration) {
         Path workingDir = getWorkingPath(configuration);
         if (workingDir != null) {
@@ -90,6 +121,7 @@ public final class PluginUtils {
             dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
             dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         } catch (IllegalArgumentException ignored) {
+            // Some Java implementations do not support these features
         }
 
         dbf.setExpandEntityReferences(false);
@@ -104,5 +136,58 @@ public final class PluginUtils {
         factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
         return factory.newTransformer();
+    }
+
+    public static void openTomcatConfiguration() {
+        ShowSettingsUtil.getInstance().showSettingsDialog(null, TomcatServersConfigurable.class);
+    }
+
+    public static int parsePort(String text) throws ConfigurationException {
+        if (StringUtil.isEmpty(text)) {
+            throw new ConfigurationException("Port cannot be empty");
+        }
+
+        try {
+            int port = Integer.parseInt(text);
+            if (port < MIN_PORT_VALUE || port > MAX_PORT_VALUE) {
+                throw new ConfigurationException("Port number must be between " + MIN_PORT_VALUE + " and " + MAX_PORT_VALUE);
+            }
+            return port;
+        } catch (NumberFormatException e) {
+            throw new ConfigurationException("Port number must be an integer");
+        }
+    }
+
+    public static List<VirtualFile> findWebRoots(Project project) {
+        Module[] modules = ModuleManager.getInstance(project).getModules();
+        List<VirtualFile> webRoots = new ArrayList<>();
+
+        for (Module module : modules) {
+            ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
+            ModuleFileIndex fileIndex = moduleRootManager.getFileIndex();
+            VirtualFile[] sourceRoots = moduleRootManager.getSourceRoots(false);
+            List<VirtualFile> parentRoots = Stream.of(sourceRoots)
+                    .map(VirtualFile::getParent)
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            for (VirtualFile parentRoot : parentRoots) {
+                fileIndex.iterateContentUnderDirectory(parentRoot, file -> {
+                    Path path = Paths.get(file.getPath(), "WEB-INF");
+                    if (Files.exists(path)) {
+                        webRoots.add(file);
+                    }
+                    return true;
+                }, file -> {
+                    if (file.isDirectory()) {
+                        String path = file.getPath();
+                        return webRoots.stream().noneMatch(root -> file.getPath().startsWith(root.getPath())) && !path.contains("node_modules");
+                    }
+                    return false;
+                });
+            }
+        }
+
+        return webRoots;
     }
 }

@@ -137,7 +137,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             javaParams.setMainClass(TOMCAT_MAIN_CLASS);
             javaParams.getProgramParametersList().add("start");
 
-            javaParams.setPassParentEnvs(configuration.getPassParentEnvironmentVariables());
+            javaParams.setPassParentEnvs(configuration.isPassParentEnvs());
             if (envOptions != null) {
                 javaParams.setEnv(envOptions);
             }
@@ -166,11 +166,8 @@ public class TomcatCommandLineState extends JavaCommandLineState {
     private void updateServerConf(Path confPath, TomcatRunConfiguration cfg)
             throws ParserConfigurationException, XPathExpressionException, TransformerException, IOException, SAXException {
         Path serverXml = confPath.resolve("server.xml");
-
-        DocumentBuilder builder = PluginUtils.createDocumentBuilder();
-        Document doc = builder.parse(serverXml.toFile());
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
+        Document doc = PluginUtils.createDocumentBuilder().parse(serverXml.toFile());
+        XPath xpath = XPathFactory.newInstance().newXPath();
         XPathExpression exprConnectorShutdown = xpath.compile("/Server[@shutdown='SHUTDOWN']");
         XPathExpression exprConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[@protocol='HTTP/1.1']");
         XPathExpression exprContext = xpath.compile
@@ -180,14 +177,14 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         Element portE = (Element) exprConnector.evaluate(doc, XPathConstants.NODE);
         NodeList nodeList = (NodeList) exprContext.evaluate(doc, XPathConstants.NODESET);
 
-        if (nodeList != null && nodeList.getLength() > 0) {
+        if (nodeList != null) {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
                 node.getParentNode().removeChild(node);
             }
         }
-        portShutdown.setAttribute("port", cfg.getAdminPort());
-        portE.setAttribute("port", cfg.getPort());
+        portShutdown.setAttribute("port", String.valueOf(cfg.getAdminPort()));
+        portE.setAttribute("port", String.valueOf(cfg.getPort()));
 
         Source source = new DOMSource(doc);
         StreamResult result = new StreamResult(serverXml.toFile());
