@@ -23,13 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -170,25 +167,14 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         XPath xpath = XPathFactory.newInstance().newXPath();
         XPathExpression exprConnectorShutdown = xpath.compile("/Server[@shutdown='SHUTDOWN']");
         XPathExpression exprConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[@protocol='HTTP/1.1']");
-        XPathExpression exprContext = xpath.compile
-                ("/Server/Service[@name='Catalina']/Engine[@name='Catalina']/Host/Context");
 
         Element portShutdown = (Element) exprConnectorShutdown.evaluate(doc, XPathConstants.NODE);
         Element portE = (Element) exprConnector.evaluate(doc, XPathConstants.NODE);
-        NodeList nodeList = (NodeList) exprContext.evaluate(doc, XPathConstants.NODESET);
 
-        if (nodeList != null) {
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                node.getParentNode().removeChild(node);
-            }
-        }
         portShutdown.setAttribute("port", String.valueOf(cfg.getAdminPort()));
         portE.setAttribute("port", String.valueOf(cfg.getPort()));
 
-        Source source = new DOMSource(doc);
-        StreamResult result = new StreamResult(serverXml.toFile());
-        PluginUtils.createTransformer().transform(source, result);
+        PluginUtils.createTransformer().transform(new DOMSource(doc), new StreamResult(serverXml.toFile()));
     }
 
     private void createContextFile(String tomcatVersion, Module module, Path confPath, String docBase, String contextPath)
@@ -210,9 +196,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         collectResources(doc, contextRoot, module, tomcatVersion);
         doc.appendChild(contextRoot);
 
-        DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(contextFilePath.toFile());
-        PluginUtils.createTransformer().transform(source, result);
+        PluginUtils.createTransformer().transform(new DOMSource(doc), new StreamResult(contextFilePath.toFile()));
     }
 
     private Element createContextElement(Document doc, DocumentBuilder builder) throws IOException, SAXException {
@@ -259,16 +243,25 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             Element resources = createResourcesElementIfNecessary(doc, contextRoot);
             pathsList.getVirtualFiles().forEach(file -> {
                 Element res;
+                String tagName;
+                String className;
+                String webAppMount;
+
                 if (file.isDirectory()) {
-                    res = doc.createElement("PreResources");
-                    res.setAttribute("className", "org.apache.catalina.webresources.DirResourceSet");
-                    res.setAttribute("webAppMount", "/WEB-INF/classes");
+                    tagName = "PreResources";
+                    className = "org.apache.catalina.webresources.DirResourceSet";
+                    webAppMount = "/WEB-INF/classes";
                 } else {
-                    res = doc.createElement("PostResources");
-                    res.setAttribute("className", "org.apache.catalina.webresources.FileResourceSet");
-                    res.setAttribute("webAppMount", "/WEB-INF/lib/" + file.getName());
+                    tagName = "PostResources";
+                    className = "org.apache.catalina.webresources.FileResourceSet";
+                    webAppMount = "/WEB-INF/lib/" + file.getName();
                 }
+
+                res = doc.createElement(tagName);
                 res.setAttribute("base", file.getPath());
+                res.setAttribute("className", className);
+                res.setAttribute("webAppMount", webAppMount);
+
                 resources.appendChild(res);
             });
         } else if (majorVersion >= 6) {
