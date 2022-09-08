@@ -191,7 +191,6 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         Element contextRoot = createContextElement(doc, builder);
 
         contextRoot.setAttribute("docBase", docBase);
-        contextRoot.setAttribute("reloadable", "true");
 
         collectResources(doc, contextRoot, module, tomcatVersion);
         doc.appendChild(contextRoot);
