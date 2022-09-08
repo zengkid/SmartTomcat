@@ -21,6 +21,7 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
@@ -129,13 +130,22 @@ public final class PluginUtils {
         return dbf.newDocumentBuilder();
     }
 
+    @SuppressWarnings("HttpUrlsUsage")
     public static Transformer createTransformer() throws TransformerConfigurationException {
         TransformerFactory factory = TransformerFactory.newInstance();
 
         factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
         factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
-        return factory.newTransformer();
+        Transformer transformer = factory.newTransformer();
+        try {
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        } catch (IllegalArgumentException ignored) {
+            // ignore
+        }
+        return transformer;
     }
 
     public static void openTomcatConfiguration() {
