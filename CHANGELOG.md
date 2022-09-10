@@ -1,6 +1,13 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.3.5]
+### Changed
+- Remove Context elements inside the `server.xml`, fix #91
+- Remove `reloadable` from the generated context xml file
+- Pretty print the generated context xml file
+- Improve the Tomcat configuration producer
+
 ## [4.3.4]
 ### Changed
 - Improve the Tomcat runner settings editor 
