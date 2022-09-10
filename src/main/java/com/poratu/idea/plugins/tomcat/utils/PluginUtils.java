@@ -12,6 +12,7 @@ import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.ArrayUtil;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
@@ -168,34 +169,51 @@ public final class PluginUtils {
         }
     }
 
+    public static String extractContextPath(Module module) {
+        String name = module.getName();
+        String s = StringUtil.trimEnd(name, ".main");
+        return ArrayUtil.getLastElement(s.split("\\."));
+    }
+
+    public static List<VirtualFile> findWebRoots(Module module) {
+        List<VirtualFile> webRoots = new ArrayList<>();
+        if (module == null) {
+            return webRoots;
+        }
+
+        ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
+        ModuleFileIndex fileIndex = moduleRootManager.getFileIndex();
+        VirtualFile[] sourceRoots = moduleRootManager.getSourceRoots(false);
+        List<VirtualFile> parentRoots = Stream.of(sourceRoots)
+                .map(VirtualFile::getParent)
+                .distinct()
+                .collect(Collectors.toList());
+
+        for (VirtualFile parentRoot : parentRoots) {
+            fileIndex.iterateContentUnderDirectory(parentRoot, file -> {
+                Path path = Paths.get(file.getPath(), "WEB-INF");
+                if (Files.exists(path)) {
+                    webRoots.add(file);
+                }
+                return true;
+            }, file -> {
+                if (file.isDirectory()) {
+                    String path = file.getPath();
+                    return webRoots.stream().noneMatch(root -> file.getPath().startsWith(root.getPath())) && !path.contains("node_modules");
+                }
+                return false;
+            });
+        }
+
+        return webRoots;
+    }
+
     public static List<VirtualFile> findWebRoots(Project project) {
         Module[] modules = ModuleManager.getInstance(project).getModules();
         List<VirtualFile> webRoots = new ArrayList<>();
 
         for (Module module : modules) {
-            ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
-            ModuleFileIndex fileIndex = moduleRootManager.getFileIndex();
-            VirtualFile[] sourceRoots = moduleRootManager.getSourceRoots(false);
-            List<VirtualFile> parentRoots = Stream.of(sourceRoots)
-                    .map(VirtualFile::getParent)
-                    .distinct()
-                    .collect(Collectors.toList());
-
-            for (VirtualFile parentRoot : parentRoots) {
-                fileIndex.iterateContentUnderDirectory(parentRoot, file -> {
-                    Path path = Paths.get(file.getPath(), "WEB-INF");
-                    if (Files.exists(path)) {
-                        webRoots.add(file);
-                    }
-                    return true;
-                }, file -> {
-                    if (file.isDirectory()) {
-                        String path = file.getPath();
-                        return webRoots.stream().noneMatch(root -> file.getPath().startsWith(root.getPath())) && !path.contains("node_modules");
-                    }
-                    return false;
-                });
-            }
+            webRoots.addAll(findWebRoots(module));
         }
 
         return webRoots;

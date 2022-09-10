@@ -122,7 +122,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
                 tomcatOptions.setDocBase(webRoot.getPath());
                 Module module = ModuleUtilCore.findModuleForFile(webRoot, project);
                 if (module != null) {
-                    tomcatOptions.setContextPath("/" + module.getName());
+                    tomcatOptions.setContextPath("/" + PluginUtils.extractContextPath(module));
                 }
             }
         } catch (Exception e) {
