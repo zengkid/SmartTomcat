@@ -1,5 +1,6 @@
 package com.poratu.idea.plugins.tomcat.runner;
 
+import com.intellij.execution.Location;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.execution.actions.LazyRunConfigurationProducer;
 import com.intellij.execution.configurations.ConfigurationFactory;
@@ -8,12 +9,14 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.util.containers.ContainerUtil;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
 import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -27,7 +30,11 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
     @Override
     protected boolean setupConfigurationFromContext(@NotNull TomcatRunConfiguration configuration, @NotNull ConfigurationContext context, @NotNull Ref<PsiElement> sourceElement) {
         Module module = context.getModule();
-        List<VirtualFile> webRoots = PluginUtils.findWebRoots(module);
+        if (module == null) {
+            return false;
+        }
+
+        List<VirtualFile> webRoots = findWebRoots(context.getLocation());
 
         if (webRoots.isEmpty()) {
             return false;
@@ -47,10 +54,21 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
 
     @Override
     public boolean isConfigurationFromContext(@NotNull TomcatRunConfiguration configuration, @NotNull ConfigurationContext context) {
-        Module module = context.getModule();
-        List<VirtualFile> webRoots = PluginUtils.findWebRoots(module);
-
+        List<VirtualFile> webRoots = findWebRoots(context.getLocation());
         return webRoots.stream().anyMatch(webRoot -> webRoot.getPath().equals(configuration.getDocBase()));
+    }
+
+    private List<VirtualFile> findWebRoots(@Nullable Location<?> location) {
+        if (location == null) {
+            return ContainerUtil.emptyList();
+        }
+
+        boolean isTestFile = PluginUtils.isUnderTestSources(location);
+        if (isTestFile) {
+            return ContainerUtil.emptyList();
+        }
+
+        return PluginUtils.findWebRoots(location.getModule());
     }
 
 }

@@ -1,5 +1,6 @@
 package com.poratu.idea.plugins.tomcat.utils;
 
+import com.intellij.execution.Location;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -10,6 +11,7 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleFileIndex;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ArrayUtil;
@@ -17,6 +19,7 @@ import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
 import com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable;
+import org.jetbrains.annotations.Nullable;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -216,5 +219,18 @@ public final class PluginUtils {
         }
 
         return webRoots;
+    }
+
+    public static boolean isUnderTestSources(@Nullable Location<?> location) {
+        if (location == null) {
+            return false;
+        }
+
+        VirtualFile file = location.getVirtualFile();
+        if (file == null) {
+            return false;
+        }
+
+        return ProjectFileIndex.getInstance(location.getProject()).isInTestSourceContent(file);
     }
 }
