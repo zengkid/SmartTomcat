@@ -190,7 +190,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
     private void createContextFile(String tomcatVersion, Module module, Path confPath, String docBase, String contextPath)
             throws ParserConfigurationException, IOException, SAXException, TransformerException {
-        String contextName = StringUtil.trimStart(contextPath, "/");
+        String contextName = StringUtil.defaultIfEmpty(StringUtil.trimStart(contextPath, "/"), "ROOT");
         Path contextFilesDir = confPath.resolve("Catalina/localhost");
         Path contextFilePath = contextFilesDir.resolve(contextName + ".xml");
 
