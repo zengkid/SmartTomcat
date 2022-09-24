@@ -38,6 +38,7 @@ import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -189,7 +190,7 @@ public final class PluginUtils {
         List<VirtualFile> parentRoots = Stream.of(sourceRoots)
                 .map(VirtualFile::getParent)
                 .distinct()
-                .toList();
+                .collect(Collectors.toList());
 
         for (VirtualFile parentRoot : parentRoots) {
             fileIndex.iterateContentUnderDirectory(parentRoot, file -> {
