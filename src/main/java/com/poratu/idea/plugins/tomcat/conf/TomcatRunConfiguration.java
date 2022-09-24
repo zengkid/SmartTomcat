@@ -100,10 +100,6 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
             throw new RuntimeConfigurationError("Deployment directory cannot be empty");
         }
 
-        if (StringUtil.isEmpty(tomcatOptions.getContextPath())) {
-            throw new RuntimeConfigurationError("Context path cannot be empty");
-        }
-
         if (tomcatOptions.getPort() == null || tomcatOptions.getAdminPort() == null) {
             throw new RuntimeConfigurationError("Port cannot be empty");
         }
