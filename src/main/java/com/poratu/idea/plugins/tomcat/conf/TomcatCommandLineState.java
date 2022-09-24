@@ -108,7 +108,6 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
             Path tomcatInstallationPath = Paths.get(configuration.getTomcatInfo().getPath());
             Project project = configuration.getProject();
-            String contextPath = configuration.getContextPath();
             String tomcatVersion = configuration.getTomcatInfo().getVersion();
             String vmOptions = configuration.getVmOptions();
             Map<String, String> envOptions = configuration.getEnvOptions();
@@ -122,7 +121,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             FileUtil.createDirectory(workingPath.resolve("temp").toFile());
 
             updateServerConf(confPath, configuration);
-            createContextFile(tomcatVersion, module, confPath, configuration.getDocBase(), contextPath);
+            createContextFile(tomcatVersion, module, confPath);
             deleteTomcatWorkFiles(workingPath);
 
             ProjectRootManager manager = ProjectRootManager.getInstance(project);
@@ -188,9 +187,11 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         PluginUtils.createTransformer().transform(new DOMSource(doc), new StreamResult(serverXml.toFile()));
     }
 
-    private void createContextFile(String tomcatVersion, Module module, Path confPath, String docBase, String contextPath)
+    private void createContextFile(String tomcatVersion, Module module, Path confPath)
             throws ParserConfigurationException, IOException, SAXException, TransformerException {
-        String contextName = StringUtil.defaultIfEmpty(StringUtil.trimStart(contextPath, "/"), "ROOT");
+        String docBase = configuration.getDocBase();
+        String contextPath = configuration.getContextPath();
+        String contextName = StringUtil.defaultIfEmpty(StringUtil.trim(contextPath, ch -> ch != '/'), "ROOT");
         Path contextFilesDir = confPath.resolve("Catalina/localhost");
         Path contextFilePath = contextFilesDir.resolve(contextName + ".xml");
 
