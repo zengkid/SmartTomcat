@@ -2,6 +2,9 @@ package com.poratu.idea.plugins.tomcat.conf;
 
 import com.intellij.execution.impl.ConsoleViewImpl;
 import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.Url;
+import com.intellij.util.Urls;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -35,8 +38,12 @@ public class ServerConsoleView extends ConsoleViewImpl {
 
         if (s.contains("org.apache.catalina.startup.Catalina start")
                 || s.contains("org.apache.catalina.startup.Catalina.start")) {
+
             boolean isDefaultPort = Integer.valueOf(80).equals(configuration.getPort());
-            String url = "http://localhost" + (isDefaultPort ? "" : ":" + configuration.getPort()) + configuration.getContextPath();
+            String authority = "localhost" + (isDefaultPort ? "" : ":" + configuration.getPort());
+            String path = '/' + StringUtil.trimStart(configuration.getContextPath(), "/");
+            Url url = Urls.newHttpUrl(authority, path);
+
             super.print(url + "\n", contentType);
             printStarted = true;
         }
