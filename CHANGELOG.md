@@ -1,6 +1,13 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.3.6]
+### Changed
+
+- Allow `Context Path` to be empty
+- Support `Context Path` like `/foo/bar`
+- Fix #92
+
 ## [4.3.5]
 ### Changed
 - Remove Context elements inside the `server.xml`, fix #91
