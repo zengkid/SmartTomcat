@@ -34,13 +34,16 @@ changelog {
     groups.set(emptyList())
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(prop("jdkVersion")))
+    }
+}
+
 tasks {
     // Set the JVM compatibility versions
-    prop("javaVersion").let {
-        withType<JavaCompile> {
-            sourceCompatibility = it
-            targetCompatibility = it
-        }
+    compileJava {
+        options.release.set(prop("compatibleJdkVersion").toInt())
     }
 
     wrapper {
