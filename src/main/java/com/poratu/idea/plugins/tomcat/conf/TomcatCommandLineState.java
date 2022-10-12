@@ -38,6 +38,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -208,7 +209,9 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         collectResources(doc, contextRoot, module, tomcatVersion);
         doc.appendChild(contextRoot);
 
-        PluginUtils.createTransformer().transform(new DOMSource(doc), new StreamResult(contextFilePath.toFile()));
+        StringWriter writer = new StringWriter();
+        PluginUtils.createTransformer().transform(new DOMSource(doc), new StreamResult(writer));
+        FileUtil.writeToFile(contextFilePath.toFile(), writer.toString());
     }
 
     private Element createContextElement(Document doc, DocumentBuilder builder) throws IOException, SAXException {
