@@ -1,6 +1,11 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.3.7]
+### Changed
+
+- Fix context paths like /foo/bar may not working on Windows, fix #95
+
 ## [4.3.6]
 ### Changed
 
