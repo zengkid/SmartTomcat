@@ -1,6 +1,15 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.3.8]
+### Added
+
+- Added support for `allowLinking` and `cacheMaxSize` configurations, fix #99
+
+### Changed
+
+- Fixed a bug where SmartTomcat run configuration overrides the Application configuration, fix #100
+
 ## [4.3.7]
 ### Changed
 
