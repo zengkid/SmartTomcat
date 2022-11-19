@@ -12,7 +12,7 @@
         <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable" />
         <applicationService serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState"/>
         <configurationType implementation="com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType"/>
-        <runConfigurationProducer implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunConfigurationProducer" order="last"/>
+        <runConfigurationProducer implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunConfigurationProducer"/>
         <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunner"/>
         <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatDebugger"/>
         <registryKey key="smartTomcat.resources.allowLinking" description="If enabled, symlinks will be allowed inside the web application, pointing to resources inside or outside the web application base path." defaultValue="false" restartRequired="false" />

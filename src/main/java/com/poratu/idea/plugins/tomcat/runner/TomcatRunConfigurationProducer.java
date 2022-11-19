@@ -2,12 +2,15 @@ package com.poratu.idea.plugins.tomcat.runner;
 
 import com.intellij.execution.Location;
 import com.intellij.execution.actions.ConfigurationContext;
+import com.intellij.execution.actions.ConfigurationFromContext;
 import com.intellij.execution.actions.LazyRunConfigurationProducer;
+import com.intellij.execution.application.ApplicationConfigurationType;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationTypeUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.ContainerUtil;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
@@ -34,8 +37,14 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
             return false;
         }
 
-        List<VirtualFile> webRoots = findWebRoots(context.getLocation());
+        // Skip if it contains a main class, to avoid conflict with the default Application run configuration
+        PsiElement location = context.getPsiLocation();
+        PsiClass aClass = ApplicationConfigurationType.getMainClass(location);
+        if (aClass != null) {
+            return false;
+        }
 
+        List<VirtualFile> webRoots = findWebRoots(context.getLocation());
         if (webRoots.isEmpty()) {
             return false;
         }
@@ -50,6 +59,11 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
         configuration.setContextPath("/" + contextPath);
 
         return true;
+    }
+
+    @Override
+    public boolean isPreferredConfiguration(ConfigurationFromContext self, ConfigurationFromContext other) {
+        return false;
     }
 
     @Override
