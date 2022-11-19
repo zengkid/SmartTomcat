@@ -38,9 +38,8 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
         }
 
         // Skip if it contains a main class, to avoid conflict with the default Application run configuration
-        PsiElement location = context.getPsiLocation();
-        PsiClass aClass = ApplicationConfigurationType.getMainClass(location);
-        if (aClass != null) {
+        PsiClass psiClass = ApplicationConfigurationType.getMainClass(context.getPsiLocation());
+        if (psiClass != null) {
             return false;
         }
 
