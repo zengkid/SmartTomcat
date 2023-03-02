@@ -112,6 +112,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             Project project = configuration.getProject();
             String tomcatVersion = configuration.getTomcatInfo().getVersion();
             String vmOptions = configuration.getVmOptions();
+            String extraClassPath = configuration.getExtraClassPath();
             Map<String, String> envOptions = configuration.getEnvOptions();
 
             // Copy the Tomcat configuration files to the working directory
@@ -132,8 +133,13 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             javaParams.setDefaultCharset(project);
             javaParams.setWorkingDirectory(workingPath.toFile());
             javaParams.setJdk(manager.getProjectSdk());
+
             javaParams.getClassPath().add(tomcatInstallationPath.resolve("bin/bootstrap.jar").toFile());
             javaParams.getClassPath().add(tomcatInstallationPath.resolve("bin/tomcat-juli.jar").toFile());
+            if (StringUtil.isNotEmpty(extraClassPath)) {
+                javaParams.getClassPath().addAll(StringUtil.split(extraClassPath, " "));
+            }
+
             javaParams.setMainClass(TOMCAT_MAIN_CLASS);
             javaParams.getProgramParametersList().add("start");
 

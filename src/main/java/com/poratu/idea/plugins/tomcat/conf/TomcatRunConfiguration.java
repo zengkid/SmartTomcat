@@ -246,6 +246,14 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         tomcatOptions.setPassParentEnvs(passParentEnvs);
     }
 
+    public String getExtraClassPath() {
+        return tomcatOptions.getExtraClassPath();
+    }
+
+    public void setExtraClassPath(String extraClassPath) {
+        tomcatOptions.setExtraClassPath(extraClassPath);
+    }
+
     @Override
     public RunConfiguration clone() {
         TomcatRunConfiguration configuration = (TomcatRunConfiguration) super.clone();
@@ -263,6 +271,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         private String vmOptions;
         private Map<String, String> envOptions;
         private Boolean passParentEnvs = true;
+        private String extraClassPath;
 
         public TomcatInfo getTomcatInfo() {
             return tomcatInfo;
@@ -327,6 +336,14 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
         public void setPassParentEnvs(Boolean passParentEnvs) {
             this.passParentEnvs = passParentEnvs;
+        }
+
+        public String getExtraClassPath() {
+            return extraClassPath;
+        }
+
+        public void setExtraClassPath(String extraClassPath) {
+            this.extraClassPath = extraClassPath;
         }
     }
 

@@ -43,6 +43,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
     private final JTextField adminPort = new JTextField();
     private final RawCommandLineEditor vmOptions = new RawCommandLineEditor();
     private final EnvironmentVariablesTextFieldWithBrowseButton envOptions = new EnvironmentVariablesTextFieldWithBrowseButton();
+    private final RawCommandLineEditor extraClassPath = new RawCommandLineEditor();
 
     TomcatRunnerSettingsForm(Project project) {
         this.project = project;
@@ -70,7 +71,8 @@ public class TomcatRunnerSettingsForm implements Disposable {
                 .addLabeledComponent("Server port:", portField)
                 .addLabeledComponent("Admin port:", adminPort)
                 .addLabeledComponent("VM options:", vmOptions)
-                .addLabeledComponent("Env options:", envOptions)
+                .addLabeledComponent("Env variables:", envOptions)
+                .addLabeledComponent("Extra classpath:", extraClassPath)
                 .addComponentFillVertically(new JPanel(), 0);
 
         mainPanel = builder.getPanel();
@@ -91,6 +93,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
             envOptions.setEnvs(configuration.getEnvOptions());
         }
         envOptions.setPassParentEnvs(configuration.isPassParentEnvs());
+        extraClassPath.setText(configuration.getExtraClassPath());
     }
 
     public void applyTo(TomcatRunConfiguration configuration) throws ConfigurationException {
@@ -103,6 +106,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
             configuration.setVmOptions(vmOptions.getText());
             configuration.setEnvOptions(envOptions.getEnvs());
             configuration.setPassParentEnvironmentVariables(envOptions.isPassParentEnvs());
+            configuration.setExtraClassPath(extraClassPath.getText());
         } catch (Exception e) {
             throw new ConfigurationException(e.getMessage());
         }
