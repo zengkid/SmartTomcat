@@ -1,6 +1,11 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.4.1]
+### Added
+
+- Added support for passing extra classpath the JVM.
+
 ## [4.4.0]
 ### Added
 
