@@ -12,12 +12,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.ui.UIBundle;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.util.Function;
 import com.intellij.util.ui.FormBuilder;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
@@ -29,9 +31,21 @@ import javax.swing.plaf.basic.BasicComboBoxEditor;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class TomcatRunnerSettingsForm implements Disposable {
+    private static final Function<String, List<String>> PATH_SEPARATOR_LINE_PARSER = text -> {
+        final List<String> result = new ArrayList<>();
+        final StringTokenizer tokenizer = new StringTokenizer(text, File.pathSeparator, false);
+        while (tokenizer.hasMoreTokens()) {
+            result.add(tokenizer.nextToken());
+        }
+        return result;
+    };
+    private static final Function<List<String>, String> PATH_SEPARATOR_LINE_JOINER = strings -> StringUtil.join(strings, File.pathSeparator);
 
     private final Project project;
     private JPanel mainPanel;
@@ -43,7 +57,8 @@ public class TomcatRunnerSettingsForm implements Disposable {
     private final JTextField adminPort = new JTextField();
     private final RawCommandLineEditor vmOptions = new RawCommandLineEditor();
     private final EnvironmentVariablesTextFieldWithBrowseButton envOptions = new EnvironmentVariablesTextFieldWithBrowseButton();
-    private final RawCommandLineEditor extraClassPath = new RawCommandLineEditor();
+    private final RawCommandLineEditor extraClassPath = new RawCommandLineEditor(PATH_SEPARATOR_LINE_PARSER, PATH_SEPARATOR_LINE_JOINER);
+
 
     TomcatRunnerSettingsForm(Project project) {
         this.project = project;
@@ -52,6 +67,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
 
         tomcatField.add(tomcatComboBox, BorderLayout.CENTER);
         tomcatField.add(configurationButton, BorderLayout.EAST);
+        extraClassPath.getEditorField().getEmptyText().setText("Use '" + File.pathSeparator + "' to separate paths");
 
         initDeploymentDirectory();
         buildForm();

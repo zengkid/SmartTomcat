@@ -38,6 +38,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -137,7 +138,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             javaParams.getClassPath().add(tomcatInstallationPath.resolve("bin/bootstrap.jar").toFile());
             javaParams.getClassPath().add(tomcatInstallationPath.resolve("bin/tomcat-juli.jar").toFile());
             if (StringUtil.isNotEmpty(extraClassPath)) {
-                javaParams.getClassPath().addAll(StringUtil.split(extraClassPath, " "));
+                javaParams.getClassPath().addAll(StringUtil.split(extraClassPath, File.pathSeparator));
             }
 
             javaParams.setMainClass(TOMCAT_MAIN_CLASS);
