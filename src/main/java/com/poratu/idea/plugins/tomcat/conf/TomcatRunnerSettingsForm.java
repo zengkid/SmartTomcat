@@ -53,6 +53,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
     private final TomcatComboBox tomcatComboBox = new TomcatComboBox();
     private final TextFieldWithBrowseButton docBaseField = new TextFieldWithBrowseButton();
     private final JTextField contextPathField = new JTextField();
+    private final JPanel portFieldPanel = new JPanel(new GridBagLayout());
     private final JTextField portField = new JTextField();
     private final JTextField adminPort = new JTextField();
     private final RawCommandLineEditor vmOptions = new RawCommandLineEditor();
@@ -62,15 +63,45 @@ public class TomcatRunnerSettingsForm implements Disposable {
 
     TomcatRunnerSettingsForm(Project project) {
         this.project = project;
+
+        // Create Tomcat server combo box
         JButton configurationButton = new JButton("Configure...");
         configurationButton.addActionListener(e -> PluginUtils.openTomcatConfiguration());
-
         tomcatField.add(tomcatComboBox, BorderLayout.CENTER);
         tomcatField.add(configurationButton, BorderLayout.EAST);
+
         extraClassPath.getEditorField().getEmptyText().setText("Use '" + File.pathSeparator + "' to separate paths");
+
+        // Create port field panel
+        createPortField();
 
         initDeploymentDirectory();
         buildForm();
+    }
+
+    private void createPortField() {
+        JLabel adminPortLabel = new JLabel("Admin port:");
+        adminPortLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        adminPortLabel.setLabelFor(adminPort);
+
+        GridBagConstraints c = new GridBagConstraints();
+
+        // default constraints
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridy = 0;
+
+        c.gridx = 0;
+        c.weightx = 1;
+        portFieldPanel.add(portField, c);
+
+        c.gridx = 1;
+        c.weightx = 0;
+        c.ipadx = 10;
+        portFieldPanel.add(adminPortLabel, c);
+
+        c.gridx = 2;
+        c.weightx = 1;
+        portFieldPanel.add(adminPort, c);
     }
 
     private void initDeploymentDirectory() {
@@ -84,11 +115,10 @@ public class TomcatRunnerSettingsForm implements Disposable {
                 .addLabeledComponent("Tomcat server:", tomcatField)
                 .addLabeledComponent("Deployment directory:", docBaseField)
                 .addLabeledComponent("Context path:", contextPathField)
-                .addLabeledComponent("Server port:", portField)
-                .addLabeledComponent("Admin port:", adminPort)
+                .addLabeledComponent("Server port:", portFieldPanel)
                 .addLabeledComponent("VM options:", vmOptions)
                 .addLabeledComponent("Env variables:", envOptions)
-                .addLabeledComponent("Extra classpath:", extraClassPath)
+                .addLabeledComponent("Extra JVM classpath:", extraClassPath)
                 .addComponentFillVertically(new JPanel(), 0);
 
         mainPanel = builder.getPanel();
