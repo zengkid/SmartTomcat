@@ -1,5 +1,6 @@
 package com.poratu.idea.plugins.tomcat.conf;
 
+import com.intellij.application.options.ModulesComboBox;
 import com.intellij.execution.configuration.EnvironmentVariablesTextFieldWithBrowseButton;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
@@ -15,6 +16,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionComboBoxModel;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.ui.UIBundle;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
@@ -27,6 +29,7 @@ import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -52,6 +55,8 @@ public class TomcatRunnerSettingsForm implements Disposable {
     private final JPanel tomcatField = new JPanel(new BorderLayout());
     private final TomcatComboBox tomcatComboBox = new TomcatComboBox();
     private final TextFieldWithBrowseButton docBaseField = new TextFieldWithBrowseButton();
+    private final JPanel modulesComboBoxPanel = new JPanel(new GridBagLayout());
+    private final ModulesComboBox modulesComboBox = new ModulesComboBox();
     private final JTextField contextPathField = new JTextField();
     private final JPanel portFieldPanel = new JPanel(new GridBagLayout());
     private final JTextField portField = new JTextField();
@@ -64,19 +69,30 @@ public class TomcatRunnerSettingsForm implements Disposable {
     TomcatRunnerSettingsForm(Project project) {
         this.project = project;
 
-        // Create Tomcat server combo box
+        createTomcatField();
+        createClasspathField();
+        createPortField();
+
+        extraClassPath.getEditorField().getEmptyText().setText("Use '" + File.pathSeparator + "' to separate paths");
+
+        initDeploymentDirectory();
+        buildForm();
+    }
+
+    private void createTomcatField() {
         JButton configurationButton = new JButton("Configure...");
         configurationButton.addActionListener(e -> PluginUtils.openTomcatConfiguration());
         tomcatField.add(tomcatComboBox, BorderLayout.CENTER);
         tomcatField.add(configurationButton, BorderLayout.EAST);
+    }
 
-        extraClassPath.getEditorField().getEmptyText().setText("Use '" + File.pathSeparator + "' to separate paths");
-
-        // Create port field panel
-        createPortField();
-
-        initDeploymentDirectory();
-        buildForm();
+    private void createClasspathField() {
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1;
+        c.weighty = 1;
+        modulesComboBoxPanel.add(modulesComboBox, c);
+        modulesComboBox.setModules(PluginUtils.getModules(project));
     }
 
     private void createPortField() {
@@ -108,16 +124,29 @@ public class TomcatRunnerSettingsForm implements Disposable {
         FileChooserDescriptor descriptor = new IgnoreOutputFileChooserDescriptor(project);
         docBaseField.addBrowseFolderListener("Select Deployment Directory", "Please the directory to deploy",
                 project, descriptor);
+        docBaseField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+            // Update module selection when docBase is changed
+            @Override
+            protected void textChanged(@NotNull DocumentEvent e) {
+                String docBase = docBaseField.getText();
+                Module module = PluginUtils.findContaingModule(docBase, project);
+
+                if (module != null) {
+                    modulesComboBox.setSelectedModule(module);
+                }
+            }
+        });
     }
 
     private void buildForm() {
         FormBuilder builder = FormBuilder.createFormBuilder()
                 .addLabeledComponent("Tomcat server:", tomcatField)
                 .addLabeledComponent("Deployment directory:", docBaseField)
+                .addLabeledComponent("Use classpath of module:", modulesComboBoxPanel)
                 .addLabeledComponent("Context path:", contextPathField)
                 .addLabeledComponent("Server port:", portFieldPanel)
                 .addLabeledComponent("VM options:", vmOptions)
-                .addLabeledComponent("Env variables:", envOptions)
+                .addLabeledComponent("Environment variables:", envOptions)
                 .addLabeledComponent("Extra JVM classpath:", extraClassPath)
                 .addComponentFillVertically(new JPanel(), 0);
 
@@ -131,6 +160,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
     public void resetFrom(TomcatRunConfiguration configuration) {
         tomcatComboBox.setSelectedItem(configuration.getTomcatInfo());
         docBaseField.setText(configuration.getDocBase());
+        modulesComboBox.setSelectedModule(configuration.getModule());
         contextPathField.setText(configuration.getContextPath());
         portField.setText(String.valueOf(configuration.getPort()));
         adminPort.setText(String.valueOf(configuration.getAdminPort()));
@@ -146,6 +176,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
         try {
             configuration.setTomcatInfo((TomcatInfo) tomcatComboBox.getSelectedItem());
             configuration.setDocBase(docBaseField.getText());
+            configuration.setModule(modulesComboBox.getSelectedModule());
             configuration.setContextPath(contextPathField.getText());
             configuration.setPort(PluginUtils.parsePort(portField.getText()));
             configuration.setAdminPort(PluginUtils.parsePort(adminPort.getText()));
