@@ -176,11 +176,13 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         Document doc = PluginUtils.createDocumentBuilder().parse(serverXml.toFile());
         XPath xpath = XPathFactory.newInstance().newXPath();
         XPathExpression exprConnectorShutdown = xpath.compile("/Server[@shutdown='SHUTDOWN']");
-        XPathExpression exprConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[@protocol='HTTP/1.1']");
+        XPathExpression exprConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[@protocol='HTTP/1.1' and (not(@SSLEnabled) or @SSLEnabled='false')]");
+        XPathExpression exprSSLConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[@protocol='HTTP/1.1' and @SSLEnabled='true']");
         XPathExpression exprContext = xpath.compile("/Server/Service[@name='Catalina']/Engine[@name='Catalina']/Host/Context");
 
         Element portShutdown = (Element) exprConnectorShutdown.evaluate(doc, XPathConstants.NODE);
         Element portE = (Element) exprConnector.evaluate(doc, XPathConstants.NODE);
+        Element sslPortE = (Element) exprSSLConnector.evaluate(doc, XPathConstants.NODE);
 
         NodeList nodeList = (NodeList) exprContext.evaluate(doc, XPathConstants.NODESET);
         if (nodeList != null) {
@@ -192,6 +194,9 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
         portShutdown.setAttribute("port", String.valueOf(cfg.getAdminPort()));
         portE.setAttribute("port", String.valueOf(cfg.getPort()));
+        if (sslPortE != null) {
+            sslPortE.setAttribute("port", String.valueOf(cfg.getSslPort()));
+        }
 
         PluginUtils.createTransformer().transform(new DOMSource(doc), new StreamResult(serverXml.toFile()));
     }
