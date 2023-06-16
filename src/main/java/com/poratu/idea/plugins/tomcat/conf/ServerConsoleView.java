@@ -39,10 +39,15 @@ public class ServerConsoleView extends ConsoleViewImpl {
         if (s.contains("org.apache.catalina.startup.Catalina start")
                 || s.contains("org.apache.catalina.startup.Catalina.start")) {
 
-            boolean isDefaultPort = Integer.valueOf(80).equals(configuration.getPort());
-            String authority = "localhost" + (isDefaultPort ? "" : ":" + configuration.getPort());
+            boolean isSSL = configuration.getSslPort() != null &&
+                    StringUtil.isNotEmpty(String.valueOf(configuration.getSslPort()));
+            Integer port = isSSL ? configuration.getSslPort() : configuration.getPort();
+            boolean isDefaultPort = isSSL ?
+                    Integer.valueOf(443).equals(port) :
+                    Integer.valueOf(80).equals(port);
+            String authority = "localhost" + (isDefaultPort ? "" : ":" + port);
             String path = '/' + StringUtil.trimStart(configuration.getContextPath(), "/");
-            Url url = Urls.newHttpUrl(authority, path);
+            Url url = isSSL ? Urls.newUrl("https", authority, path) : Urls.newHttpUrl(authority, path);
 
             super.print(url + "\n", contentType);
             printStarted = true;

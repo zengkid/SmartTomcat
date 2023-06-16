@@ -59,7 +59,9 @@ public class TomcatRunnerSettingsForm implements Disposable {
     private final ModulesComboBox modulesComboBox = new ModulesComboBox();
     private final JTextField contextPathField = new JTextField();
     private final JPanel portFieldPanel = new JPanel(new GridBagLayout());
+    private final JPanel adminPortFieldPanel = new JPanel(new GridBagLayout());
     private final JTextField portField = new JTextField();
+    private final JTextField sslPortField = new JTextField();
     private final JTextField adminPort = new JTextField();
     private final RawCommandLineEditor vmOptions = new RawCommandLineEditor();
     private final EnvironmentVariablesTextFieldWithBrowseButton envOptions = new EnvironmentVariablesTextFieldWithBrowseButton();
@@ -72,6 +74,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
         createTomcatField();
         createClasspathField();
         createPortField();
+        createAdminPortField();
 
         extraClassPath.getEditorField().getEmptyText().setText("Use '" + File.pathSeparator + "' to separate paths");
 
@@ -96,9 +99,9 @@ public class TomcatRunnerSettingsForm implements Disposable {
     }
 
     private void createPortField() {
-        JLabel adminPortLabel = new JLabel("Admin port:");
-        adminPortLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        adminPortLabel.setLabelFor(adminPort);
+        JLabel sslPortLabel = new JLabel("SSL port:");
+        sslPortLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        sslPortLabel.setLabelFor(sslPortField);
 
         GridBagConstraints c = new GridBagConstraints();
 
@@ -113,11 +116,23 @@ public class TomcatRunnerSettingsForm implements Disposable {
         c.gridx = 1;
         c.weightx = 0;
         c.ipadx = 10;
-        portFieldPanel.add(adminPortLabel, c);
+        portFieldPanel.add(sslPortLabel, c);
 
         c.gridx = 2;
         c.weightx = 1;
-        portFieldPanel.add(adminPort, c);
+        portFieldPanel.add(sslPortField, c);
+    }
+
+    private void createAdminPortField() {
+        GridBagConstraints c = new GridBagConstraints();
+
+        // default constraints
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridy = 0;
+
+        c.gridx = 0;
+        c.weightx = 1;
+        adminPortFieldPanel.add(adminPort, c);
     }
 
     private void initDeploymentDirectory() {
@@ -145,6 +160,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
                 .addLabeledComponent("Use classpath of module:", modulesComboBoxPanel)
                 .addLabeledComponent("Context path:", contextPathField)
                 .addLabeledComponent("Server port:", portFieldPanel)
+                .addLabeledComponent("Admin port:", adminPortFieldPanel)
                 .addLabeledComponent("VM options:", vmOptions)
                 .addLabeledComponent("Environment variables:", envOptions)
                 .addLabeledComponent("Extra JVM classpath:", extraClassPath)
@@ -163,6 +179,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
         modulesComboBox.setSelectedModule(configuration.getModule());
         contextPathField.setText(configuration.getContextPath());
         portField.setText(String.valueOf(configuration.getPort()));
+        sslPortField.setText(configuration.getSslPort() != null ? String.valueOf(configuration.getSslPort()) : "");
         adminPort.setText(String.valueOf(configuration.getAdminPort()));
         vmOptions.setText(configuration.getVmOptions());
         if (configuration.getEnvOptions() != null) {
@@ -179,6 +196,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
             configuration.setModule(modulesComboBox.getSelectedModule());
             configuration.setContextPath(contextPathField.getText());
             configuration.setPort(PluginUtils.parsePort(portField.getText()));
+            configuration.setSslPort(StringUtil.isNotEmpty(sslPortField.getText()) ? PluginUtils.parsePort(sslPortField.getText()) : null);
             configuration.setAdminPort(PluginUtils.parsePort(adminPort.getText()));
             configuration.setVmOptions(vmOptions.getText());
             configuration.setEnvOptions(envOptions.getEnvs());

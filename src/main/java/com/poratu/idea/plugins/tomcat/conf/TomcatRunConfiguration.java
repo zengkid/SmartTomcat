@@ -236,6 +236,14 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         tomcatOptions.setPort(port);
     }
 
+    public Integer getSslPort() {
+        return tomcatOptions.getSslPort();
+    }
+
+    public void setSslPort(Integer sslPort) {
+        tomcatOptions.setSslPort(sslPort);
+    }
+
     public Integer getAdminPort() {
         return tomcatOptions.getAdminPort();
     }
@@ -291,6 +299,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         private String docBase;
         private String contextPath;
         private Integer port = 8080;
+        private Integer sslPort = 8082;
         private Integer adminPort = 8005;
         private String vmOptions;
         private Map<String, String> envOptions;
@@ -328,6 +337,14 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
         public void setPort(Integer port) {
             this.port = port;
+        }
+
+        public Integer getSslPort() {
+            return sslPort;
+        }
+
+        public void setSslPort(Integer sslPort) {
+            this.sslPort = sslPort;
         }
 
         public Integer getAdminPort() {
