@@ -299,7 +299,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         private String docBase;
         private String contextPath;
         private Integer port = 8080;
-        private Integer sslPort = 8082;
+        private Integer sslPort;
         private Integer adminPort = 8005;
         private String vmOptions;
         private Map<String, String> envOptions;
