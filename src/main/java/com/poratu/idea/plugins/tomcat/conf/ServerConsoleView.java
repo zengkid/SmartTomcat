@@ -7,6 +7,11 @@ import com.intellij.util.Url;
 import com.intellij.util.Urls;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Author : zengkid
  * Date   : 2017-02-23
@@ -15,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 public class ServerConsoleView extends ConsoleViewImpl {
     private final TomcatRunConfiguration configuration;
     private boolean printStarted = false;
+    private final List<String> httpPorts = new ArrayList<>();
+    private final List<String> httpsPorts = new ArrayList<>();
 
     public ServerConsoleView(TomcatRunConfiguration configuration) {
         super(configuration.getProject(), true);
@@ -36,22 +43,70 @@ public class ServerConsoleView extends ConsoleViewImpl {
             return;
         }
 
+        if (this.parsePorts(s)) {
+            return;
+        }
+
         if (s.contains("org.apache.catalina.startup.Catalina start")
                 || s.contains("org.apache.catalina.startup.Catalina.start")) {
+            boolean portNotFound = httpPorts.isEmpty() && httpsPorts.isEmpty();
+            // Use the configured port if the port is not found in the log
+            if (portNotFound) {
+                this.httpPorts.add(String.valueOf(configuration.getPort()));
+                this.httpsPorts.add(String.valueOf(configuration.getSslPort()));
+            }
 
-            boolean isSSL = configuration.getSslPort() != null &&
-                    StringUtil.isNotEmpty(String.valueOf(configuration.getSslPort()));
-            Integer port = isSSL ? configuration.getSslPort() : configuration.getPort();
-            boolean isDefaultPort = isSSL ?
-                    Integer.valueOf(443).equals(port) :
-                    Integer.valueOf(80).equals(port);
-            String authority = "localhost" + (isDefaultPort ? "" : ":" + port);
-            String path = '/' + StringUtil.trimStart(configuration.getContextPath(), "/");
-            Url url = isSSL ? Urls.newUrl("https", authority, path) : Urls.newHttpUrl(authority, path);
-
-            super.print(url + "\n", contentType);
+            List<Url> urls = buildServerUrls();
+            for (Url url : urls) {
+                super.print(url + "\n", contentType);
+            }
             printStarted = true;
         }
     }
 
+    // Parse the port number from the log
+    // 21-Jun-2023 13:27:15.385 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+    // 21-Jun-2023 13:27:15.385 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["https-jsse-nio-8443"]
+    private boolean parsePorts(String s) {
+        Pattern pattern = Pattern.compile("http-nio-(\\d+)");
+        Matcher matcher = pattern.matcher(s);
+        if (matcher.find()) {
+            String port = matcher.group(1);
+            if (!this.httpPorts.contains(port)) {
+                this.httpPorts.add(port);
+            }
+            return true;
+        }
+
+        pattern = Pattern.compile("https-jsse-nio-(\\d+)");
+        matcher = pattern.matcher(s);
+        if (matcher.find()) {
+            String port = matcher.group(1);
+            if (!this.httpsPorts.contains(port)) {
+                this.httpsPorts.add(port);
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private List<Url> buildServerUrls() {
+        List<Url> urls = new ArrayList<>();
+        String path = '/' + StringUtil.trimStart(configuration.getContextPath(), "/");
+
+        for (String httpPort : httpPorts) {
+            boolean isDefaultPort = "80".equals(httpPort);
+            String authority = "localhost" + (isDefaultPort ? "" : ":" + httpPort);
+            urls.add(Urls.newHttpUrl(authority, path));
+        }
+
+        for (String httpsPort : httpsPorts) {
+            boolean isDefaultPort = "443".equals(httpsPort);
+            String authority = "localhost" + (isDefaultPort ? "" : ":" + httpsPort);
+            urls.add(Urls.newUrl("https", authority, path));
+        }
+
+        return urls;
+    }
 }
