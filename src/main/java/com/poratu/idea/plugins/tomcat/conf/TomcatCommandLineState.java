@@ -196,12 +196,16 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
         portShutdown.setAttribute("port", String.valueOf(cfg.getAdminPort()));
         portE.setAttribute("port", String.valueOf(cfg.getPort()));
-        if (sslPortE != null && cfg.getSslPort() != null && StringUtil.isNotEmpty(String.valueOf(cfg.getSslPort()))) {
-            portE.setAttribute("redirectPort", String.valueOf(cfg.getSslPort()));
-            sslPortE.setAttribute("port", String.valueOf(cfg.getSslPort()));
-        } else if (portE.hasAttribute("redirectPort")) {
+        Integer sslPort = cfg.getSslPort();
+
+        if (sslPortE != null && sslPort != null) {
+            // Update SSL configuration
+            sslPortE.setAttribute("port", sslPort.toString());
+            portE.setAttribute("redirectPort", sslPort.toString());
+        } else {
+            // Clean up SSL configuration
             portE.removeAttribute("redirectPort");
-            if (sslPortE != null && serviceE != null) {
+            if (serviceE != null && sslPortE != null) {
                 serviceE.removeChild(sslPortE);
             }
         }
