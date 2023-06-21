@@ -1,6 +1,10 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.6.0]
+
+- Support configuring the SSL port, thanks to @leopoldhub.
+
 ## [4.5.0]
 
 - Support reading classpath from the specific module as the classpath for Tomcat runtime.
