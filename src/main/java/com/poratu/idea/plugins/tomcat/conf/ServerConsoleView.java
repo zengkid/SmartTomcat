@@ -53,7 +53,10 @@ public class ServerConsoleView extends ConsoleViewImpl {
             // Use the configured port if the port is not found in the log
             if (portNotFound) {
                 this.httpPorts.add(String.valueOf(configuration.getPort()));
-                this.httpsPorts.add(String.valueOf(configuration.getSslPort()));
+                Integer sslPort = configuration.getSslPort();
+                if (sslPort != null) {
+                    this.httpsPorts.add(String.valueOf(sslPort));
+                }
             }
 
             List<Url> urls = buildServerUrls();
