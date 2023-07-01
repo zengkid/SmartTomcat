@@ -144,7 +144,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
             @Override
             protected void textChanged(@NotNull DocumentEvent e) {
                 String docBase = docBaseField.getText();
-                Module module = PluginUtils.findContaingModule(docBase, project);
+                Module module = PluginUtils.findContainingModule(docBase, project);
 
                 if (module != null) {
                     modulesComboBox.setSelectedModule(module);

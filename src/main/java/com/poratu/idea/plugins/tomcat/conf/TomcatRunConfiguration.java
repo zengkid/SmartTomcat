@@ -124,7 +124,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
             if (!webRoots.isEmpty()) {
                 VirtualFile webRoot = webRoots.get(0);
                 tomcatOptions.setDocBase(webRoot.getPath());
-                Module module = PluginUtils.findContaingModule(webRoot.getPath(), project);
+                Module module = PluginUtils.findContainingModule(webRoot.getPath(), project);
 
                 if (module == null) {
                     module = PluginUtils.guessModule(project);
@@ -178,7 +178,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
         // for backward compatibility
         if (configurationModule.getModule() == null) {
-            configurationModule.setModule(PluginUtils.findContaingModule(tomcatOptions.getDocBase(), getProject()));
+            configurationModule.setModule(PluginUtils.findContainingModule(tomcatOptions.getDocBase(), getProject()));
         }
     }
 

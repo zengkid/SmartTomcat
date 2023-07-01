@@ -277,7 +277,7 @@ public final class PluginUtils {
     /**
      * Find the module containing the file
      */
-    public static @Nullable Module findContaingModule(@Nullable String filePath, @NotNull Project project) {
+    public static @Nullable Module findContainingModule(@Nullable String filePath, @NotNull Project project) {
         if (StringUtil.isEmpty(filePath)) {
             return null;
         }
