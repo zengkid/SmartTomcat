@@ -19,7 +19,7 @@ jobs:
 
       - name: Build with Gradle
         run: | 
-         ./gradlew runPluginVerifier 
+         ./gradlew verifyPlugin 
 
       - name: Upload to releasex
         uses: softprops/action-gh-release@v1
