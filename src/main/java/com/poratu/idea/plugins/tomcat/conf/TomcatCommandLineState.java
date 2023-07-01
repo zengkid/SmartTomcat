@@ -7,8 +7,9 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.JavaCommandLineState;
 import com.intellij.execution.configurations.JavaParameters;
 import com.intellij.execution.configurations.ParametersList;
-import com.intellij.execution.process.KillableProcessHandler;
+import com.intellij.execution.process.KillableColoredProcessHandler;
 import com.intellij.execution.process.OSProcessHandler;
+import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.module.Module;
@@ -92,12 +93,13 @@ public class TomcatCommandLineState extends JavaCommandLineState {
     @Override
     @NotNull
     protected OSProcessHandler startProcess() throws ExecutionException {
-        OSProcessHandler progressHandler = super.startProcess();
-        if (progressHandler instanceof KillableProcessHandler) {
-            boolean shouldKillSoftly = !DebuggerSettings.getInstance().KILL_PROCESS_IMMEDIATELY;
-            ((KillableProcessHandler) progressHandler).setShouldKillProcessSoftly(shouldKillSoftly);
-        }
-        return progressHandler;
+        KillableColoredProcessHandler processHandler = new KillableColoredProcessHandler(createCommandLine());
+        boolean shouldKillSoftly = !DebuggerSettings.getInstance().KILL_PROCESS_IMMEDIATELY;
+
+        processHandler.setShouldKillProcessSoftly(shouldKillSoftly);
+        ProcessTerminatedListener.attach(processHandler);
+
+        return processHandler;
     }
 
     @Override
