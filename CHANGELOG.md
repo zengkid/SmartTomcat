@@ -1,6 +1,10 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.6.1]
+
+- Stop the debug process gracefully, fix #75.
+
 ## [4.6.0]
 
 - Support configuring the SSL port, thanks to @leopoldhub.
