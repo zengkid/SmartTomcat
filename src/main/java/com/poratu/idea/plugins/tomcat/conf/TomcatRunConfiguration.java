@@ -212,6 +212,8 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         tomcatOptions.setTomcatInfo(tomcatInfo);
     }
 
+    public String getCatalinaBase() { return tomcatOptions.getCatalinaBase(); }
+    public void setCatalinaBase(String catalinaBase) { tomcatOptions.setCatalinaBase(catalinaBase); }
     public String getDocBase() {
         return tomcatOptions.getDocBase();
     }
@@ -296,6 +298,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
     private static class TomcatRunConfigurationOptions implements Serializable {
         private TomcatInfo tomcatInfo;
 
+        private String catalinaBase;
         private String docBase;
         private String contextPath;
         private Integer port = 8080;
@@ -313,6 +316,10 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         public void setTomcatInfo(TomcatInfo tomcatInfo) {
             this.tomcatInfo = tomcatInfo;
         }
+
+        @Nullable
+        public String getCatalinaBase() { return this.catalinaBase; }
+        public void setCatalinaBase(String catalinaBase) { this.catalinaBase = catalinaBase; }
 
         @Nullable
         public String getDocBase() {
