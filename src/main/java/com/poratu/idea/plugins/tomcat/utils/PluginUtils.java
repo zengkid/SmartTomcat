@@ -99,7 +99,7 @@ public final class PluginUtils {
                 .ifPresent(callback));
     }
 
-    public static Path getWorkingPath(TomcatRunConfiguration configuration) {
+    public static Path getCatalinaBase(TomcatRunConfiguration configuration) {
         if(!StringUtils.isBlank(configuration.getCatalinaBase())) {
             /* CATALINA_BASE override from intellij run configuration */
             return Paths.get(configuration.getCatalinaBase());
@@ -116,9 +116,9 @@ public final class PluginUtils {
     }
 
     public static Path getTomcatLogsDirPath(TomcatRunConfiguration configuration) {
-        Path workingDir = getWorkingPath(configuration);
-        if (workingDir != null) {
-            return workingDir.resolve("logs");
+        Path catalinaBase = getCatalinaBase(configuration);
+        if (catalinaBase != null) {
+            return catalinaBase.resolve("logs");
         }
         return null;
     }
