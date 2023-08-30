@@ -54,6 +54,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
     private JPanel mainPanel;
     private final JPanel tomcatField = new JPanel(new BorderLayout());
     private final TomcatComboBox tomcatComboBox = new TomcatComboBox();
+    private final JTextField catalinaBaseField = new JTextField();
     private final TextFieldWithBrowseButton docBaseField = new TextFieldWithBrowseButton();
     private final JPanel modulesComboBoxPanel = new JPanel(new GridBagLayout());
     private final ModulesComboBox modulesComboBox = new ModulesComboBox();
@@ -156,6 +157,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
     private void buildForm() {
         FormBuilder builder = FormBuilder.createFormBuilder()
                 .addLabeledComponent("Tomcat server:", tomcatField)
+                .addLabeledComponent("CATALINA_BASE:", catalinaBaseField)
                 .addLabeledComponent("Deployment directory:", docBaseField)
                 .addLabeledComponent("Use classpath of module:", modulesComboBoxPanel)
                 .addLabeledComponent("Context path:", contextPathField)
@@ -175,6 +177,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
 
     public void resetFrom(TomcatRunConfiguration configuration) {
         tomcatComboBox.setSelectedItem(configuration.getTomcatInfo());
+        catalinaBaseField.setText(configuration.getCatalinaBase());
         docBaseField.setText(configuration.getDocBase());
         modulesComboBox.setSelectedModule(configuration.getModule());
         contextPathField.setText(configuration.getContextPath());
@@ -192,6 +195,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
     public void applyTo(TomcatRunConfiguration configuration) throws ConfigurationException {
         try {
             configuration.setTomcatInfo((TomcatInfo) tomcatComboBox.getSelectedItem());
+            configuration.setCatalinaBase(catalinaBaseField.getText());
             configuration.setDocBase(docBaseField.getText());
             configuration.setModule(modulesComboBox.getSelectedModule());
             configuration.setContextPath(contextPathField.getText());
