@@ -35,6 +35,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -54,7 +55,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
     private JPanel mainPanel;
     private final JPanel tomcatField = new JPanel(new BorderLayout());
     private final TomcatComboBox tomcatComboBox = new TomcatComboBox();
-    private final JTextField catalinaBaseField = new JTextField();
+    private final TextFieldWithBrowseButton catalinaBaseField = new TextFieldWithBrowseButton();
     private final TextFieldWithBrowseButton docBaseField = new TextFieldWithBrowseButton();
     private final JPanel modulesComboBoxPanel = new JPanel(new GridBagLayout());
     private final ModulesComboBox modulesComboBox = new ModulesComboBox();
@@ -79,6 +80,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
 
         extraClassPath.getEditorField().getEmptyText().setText("Use '" + File.pathSeparator + "' to separate paths");
 
+        initCatalinaBaseDirectory();
         initDeploymentDirectory();
         buildForm();
     }
@@ -136,6 +138,11 @@ public class TomcatRunnerSettingsForm implements Disposable {
         adminPortFieldPanel.add(adminPort, c);
     }
 
+    private void initCatalinaBaseDirectory() {
+        FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
+        catalinaBaseField.addBrowseFolderListener("Select Catalina Base", "Please select the Catalina Base directory",
+                project, descriptor);
+    }
     private void initDeploymentDirectory() {
         FileChooserDescriptor descriptor = new IgnoreOutputFileChooserDescriptor(project);
         docBaseField.addBrowseFolderListener("Select Deployment Directory", "Please the directory to deploy",
@@ -157,7 +164,7 @@ public class TomcatRunnerSettingsForm implements Disposable {
     private void buildForm() {
         FormBuilder builder = FormBuilder.createFormBuilder()
                 .addLabeledComponent("Tomcat server:", tomcatField)
-                .addLabeledComponent("CATALINA_BASE:", catalinaBaseField)
+                .addLabeledComponent("Catalina base:", catalinaBaseField)
                 .addLabeledComponent("Deployment directory:", docBaseField)
                 .addLabeledComponent("Use classpath of module:", modulesComboBoxPanel)
                 .addLabeledComponent("Context path:", contextPathField)
@@ -177,7 +184,14 @@ public class TomcatRunnerSettingsForm implements Disposable {
 
     public void resetFrom(TomcatRunConfiguration configuration) {
         tomcatComboBox.setSelectedItem(configuration.getTomcatInfo());
-        catalinaBaseField.setText(configuration.getCatalinaBase());
+
+        Path catalinaBase = PluginUtils.getCatalinaBase(configuration);
+        if (catalinaBase != null) {
+            catalinaBaseField.setText(catalinaBase.toString());
+        } else {
+            catalinaBaseField.setText("");
+        }
+
         docBaseField.setText(configuration.getDocBase());
         modulesComboBox.setSelectedModule(configuration.getModule());
         contextPathField.setText(configuration.getContextPath());
