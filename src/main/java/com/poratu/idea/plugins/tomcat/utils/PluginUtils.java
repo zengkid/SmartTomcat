@@ -33,6 +33,7 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -99,11 +100,8 @@ public final class PluginUtils {
                 .ifPresent(callback));
     }
 
-    public static Path getWorkingPath(TomcatRunConfiguration configuration) {
-        if(!StringUtils.isBlank(configuration.getCatalinaBase())) {
-            /* CATALINA_BASE override from intellij run configuration */
-            return Paths.get(configuration.getCatalinaBase());
-        }
+    @Nullable
+    private static Path defaultCatalinaBase(TomcatRunConfiguration configuration) {
         String userHome = System.getProperty("user.home");
         Project project = configuration.getProject();
         Module module = configuration.getModule();
@@ -112,13 +110,32 @@ public final class PluginUtils {
             return null;
         }
 
-        return Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
+        Path path = Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        return path;
+    }
+
+    @Nullable
+    public static Path getCatalinaBase(TomcatRunConfiguration configuration) {
+        if(!StringUtils.isBlank(configuration.getCatalinaBase())) {
+            /* CATALINA_BASE override from intellij run configuration */
+            return Paths.get(configuration.getCatalinaBase());
+        }
+
+        return defaultCatalinaBase(configuration);
     }
 
     public static Path getTomcatLogsDirPath(TomcatRunConfiguration configuration) {
-        Path workingDir = getWorkingPath(configuration);
-        if (workingDir != null) {
-            return workingDir.resolve("logs");
+        Path catalinaBase = getCatalinaBase(configuration);
+        if (catalinaBase != null) {
+            return catalinaBase.resolve("logs");
         }
         return null;
     }

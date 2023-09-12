@@ -105,9 +105,9 @@ public class TomcatCommandLineState extends JavaCommandLineState {
     @Override
     protected JavaParameters createJavaParameters() {
         try {
-            Path workingPath = PluginUtils.getWorkingPath(configuration);
+            Path catalinaBase = PluginUtils.getCatalinaBase(configuration);
             Module module = configuration.getModule();
-            if (workingPath == null || module == null) {
+            if (catalinaBase == null || module == null) {
                 throw new ExecutionException("The Module Root specified is not a module according to Intellij");
             }
 
@@ -119,22 +119,22 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             Map<String, String> envOptions = configuration.getEnvOptions();
 
             // Copy the Tomcat configuration files to the working directory
-            Path confPath = workingPath.resolve("conf");
+            Path confPath = catalinaBase.resolve("conf");
             FileUtil.delete(confPath);
             FileUtil.createDirectory(confPath.toFile());
             FileUtil.copyDir(tomcatInstallationPath.resolve("conf").toFile(), confPath.toFile());
             // create the temp folder
-            FileUtil.createDirectory(workingPath.resolve("temp").toFile());
+            FileUtil.createDirectory(catalinaBase.resolve("temp").toFile());
 
             updateServerConf(confPath, configuration);
             createContextFile(tomcatVersion, module, confPath);
-            deleteTomcatWorkFiles(workingPath);
+            deleteTomcatWorkFiles(catalinaBase);
 
             ProjectRootManager manager = ProjectRootManager.getInstance(project);
 
             JavaParameters javaParams = new JavaParameters();
             javaParams.setDefaultCharset(project);
-            javaParams.setWorkingDirectory(workingPath.toFile());
+            javaParams.setWorkingDirectory(catalinaBase.toFile());
             javaParams.setJdk(manager.getProjectSdk());
 
             javaParams.getClassPath().add(tomcatInstallationPath.resolve("bin/bootstrap.jar").toFile());
@@ -154,8 +154,8 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             ParametersList vmParams = javaParams.getVMParametersList();
             vmParams.addParametersString(vmOptions);
             vmParams.addProperty(PARAM_CATALINA_HOME, tomcatInstallationPath.toString());
-            vmParams.defineProperty(PARAM_CATALINA_BASE, workingPath.toString());
-            vmParams.defineProperty(PARAM_CATALINA_TMPDIR, workingPath.resolve("temp").toString());
+            vmParams.defineProperty(PARAM_CATALINA_BASE, catalinaBase.toString());
+            vmParams.defineProperty(PARAM_CATALINA_TMPDIR, catalinaBase.resolve("temp").toString());
             vmParams.defineProperty(PARAM_LOGGING_CONFIG, confPath.resolve("logging.properties").toString());
             vmParams.defineProperty(PARAM_LOGGING_MANAGER, PARAM_LOGGING_MANAGER_VALUE);
 
