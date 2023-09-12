@@ -1,6 +1,10 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.7.0]
+
+- Support config the catalina base directory, thanks to @meier123456
+
 ## [4.6.1]
 
 - Stop the debug process gracefully, fix #75.
