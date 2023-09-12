@@ -22,3 +22,4 @@ target
 gradle
 bin
 gradle.properties
+release-notes.txt

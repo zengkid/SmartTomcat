@@ -17,14 +17,29 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
+      - name: Check plugin version matches release tag
+        run: |
+          # Read the version from the Gradle properties
+          version=$(./gradlew -q --no-daemon properties -Pversion | grep version: | awk '{print $2}')
+          # Check that the version matches the tag
+          if [[ "$version" != "${GITHUB_REF#refs/tags/release}" ]]; then
+              echo "Version $version does not match tag ${GITHUB_REF#refs/tags/}"
+              exit 1
+          fi
+
+      - name: Generate release notes
+        run: |
+          ./gradlew -q getChangelog --no-header --project-version="${GITHUB_REF#refs/tags/release}" > release-notes.txt
+
       - name: Build with Gradle
         run: | 
-         ./gradlew verifyPlugin 
+          ./gradlew verifyPlugin
 
       - name: Upload to releasex
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          body_path: release-notes.txt
           files: build/libs/SmartTomcat-*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
