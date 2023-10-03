@@ -21,7 +21,6 @@ import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
 import com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -124,7 +123,7 @@ public final class PluginUtils {
 
     @Nullable
     public static Path getCatalinaBase(TomcatRunConfiguration configuration) {
-        if(!StringUtils.isBlank(configuration.getCatalinaBase())) {
+        if(!StringUtil.isEmptyOrSpaces(configuration.getCatalinaBase())) {
             /* CATALINA_BASE override from intellij run configuration */
             return Paths.get(configuration.getCatalinaBase());
         }
