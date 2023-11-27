@@ -196,8 +196,12 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             }
         }
 
-        portShutdown.setAttribute("port", String.valueOf(cfg.getAdminPort()));
-        portE.setAttribute("port", String.valueOf(cfg.getPort()));
+        if (portShutdown != null) {
+            portShutdown.setAttribute("port", String.valueOf(cfg.getAdminPort()));
+        }
+        if (portE != null) {
+            portE.setAttribute("port", String.valueOf(cfg.getPort()));
+        }
         Integer sslPort = cfg.getSslPort();
 
         if (sslPortE != null && sslPort != null) {
