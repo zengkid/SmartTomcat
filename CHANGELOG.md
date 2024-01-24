@@ -4,6 +4,7 @@
 ## [4.7.1]
 
 - Improve the release CI job.
+- Fix an NPE
 
 ## [4.7.0]
 
