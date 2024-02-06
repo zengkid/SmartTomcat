@@ -9,6 +9,7 @@ import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationTypeUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.Ref;
+import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -32,6 +33,10 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
 
     @Override
     protected boolean setupConfigurationFromContext(@NotNull TomcatRunConfiguration configuration, @NotNull ConfigurationContext context, @NotNull Ref<PsiElement> sourceElement) {
+        if (Registry.is("smartTomcat.disableRunConfigurationProducer")) {
+            return false;
+        }
+
         Module module = context.getModule();
         if (module == null) {
             return false;
@@ -67,6 +72,10 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
 
     @Override
     public boolean isConfigurationFromContext(@NotNull TomcatRunConfiguration configuration, @NotNull ConfigurationContext context) {
+        if (Registry.is("smartTomcat.disableRunConfigurationProducer")) {
+            return false;
+        }
+
         List<VirtualFile> webRoots = findWebRoots(context.getLocation());
         return webRoots.stream().anyMatch(webRoot -> webRoot.getPath().equals(configuration.getDocBase()));
     }
