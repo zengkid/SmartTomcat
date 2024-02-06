@@ -1,6 +1,10 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.7.2]
+
+- Add option to disable run configuration from context.
+
 ## [4.7.1]
 
 - Improve the release CI job.
