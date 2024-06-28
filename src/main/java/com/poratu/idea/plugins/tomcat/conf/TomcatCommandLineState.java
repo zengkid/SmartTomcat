@@ -118,11 +118,18 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             String extraClassPath = configuration.getExtraClassPath();
             Map<String, String> envOptions = configuration.getEnvOptions();
 
+            //copy to project folder, and then user is able to update server.xml under the project.
+            Path projectConfPath = Paths.get(project.getBasePath(), ".smarttomcat", module.getName(), "conf");
+            if (!projectConfPath.toFile().exists()) {
+                FileUtil.createDirectory(projectConfPath.toFile());
+                FileUtil.copyDir(tomcatInstallationPath.resolve("conf").toFile(), projectConfPath.toFile());
+            }
+
             // Copy the Tomcat configuration files to the working directory
             Path confPath = catalinaBase.resolve("conf");
             FileUtil.delete(confPath);
             FileUtil.createDirectory(confPath.toFile());
-            FileUtil.copyDir(tomcatInstallationPath.resolve("conf").toFile(), confPath.toFile());
+            FileUtil.copyDir(projectConfPath.toFile(), confPath.toFile());
             // create the temp folder
             FileUtil.createDirectory(catalinaBase.resolve("temp").toFile());
 

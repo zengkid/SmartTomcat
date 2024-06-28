@@ -1,6 +1,10 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.7.3]
+
+- be able to update the server.xml under the <project>/.smarttomcat/<module>/conf.
+
 ## [4.7.2]
 
 - Add option to disable run configuration from context.
