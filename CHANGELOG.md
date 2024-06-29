@@ -1,6 +1,11 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+##[4.7.4]
+
+### Fixed
+- write change log in plugin.xml
+
 ## [4.7.3]
 
 - be able to update the server.xml under the <project>/.smarttomcat/<module>/conf.
