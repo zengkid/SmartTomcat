@@ -186,7 +186,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         XPath xpath = XPathFactory.newInstance().newXPath();
         XPathExpression exprConnectorShutdown = xpath.compile("/Server[@shutdown='SHUTDOWN']");
         XPathExpression serviceExpression = xpath.compile("/Server/Service[@name='Catalina']");
-        XPathExpression exprConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[@protocol='HTTP/1.1' and (not(@SSLEnabled) or @SSLEnabled='false')]");
+        XPathExpression exprConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[(@protocol='HTTP/1.1' or @protocol='org.apache.coyote.http11.Http11NioProtocol' or @protocol='org.apache.coyote.http11.Http11Protocol') and (not(@SSLEnabled) or @SSLEnabled='false')]");
         XPathExpression exprSSLConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[@SSLEnabled='true']");
         XPathExpression exprContext = xpath.compile("/Server/Service[@name='Catalina']/Engine[@name='Catalina']/Host/Context");
 
