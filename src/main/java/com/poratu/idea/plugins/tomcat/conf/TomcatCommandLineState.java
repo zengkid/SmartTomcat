@@ -120,7 +120,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
             //copy to project folder, and then user is able to update server.xml under the project.
             Path projectConfPath = Paths.get(project.getBasePath(), ".smarttomcat", module.getName(), "conf");
-            if (!projectConfPath.toFile().exists()) {
+            if (!projectConfPath.toFile().exists() || PluginUtils.isEmptyFolder(projectConfPath)) {
                 FileUtil.createDirectory(projectConfPath.toFile());
                 FileUtil.copyDir(tomcatInstallationPath.resolve("conf").toFile(), projectConfPath.toFile());
             }

@@ -309,4 +309,22 @@ public final class PluginUtils {
 
         return ModuleUtilCore.findModuleForFile(virtualFile, project);
     }
+
+    /**
+     * Checks if the given folder is empty.
+     *
+     * @param path the path to the folder
+     * @return {@code true} if the folder exists and is empty, {@code false} otherwise
+     * @throws IOException if an I/O error occurs
+     */
+
+    public static boolean isEmptyFolder(Path path) throws IOException {
+        if (Files.isDirectory(path)) {
+            try (Stream<Path> entries = Files.list(path)) {
+                return !entries.findFirst().isPresent();
+            }
+        }
+        return false;
+    }
+
 }
