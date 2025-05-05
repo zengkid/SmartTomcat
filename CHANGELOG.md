@@ -1,7 +1,13 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
-##[4.7.4]
+## [4.7.5]
+
+### Fixed
+- Do not copy Tomcat configs file when <project>/.smarttomcat/<module>/conf folder is empty (#141)
+- Enhance the XPath selector for port (#128)
+
+## [4.7.4]
 
 ### Fixed
 - write change log in plugin.xml
