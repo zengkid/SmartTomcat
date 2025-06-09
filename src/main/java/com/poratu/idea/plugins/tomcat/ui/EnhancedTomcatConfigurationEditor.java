@@ -250,15 +250,13 @@ public class EnhancedTomcatConfigurationEditor extends SettingsEditor<EnhancedTo
         }
 
         public void resetFrom(@NotNull EnhancedTomcatRunConfiguration configuration) {
-            // Reset code coverage configuration
-            // enableCoverageCheckBox.setSelected(configuration.isCoverageEnabled());
-            // trackPerTestCheckBox.setSelected(configuration.isTrackPerTest());
+            enableCoverageCheckBox.setSelected(configuration.isCoverageEnabled());
+            trackPerTestCheckBox.setSelected(configuration.isTrackPerTest());
         }
 
         public void applyTo(@NotNull EnhancedTomcatRunConfiguration configuration) throws ConfigurationException {
-            // Apply code coverage configuration
-            // configuration.setCoverageEnabled(enableCoverageCheckBox.isSelected());
-            // configuration.setTrackPerTest(trackPerTestCheckBox.isSelected());
+            configuration.setCoverageEnabled(enableCoverageCheckBox.isSelected());
+            configuration.setTrackPerTest(trackPerTestCheckBox.isSelected());
         }
     }
 }
