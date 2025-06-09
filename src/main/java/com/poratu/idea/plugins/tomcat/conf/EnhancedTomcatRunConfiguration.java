@@ -60,6 +60,10 @@ public class EnhancedTomcatRunConfiguration extends TomcatRunConfiguration {
     private boolean updateClassesAndResources = true;
     private boolean updateTriggerFiles = false;
 
+    // Code Coverage Settings
+    private boolean coverageEnabled = false;
+    private boolean trackPerTest = false;
+
     public EnhancedTomcatRunConfiguration(Project project, ConfigurationFactory factory, String name) {
         super(project, factory, name);
         initializeDefaultConfiguration();
@@ -99,6 +103,7 @@ public class EnhancedTomcatRunConfiguration extends TomcatRunConfiguration {
         readEnvironmentConfiguration(element);
         readConnectionConfiguration(element);
         readHotDeploymentConfiguration(element);
+        readCoverageConfiguration(element);
     }
 
     @Override
@@ -111,6 +116,7 @@ public class EnhancedTomcatRunConfiguration extends TomcatRunConfiguration {
         writeEnvironmentConfiguration(element);
         writeConnectionConfiguration(element);
         writeHotDeploymentConfiguration(element);
+        writeCoverageConfiguration(element);
     }
 
     /**
@@ -278,6 +284,27 @@ public class EnhancedTomcatRunConfiguration extends TomcatRunConfiguration {
         element.addContent(hotDeployElement);
     }
 
+    /**
+     * Read code coverage configuration from XML
+     */
+    private void readCoverageConfiguration(@NotNull Element element) {
+        Element coverageElement = element.getChild("coverage");
+        if (coverageElement != null) {
+            coverageEnabled = Boolean.parseBoolean(coverageElement.getAttributeValue("enabled", "false"));
+            trackPerTest = Boolean.parseBoolean(coverageElement.getAttributeValue("perTest", "false"));
+        }
+    }
+
+    /**
+     * Write code coverage configuration to XML
+     */
+    private void writeCoverageConfiguration(@NotNull Element element) {
+        Element coverageElement = new Element("coverage");
+        coverageElement.setAttribute("enabled", String.valueOf(coverageEnabled));
+        coverageElement.setAttribute("perTest", String.valueOf(trackPerTest));
+        element.addContent(coverageElement);
+    }
+
     // Getters and Setters for Phase 2 configuration
 
     // JMX Configuration
@@ -424,6 +451,23 @@ public class EnhancedTomcatRunConfiguration extends TomcatRunConfiguration {
 
     public void setAccessLogPattern(String accessLogPattern) {
         this.accessLogPattern = accessLogPattern;
+    }
+
+    // Code Coverage
+    public boolean isCoverageEnabled() {
+        return coverageEnabled;
+    }
+
+    public void setCoverageEnabled(boolean coverageEnabled) {
+        this.coverageEnabled = coverageEnabled;
+    }
+
+    public boolean isTrackPerTest() {
+        return trackPerTest;
+    }
+
+    public void setTrackPerTest(boolean trackPerTest) {
+        this.trackPerTest = trackPerTest;
     }
 
 

@@ -145,25 +145,23 @@ public class CodeCoverageTab extends JPanel {
     }
 
     public void resetFrom(@NotNull TomcatRunConfiguration configuration) {
-        // For now, code coverage is disabled by default
-        // In the future, these settings could be stored in EnhancedTomcatRunConfiguration
-        enableCoverageCheckBox.setSelected(false);
-        trackPerTestCheckBox.setSelected(false);
+        if (configuration instanceof EnhancedTomcatRunConfiguration) {
+            EnhancedTomcatRunConfiguration enhanced = (EnhancedTomcatRunConfiguration) configuration;
+            enableCoverageCheckBox.setSelected(enhanced.isCoverageEnabled());
+            trackPerTestCheckBox.setSelected(enhanced.isTrackPerTest());
+        } else {
+            enableCoverageCheckBox.setSelected(false);
+            trackPerTestCheckBox.setSelected(false);
+        }
 
         updateCoverageFieldsState();
     }
 
     public void applyTo(@NotNull TomcatRunConfiguration configuration) throws ConfigurationException {
-        // Code coverage settings would be applied to EnhancedTomcatRunConfiguration
-        // For now, this is a placeholder since coverage integration is a future feature
-
         if (configuration instanceof EnhancedTomcatRunConfiguration) {
-            // Future implementation:
-            // EnhancedTomcatRunConfiguration enhancedConfig = (EnhancedTomcatRunConfiguration) configuration;
-            // enhancedConfig.setCoverageEnabled(enableCoverageCheckBox.isSelected());
-            // enhancedConfig.setTrackPerTest(trackPerTestCheckBox.isSelected());
-            // enhancedConfig.setCoverageIncludePatterns(coverageIncludePatternsField.getText());
-            // enhancedConfig.setCoverageExcludePatterns(coverageExcludePatternsField.getText());
+            EnhancedTomcatRunConfiguration enhanced = (EnhancedTomcatRunConfiguration) configuration;
+            enhanced.setCoverageEnabled(enableCoverageCheckBox.isSelected());
+            enhanced.setTrackPerTest(trackPerTestCheckBox.isSelected());
         }
     }
 }
