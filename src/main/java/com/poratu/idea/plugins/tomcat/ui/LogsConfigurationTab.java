@@ -13,6 +13,7 @@ import com.intellij.util.ui.JBUI;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.logging.LogFileConfiguration;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -29,6 +30,7 @@ import java.util.List;
 public class LogsConfigurationTab extends JPanel {
 
     private final Project project;
+    @Nullable
     private final TomcatRunConfiguration configuration;
 
     // UI Components
@@ -41,7 +43,7 @@ public class LogsConfigurationTab extends JPanel {
     // Log file configurations
     private List<LogFileConfiguration> logFileConfigurations;
 
-    public LogsConfigurationTab(@NotNull Project project, @NotNull TomcatRunConfiguration configuration) {
+    public LogsConfigurationTab(@NotNull Project project, @Nullable TomcatRunConfiguration configuration) {
         this.project = project;
         this.configuration = configuration;
         this.logFileConfigurations = new ArrayList<>();
