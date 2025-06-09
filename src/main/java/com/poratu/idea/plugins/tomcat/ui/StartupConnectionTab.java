@@ -8,6 +8,7 @@ import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.JBUI;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -24,6 +25,7 @@ import java.util.Map;
 public class StartupConnectionTab extends JPanel {
 
     private final Project project;
+    @Nullable
     private final TomcatRunConfiguration configuration;
 
     // JMX Configuration
@@ -46,7 +48,7 @@ public class StartupConnectionTab extends JPanel {
     private JCheckBox enableRemoteDebuggingCheckBox;
     private JTextField debugPortField;
 
-    public StartupConnectionTab(@NotNull Project project, @NotNull TomcatRunConfiguration configuration) {
+    public StartupConnectionTab(@NotNull Project project, @Nullable TomcatRunConfiguration configuration) {
         this.project = project;
         this.configuration = configuration;
         this.environmentVariables = new HashMap<>();
