@@ -82,8 +82,8 @@ public class TomcatRunConfigurationType implements ConfigurationType {
             System.out.println("DevTomcat: Creating TomcatRunConfiguration for: " + project.getName());
 
             try {
-                TomcatRunConfiguration config = new TomcatRunConfiguration(project, this, "");
-                System.out.println("DevTomcat: TomcatRunConfiguration created successfully");
+                EnhancedTomcatRunConfiguration config = new EnhancedTomcatRunConfiguration(project, this, "");
+                System.out.println("DevTomcat: EnhancedTomcatRunConfiguration created successfully");
                 return config;
 
             } catch (Exception e) {
@@ -112,7 +112,9 @@ public class TomcatRunConfigurationType implements ConfigurationType {
 
         @Override
         public @NotNull RunConfiguration createConfiguration(@Nullable String name, @NotNull RunConfiguration template) {
-            if (template instanceof TomcatRunConfiguration) {
+            if (template instanceof EnhancedTomcatRunConfiguration) {
+                return ((EnhancedTomcatRunConfiguration) template).clone();
+            } else if (template instanceof TomcatRunConfiguration) {
                 return ((TomcatRunConfiguration) template).clone();
             }
             return createTemplateConfiguration(template.getProject());
