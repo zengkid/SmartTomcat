@@ -3,31 +3,35 @@ package com.poratu.idea.plugins.tomcat.conf;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
+import com.poratu.idea.plugins.tomcat.ui.ServerConfigurationTab;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
+/**
+ * Settings editor that wraps ServerConfigurationTab
+ * Provides compatibility with IntelliJ's SettingsEditor system
+ */
 public class TomcatRunnerSettingsEditor extends SettingsEditor<TomcatRunConfiguration> {
 
-    private final TomcatRunnerSettingsForm form;
+    private final ServerConfigurationTab serverTab;
 
-    public TomcatRunnerSettingsEditor(Project project) {
-        form = new TomcatRunnerSettingsForm(project);
+    public TomcatRunnerSettingsEditor(@NotNull Project project) {
+        this.serverTab = new ServerConfigurationTab(project);
     }
 
     @Override
     protected void resetEditorFrom(@NotNull TomcatRunConfiguration configuration) {
-        form.resetFrom(configuration);
+        serverTab.resetFrom(configuration);
     }
 
     @Override
     protected void applyEditorTo(@NotNull TomcatRunConfiguration configuration) throws ConfigurationException {
-        form.applyTo(configuration);
+        serverTab.applyTo(configuration);
     }
 
     @Override
-   protected @NotNull JComponent createEditor() {
-        return form.getMainPanel();
+    protected @NotNull JComponent createEditor() {
+        return serverTab;
     }
-
 }

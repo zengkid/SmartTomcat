@@ -42,9 +42,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Author : zengkid
- * Date   : 2/16/2017
- * Time   : 3:14 PM
+ * Complete DevTomcat Run Configuration
+ * Enhanced with Phase 1 logging integration
  */
 public class TomcatRunConfiguration extends LocatableConfigurationBase<LocatableRunConfigurationOptions> implements RunProfileWithCompileBeforeLaunchOption {
 
@@ -69,48 +68,181 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         super(project, factory, name);
         configurationModule = new RunConfigurationModule(project);
 
-        TomcatServerManagerState applicationService = ApplicationManager.getApplication().getService(TomcatServerManagerState.class);
-        List<TomcatInfo> tomcatInfos = applicationService.getTomcatInfos();
-        if (!tomcatInfos.isEmpty()) {
-            tomcatOptions.setTomcatInfo(tomcatInfos.get(0));
+        System.out.println("DevTomcat: TomcatRunConfiguration constructor called");
+
+        try {
+            TomcatServerManagerState applicationService = ApplicationManager.getApplication().getService(TomcatServerManagerState.class);
+            List<TomcatInfo> tomcatInfos = applicationService.getTomcatInfos();
+            System.out.println("DevTomcat: Found " + tomcatInfos.size() + " Tomcat servers");
+
+            if (!tomcatInfos.isEmpty()) {
+                tomcatOptions.setTomcatInfo(tomcatInfos.get(0));
+                System.out.println("DevTomcat: Using Tomcat server: " + tomcatInfos.get(0).getName());
+            } else {
+                System.out.println("DevTomcat: WARNING - No Tomcat servers configured!");
+            }
+
+            addPredefinedTomcatLogFiles();
+            System.out.println("DevTomcat: TomcatRunConfiguration created successfully");
+
+        } catch (Exception e) {
+            System.err.println("DevTomcat: Error in constructor: " + e.getMessage());
+            e.printStackTrace();
         }
-        addPredefinedTomcatLogFiles();
     }
 
     @NotNull
     @Override
     public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
         Project project = getProject();
-        SettingsEditorGroup<TomcatRunConfiguration> group = new SettingsEditorGroup<>();
-        TomcatRunnerSettingsEditor tomcatSetting = new TomcatRunnerSettingsEditor(project);
 
-        group.addEditor(ExecutionBundle.message("run.configuration.configuration.tab.title"), tomcatSetting);
-        group.addEditor(ExecutionBundle.message("logs.tab.title"), new LogConfigurationPanel<>());
+        // ALWAYS use Ultimate-style 5-tab interface for DevTomcat!
+        System.out.println("DevTomcat: Using Ultimate-style 5-tab interface");
+
+        SettingsEditorGroup<TomcatRunConfiguration> group = new SettingsEditorGroup<>();
+
+        // Tab 1: Server Configuration (Ultimate-style)
+        com.poratu.idea.plugins.tomcat.ui.ServerConfigurationTab serverTab =
+                new com.poratu.idea.plugins.tomcat.ui.ServerConfigurationTab(project);
+
+        group.addEditor("Server", new SettingsEditor<TomcatRunConfiguration>() {
+            @Override
+            protected void resetEditorFrom(@NotNull TomcatRunConfiguration configuration) {
+                serverTab.resetFrom(configuration);
+            }
+
+            @Override
+            protected void applyEditorTo(@NotNull TomcatRunConfiguration configuration) throws com.intellij.openapi.options.ConfigurationException {
+                serverTab.applyTo(configuration);
+            }
+
+            @Override
+            protected @NotNull javax.swing.JComponent createEditor() {
+                return serverTab;
+            }
+        });
+
+        // Tab 2: Deployment Configuration (Ultimate-style)
+        com.poratu.idea.plugins.tomcat.ui.DeploymentConfigurationTab deploymentTab =
+                new com.poratu.idea.plugins.tomcat.ui.DeploymentConfigurationTab(project);
+
+        group.addEditor("Deployment", new SettingsEditor<TomcatRunConfiguration>() {
+            @Override
+            protected void resetEditorFrom(@NotNull TomcatRunConfiguration configuration) {
+                deploymentTab.resetFrom(configuration);
+            }
+
+            @Override
+            protected void applyEditorTo(@NotNull TomcatRunConfiguration configuration) throws com.intellij.openapi.options.ConfigurationException {
+                deploymentTab.applyTo(configuration);
+            }
+
+            @Override
+            protected @NotNull javax.swing.JComponent createEditor() {
+                return deploymentTab;
+            }
+        });
+
+        // Tab 3: Logs Configuration (Ultimate-style)
+        com.poratu.idea.plugins.tomcat.ui.LogsConfigurationTab logsTab =
+                new com.poratu.idea.plugins.tomcat.ui.LogsConfigurationTab(project, this);
+
+        group.addEditor("Logs", new SettingsEditor<TomcatRunConfiguration>() {
+            @Override
+            protected void resetEditorFrom(@NotNull TomcatRunConfiguration configuration) {
+                logsTab.resetFrom(configuration);
+            }
+
+            @Override
+            protected void applyEditorTo(@NotNull TomcatRunConfiguration configuration) throws com.intellij.openapi.options.ConfigurationException {
+                logsTab.applyTo(configuration);
+            }
+
+            @Override
+            protected @NotNull javax.swing.JComponent createEditor() {
+                return logsTab;
+            }
+        });
+
+        // Tab 4: Startup/Connection (Ultimate-style)
+        com.poratu.idea.plugins.tomcat.ui.StartupConnectionTab startupTab =
+                new com.poratu.idea.plugins.tomcat.ui.StartupConnectionTab(project, this);
+
+        group.addEditor("Startup/Connection", new SettingsEditor<TomcatRunConfiguration>() {
+            @Override
+            protected void resetEditorFrom(@NotNull TomcatRunConfiguration configuration) {
+                startupTab.resetFrom(configuration);
+            }
+
+            @Override
+            protected void applyEditorTo(@NotNull TomcatRunConfiguration configuration) throws com.intellij.openapi.options.ConfigurationException {
+                startupTab.applyTo(configuration);
+            }
+
+            @Override
+            protected @NotNull javax.swing.JComponent createEditor() {
+                return startupTab;
+            }
+        });
+
+        // Tab 5: Code Coverage (Ultimate-style)
+        com.poratu.idea.plugins.tomcat.ui.CodeCoverageTab coverageTab =
+                new com.poratu.idea.plugins.tomcat.ui.CodeCoverageTab(project);
+
+        group.addEditor("Code Coverage", new SettingsEditor<TomcatRunConfiguration>() {
+            @Override
+            protected void resetEditorFrom(@NotNull TomcatRunConfiguration configuration) {
+                coverageTab.resetFrom(configuration);
+            }
+
+            @Override
+            protected void applyEditorTo(@NotNull TomcatRunConfiguration configuration) throws com.intellij.openapi.options.ConfigurationException {
+                coverageTab.applyTo(configuration);
+            }
+
+            @Override
+            protected @NotNull javax.swing.JComponent createEditor() {
+                return coverageTab;
+            }
+        });
+
+        // Add Java extensions
         JavaRunConfigurationExtensionManager.getInstance().appendEditors(this, group);
+
+        System.out.println("DevTomcat: Ultimate-style interface created with 5 tabs: Server, Deployment, Logs, Startup/Connection, Code Coverage");
         return group;
     }
 
     @Override
     public void checkConfiguration() throws RuntimeConfigurationException {
+        System.out.println("DevTomcat: Checking configuration...");
+
         if (getTomcatInfo() == null) {
+            System.err.println("DevTomcat: No Tomcat server selected");
             throw new RuntimeConfigurationError("Tomcat server is not selected");
         }
 
         if (StringUtil.isEmpty(getDocBase())) {
+            System.err.println("DevTomcat: No deployment directory");
             throw new RuntimeConfigurationError("Deployment directory cannot be empty");
         }
 
         if (StringUtil.isEmpty(getContextPath())) {
+            System.err.println("DevTomcat: No context path");
             throw new RuntimeConfigurationError("Context path cannot be empty");
         }
 
         if (getModule() == null) {
+            System.err.println("DevTomcat: No module selected");
             throw new RuntimeConfigurationError("Module is not selected");
         }
 
         if (getPort() == null || getAdminPort() == null) {
+            System.err.println("DevTomcat: Ports not configured");
             throw new RuntimeConfigurationError("Port cannot be empty");
         }
+
+        System.out.println("DevTomcat: Configuration check passed!");
     }
 
     @Override
@@ -137,9 +269,8 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
                 configurationModule.setModule(module);
             }
         } catch (Exception e) {
-            //do nothing.
+            System.err.println("DevTomcat: Error in onNewConfigurationCreated: " + e.getMessage());
         }
-
     }
 
     @Override
@@ -151,7 +282,8 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
     @Nullable
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) {
-        return new TomcatCommandLineState(executionEnvironment, this);
+        System.out.println("DevTomcat: getState() called - using EnhancedTomcatCommandLineState");
+        return new EnhancedTomcatCommandLineState(executionEnvironment, this);
     }
 
     @Override
@@ -161,7 +293,6 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
                 return logFile.createLogFileOptions(file, PluginUtils.getTomcatLogsDirPath(this));
             }
         }
-
         return super.getOptionsForPredefinedLogFile(file);
     }
 
@@ -171,12 +302,10 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         XmlSerializer.deserializeInto(element, tomcatOptions);
         configurationModule.readExternal(element);
 
-        // for backward compatibility
         if (getAllLogFiles().isEmpty()) {
             addPredefinedTomcatLogFiles();
         }
 
-        // for backward compatibility
         if (configurationModule.getModule() == null) {
             configurationModule.setModule(PluginUtils.findContainingModule(tomcatOptions.getDocBase(), getProject()));
         }
@@ -214,6 +343,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
     public String getCatalinaBase() { return tomcatOptions.getCatalinaBase(); }
     public void setCatalinaBase(String catalinaBase) { tomcatOptions.setCatalinaBase(catalinaBase); }
+
     public String getDocBase() {
         return tomcatOptions.getDocBase();
     }
@@ -286,6 +416,8 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         tomcatOptions.setExtraClassPath(extraClassPath);
     }
 
+    // Note: setName(String) is inherited from parent class and is final
+
     @Override
     public RunConfiguration clone() {
         TomcatRunConfiguration clone = (TomcatRunConfiguration) super.clone();
@@ -297,7 +429,6 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
 
     private static class TomcatRunConfigurationOptions implements Serializable {
         private TomcatInfo tomcatInfo;
-
         private String catalinaBase;
         private String docBase;
         private String contextPath;
@@ -309,90 +440,39 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         private Boolean passParentEnvs = true;
         private String extraClassPath;
 
-        public TomcatInfo getTomcatInfo() {
-            return tomcatInfo;
-        }
-
-        public void setTomcatInfo(TomcatInfo tomcatInfo) {
-            this.tomcatInfo = tomcatInfo;
-        }
+        public TomcatInfo getTomcatInfo() { return tomcatInfo; }
+        public void setTomcatInfo(TomcatInfo tomcatInfo) { this.tomcatInfo = tomcatInfo; }
 
         @Nullable
         public String getCatalinaBase() { return this.catalinaBase; }
         public void setCatalinaBase(String catalinaBase) { this.catalinaBase = catalinaBase; }
 
         @Nullable
-        public String getDocBase() {
-            return docBase;
-        }
+        public String getDocBase() { return docBase; }
+        public void setDocBase(String docBase) { this.docBase = docBase; }
 
-        public void setDocBase(String docBase) {
-            this.docBase = docBase;
-        }
+        public String getContextPath() { return contextPath; }
+        public void setContextPath(String contextPath) { this.contextPath = contextPath; }
 
-        public String getContextPath() {
-            return contextPath;
-        }
+        public Integer getPort() { return port; }
+        public void setPort(Integer port) { this.port = port; }
 
-        public void setContextPath(String contextPath) {
-            this.contextPath = contextPath;
-        }
+        public Integer getSslPort() { return sslPort; }
+        public void setSslPort(Integer sslPort) { this.sslPort = sslPort; }
 
-        public Integer getPort() {
-            return port;
-        }
+        public Integer getAdminPort() { return adminPort; }
+        public void setAdminPort(Integer adminPort) { this.adminPort = adminPort; }
 
-        public void setPort(Integer port) {
-            this.port = port;
-        }
+        public String getVmOptions() { return vmOptions; }
+        public void setVmOptions(String vmOptions) { this.vmOptions = vmOptions; }
 
-        public Integer getSslPort() {
-            return sslPort;
-        }
+        public Map<String, String> getEnvOptions() { return envOptions; }
+        public void setEnvOptions(Map<String, String> envOptions) { this.envOptions = envOptions; }
 
-        public void setSslPort(Integer sslPort) {
-            this.sslPort = sslPort;
-        }
+        public Boolean isPassParentEnvs() { return passParentEnvs; }
+        public void setPassParentEnvs(Boolean passParentEnvs) { this.passParentEnvs = passParentEnvs; }
 
-        public Integer getAdminPort() {
-            return adminPort;
-        }
-
-        public void setAdminPort(Integer adminPort) {
-            this.adminPort = adminPort;
-        }
-
-        public String getVmOptions() {
-            return vmOptions;
-        }
-
-        public void setVmOptions(String vmOptions) {
-            this.vmOptions = vmOptions;
-        }
-
-        public Map<String, String> getEnvOptions() {
-            return envOptions;
-        }
-
-        public void setEnvOptions(Map<String, String> envOptions) {
-            this.envOptions = envOptions;
-        }
-
-        public Boolean isPassParentEnvs() {
-            return passParentEnvs;
-        }
-
-        public void setPassParentEnvs(Boolean passParentEnvs) {
-            this.passParentEnvs = passParentEnvs;
-        }
-
-        public String getExtraClassPath() {
-            return extraClassPath;
-        }
-
-        public void setExtraClassPath(String extraClassPath) {
-            this.extraClassPath = extraClassPath;
-        }
+        public String getExtraClassPath() { return extraClassPath; }
+        public void setExtraClassPath(String extraClassPath) { this.extraClassPath = extraClassPath; }
     }
-
 }

@@ -109,7 +109,7 @@ public final class PluginUtils {
             return null;
         }
 
-        Path path = Paths.get(userHome, ".SmartTomcat", project.getName(), module.getName());
+        Path path = Paths.get(userHome, ".DevTomcat", project.getName(), module.getName());
         if (!Files.exists(path)) {
             try {
                 Files.createDirectories(path);
