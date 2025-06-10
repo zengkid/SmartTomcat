@@ -27,7 +27,15 @@ intellij {
     type.set(prop("platformType"))
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    plugins.set(prop("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
+    plugins.set(
+        listOf(
+            *prop("platformPlugins")
+                .split(',')
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .toTypedArray()
+        )
+    )
 }
 
 java {
@@ -101,8 +109,6 @@ tasks {
     }
 
     test {
-        useJUnit()
-
         // Add JVM arguments to fix Java 17 module access issues
         jvmArgs(
             "--add-opens", "java.desktop/sun.awt=ALL-UNNAMED",
@@ -112,6 +118,8 @@ tasks {
             "--add-opens", "java.base/java.lang=ALL-UNNAMED",
             "--add-opens", "java.base/java.util=ALL-UNNAMED"
         )
+
+        useJUnit()
 
         // Set system properties for IntelliJ testing
         systemProperty("idea.test.cyclic.buffer.size", "1048576")

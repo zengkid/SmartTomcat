@@ -82,6 +82,11 @@ public class DevTomcatProcessHandler extends KillableColoredProcessHandler {
 		}
 
 		@Override
+		public void processWillTerminate(@NotNull ProcessEvent event, boolean willBeDestroyed) {
+			deploymentLogger.logServerInfo("Tomcat process will terminate (willBeDestroyed=" + willBeDestroyed + ")");
+		}
+
+		@Override
 		public void onTextAvailable(@NotNull ProcessEvent event, @NotNull Key outputType) {
 			String text = event.getText();
 			if (text != null && !text.trim().isEmpty()) {
