@@ -26,7 +26,7 @@ public class EnhancedTomcatCommandLineState extends TomcatCommandLineState {
 	private final long creationTime;
 
 	public EnhancedTomcatCommandLineState(@NotNull ExecutionEnvironment environment,
-										  TomcatRunConfiguration configuration) {
+		EnhancedTomcatRunConfiguration configuration) {
 		super(environment, configuration);
 		this.deploymentLogger = new TomcatDeploymentLogger(environment.getProject());
 		this.creationTime = System.currentTimeMillis();
@@ -135,7 +135,7 @@ public class EnhancedTomcatCommandLineState extends TomcatCommandLineState {
 	 */
 	private String getArtifactName() {
 		try {
-			TomcatRunConfiguration config = getConfiguration();
+		    EnhancedTomcatRunConfiguration config = getConfiguration();
 			if (config != null) {
 				String contextPath = config.getContextPath();
 				if (contextPath != null && !contextPath.isEmpty()) {
@@ -151,10 +151,10 @@ public class EnhancedTomcatCommandLineState extends TomcatCommandLineState {
 	/**
 	 * Get the configuration (helper method)
 	 */
-	private TomcatRunConfiguration getConfiguration() {
+	private EnhancedTomcatRunConfiguration getConfiguration() {
 		try {
 			// Access the configuration from parent class
-			return (TomcatRunConfiguration) getEnvironment().getRunProfile();
+			return (EnhancedTomcatRunConfiguration) getEnvironment().getRunProfile();
 		} catch (Exception e) {
 			deploymentLogger.logServerWarning("Could not access run configuration: " + e.getMessage());
 			return null;

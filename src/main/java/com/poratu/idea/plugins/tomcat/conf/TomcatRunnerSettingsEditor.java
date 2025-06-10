@@ -11,8 +11,9 @@ import javax.swing.*;
 /**
  * Settings editor that wraps ServerConfigurationTab
  * Provides compatibility with IntelliJ's SettingsEditor system
+ * Works with EnhancedTomcatRunConfiguration for Phase 2 features
  */
-public class TomcatRunnerSettingsEditor extends SettingsEditor<TomcatRunConfiguration> {
+public class TomcatRunnerSettingsEditor extends SettingsEditor<EnhancedTomcatRunConfiguration> {
 
     private final ServerConfigurationTab serverTab;
 
@@ -21,12 +22,12 @@ public class TomcatRunnerSettingsEditor extends SettingsEditor<TomcatRunConfigur
     }
 
     @Override
-    protected void resetEditorFrom(@NotNull TomcatRunConfiguration configuration) {
+    protected void resetEditorFrom(@NotNull EnhancedTomcatRunConfiguration configuration) {
         serverTab.resetFrom(configuration);
     }
 
     @Override
-    protected void applyEditorTo(@NotNull TomcatRunConfiguration configuration) throws ConfigurationException {
+    protected void applyEditorTo(@NotNull EnhancedTomcatRunConfiguration configuration) throws ConfigurationException {
         serverTab.applyTo(configuration);
     }
 

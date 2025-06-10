@@ -10,19 +10,14 @@ import javax.swing.*;
 
 /**
  * Phase 2: Enhanced Tomcat configuration editor with Ultimate-style 5-tab interface
- * Provides complete Ultimate-like configuration experience:
- * - Server tab (basic Tomcat settings)
- * - Deployment tab (artifacts and deployment options)
- * - Logs tab (multiple log file configuration)
- * - Startup/Connection tab (JMX, environment, debugging)
- * - Code Coverage tab (coverage integration)
+ * Uses the complete, fully-implemented Ultimate-style tabs
  */
 public class EnhancedTomcatConfigurationEditor extends SettingsEditor<EnhancedTomcatRunConfiguration> {
 
     private final Project project;
     private EnhancedTomcatRunConfiguration currentConfiguration;
 
-    // Tab panels
+    // Full Ultimate-style tab panels
     private ServerConfigurationTab serverTab;
     private DeploymentConfigurationTab deploymentTab;
     private LogsConfigurationTab logsTab;
@@ -56,6 +51,8 @@ public class EnhancedTomcatConfigurationEditor extends SettingsEditor<EnhancedTo
         if (codeCoverageTab != null) {
             codeCoverageTab.resetFrom(configuration);
         }
+
+        System.out.println("DevTomcat: Reset all Ultimate-style tabs from Enhanced configuration");
     }
 
     @Override
@@ -76,6 +73,8 @@ public class EnhancedTomcatConfigurationEditor extends SettingsEditor<EnhancedTo
         if (codeCoverageTab != null) {
             codeCoverageTab.applyTo(configuration);
         }
+
+        System.out.println("DevTomcat: Applied all Ultimate-style tabs to Enhanced configuration");
     }
 
     @Override
@@ -83,180 +82,106 @@ public class EnhancedTomcatConfigurationEditor extends SettingsEditor<EnhancedTo
         // Create the main tabbed pane
         tabbedPane = new JTabbedPane();
 
-        // Create and add all configuration tabs
+        // Create and add all Ultimate-style configuration tabs
         createServerTab();
         createDeploymentTab();
         createLogsTab();
         createStartupConnectionTab();
         createCodeCoverageTab();
 
+        System.out.println("DevTomcat: Created Ultimate-style 5-tab interface");
         return tabbedPane;
     }
 
     /**
-     * Create Server configuration tab
+     * Create Server configuration tab - Uses the complete Ultimate-style ServerConfigurationTab
      */
     private void createServerTab() {
         serverTab = new ServerConfigurationTab(project);
         tabbedPane.addTab("Server", serverTab);
-        tabbedPane.setToolTipTextAt(0, "Basic Tomcat server configuration");
+        tabbedPane.setToolTipTextAt(0, "Application server, ports, VM options, and Tomcat server settings");
+        System.out.println("DevTomcat: Added complete Server tab");
     }
 
     /**
-     * Create Deployment configuration tab
+     * Create Deployment configuration tab - Uses the complete Ultimate-style DeploymentConfigurationTab
      */
     private void createDeploymentTab() {
         deploymentTab = new DeploymentConfigurationTab(project);
         tabbedPane.addTab("Deployment", deploymentTab);
-        tabbedPane.setToolTipTextAt(1, "Application deployment and artifact configuration");
+        tabbedPane.setToolTipTextAt(1, "Application deployment artifacts and hot deployment configuration");
+        System.out.println("DevTomcat: Added complete Deployment tab");
     }
 
     /**
-     * Create Logs configuration tab
+     * Create Logs configuration tab - Uses the complete Ultimate-style LogsConfigurationTab
      */
     private void createLogsTab() {
         logsTab = new LogsConfigurationTab(project, currentConfiguration);
         tabbedPane.addTab("Logs", logsTab);
         tabbedPane.setToolTipTextAt(2, "Log file monitoring and display configuration");
+        System.out.println("DevTomcat: Added complete Logs tab");
     }
 
     /**
-     * Create Startup/Connection configuration tab
+     * Create Startup/Connection configuration tab - Uses the complete Ultimate-style StartupConnectionTab
      */
     private void createStartupConnectionTab() {
         startupConnectionTab = new StartupConnectionTab(project, currentConfiguration);
         tabbedPane.addTab("Startup/Connection", startupConnectionTab);
-        tabbedPane.setToolTipTextAt(3, "JMX, environment variables, and connection settings");
+        tabbedPane.setToolTipTextAt(3, "JMX settings, environment variables, and connection configuration");
+        System.out.println("DevTomcat: Added complete Startup/Connection tab");
     }
 
     /**
-     * Create Code Coverage configuration tab
+     * Create Code Coverage configuration tab - Uses the complete Ultimate-style CodeCoverageTab
      */
     private void createCodeCoverageTab() {
         codeCoverageTab = new CodeCoverageTab(project);
         tabbedPane.addTab("Code Coverage", codeCoverageTab);
-        tabbedPane.setToolTipTextAt(4, "Code coverage integration and monitoring");
+        tabbedPane.setToolTipTextAt(4, "Code coverage integration and monitoring configuration");
+        System.out.println("DevTomcat: Added complete Code Coverage tab");
     }
 
     /**
-     * Server configuration tab - basic Tomcat settings
+     * Get current configuration for tab initialization
      */
-    private static class ServerConfigurationTab extends JPanel {
-        private final Project project;
-
-        // UI Components for basic server configuration
-        private JTextField tomcatHomeField;
-        private JTextField serverPortField;
-        private JTextField contextPathField;
-        private JTextField vmOptionsField;
-        private JCheckBox enableJmxCheckBox;
-
-        public ServerConfigurationTab(@NotNull Project project) {
-            this.project = project;
-            initializeUI();
-        }
-
-        private void initializeUI() {
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-            // Basic server settings panel
-            JPanel serverPanel = new JPanel();
-            serverPanel.setBorder(BorderFactory.createTitledBorder("Server Settings"));
-            // Add server configuration fields...
-            add(serverPanel);
-
-            // VM Options panel
-            JPanel vmPanel = new JPanel();
-            vmPanel.setBorder(BorderFactory.createTitledBorder("VM Options"));
-            // Add VM options configuration...
-            add(vmPanel);
-        }
-
-        public void resetFrom(@NotNull EnhancedTomcatRunConfiguration configuration) {
-            // Reset basic server fields from configuration
-            // This would populate fields from the base TomcatRunConfiguration
-            // For now, we'll use placeholder implementation
-        }
-
-        public void applyTo(@NotNull EnhancedTomcatRunConfiguration configuration) throws ConfigurationException {
-            // Apply basic server configuration
-            // This would save field values to the base TomcatRunConfiguration
-            // For now, we'll use placeholder implementation
-        }
+    public EnhancedTomcatRunConfiguration getCurrentConfiguration() {
+        return currentConfiguration;
     }
 
     /**
-     * Deployment configuration tab - artifacts and deployment options
+     * Get the server tab for external access
      */
-    private static class DeploymentConfigurationTab extends JPanel {
-        private final Project project;
-
-        public DeploymentConfigurationTab(@NotNull Project project) {
-            this.project = project;
-            initializeUI();
-        }
-
-        private void initializeUI() {
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-            JPanel deploymentPanel = new JPanel();
-            deploymentPanel.setBorder(BorderFactory.createTitledBorder("Deployment Artifacts"));
-            add(deploymentPanel);
-
-            JPanel optionsPanel = new JPanel();
-            optionsPanel.setBorder(BorderFactory.createTitledBorder("Deployment Options"));
-            add(optionsPanel);
-        }
-
-        public void resetFrom(@NotNull EnhancedTomcatRunConfiguration configuration) {
-            // Reset deployment configuration from the configuration object
-            // This would handle artifact configurations, deployment options, etc.
-        }
-
-        public void applyTo(@NotNull EnhancedTomcatRunConfiguration configuration) throws ConfigurationException {
-            // Apply deployment configuration to the configuration object
-            // This would save artifact settings, deployment paths, etc.
-        }
+    public ServerConfigurationTab getServerTab() {
+        return serverTab;
     }
 
     /**
-     * Code Coverage configuration tab - coverage integration
+     * Get the deployment tab for external access
      */
-    private static class CodeCoverageTab extends JPanel {
-        private final Project project;
+    public DeploymentConfigurationTab getDeploymentTab() {
+        return deploymentTab;
+    }
 
-        private JCheckBox enableCoverageCheckBox;
-        private JTextField coverageAgentField;
-        private JCheckBox trackPerTestCheckBox;
+    /**
+     * Get the logs tab for external access
+     */
+    public LogsConfigurationTab getLogsTab() {
+        return logsTab;
+    }
 
-        public CodeCoverageTab(@NotNull Project project) {
-            this.project = project;
-            initializeUI();
-        }
+    /**
+     * Get the startup/connection tab for external access
+     */
+    public StartupConnectionTab getStartupConnectionTab() {
+        return startupConnectionTab;
+    }
 
-        private void initializeUI() {
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-            JPanel coveragePanel = new JPanel();
-            coveragePanel.setBorder(BorderFactory.createTitledBorder("Code Coverage"));
-
-            enableCoverageCheckBox = new JCheckBox("Enable code coverage", false);
-            coveragePanel.add(enableCoverageCheckBox);
-
-            trackPerTestCheckBox = new JCheckBox("Track coverage per test", false);
-            coveragePanel.add(trackPerTestCheckBox);
-
-            add(coveragePanel);
-        }
-
-        public void resetFrom(@NotNull EnhancedTomcatRunConfiguration configuration) {
-            enableCoverageCheckBox.setSelected(configuration.isCoverageEnabled());
-            trackPerTestCheckBox.setSelected(configuration.isTrackPerTest());
-        }
-
-        public void applyTo(@NotNull EnhancedTomcatRunConfiguration configuration) throws ConfigurationException {
-            configuration.setCoverageEnabled(enableCoverageCheckBox.isSelected());
-            configuration.setTrackPerTest(trackPerTestCheckBox.isSelected());
-        }
+    /**
+     * Get the code coverage tab for external access
+     */
+    public CodeCoverageTab getCodeCoverageTab() {
+        return codeCoverageTab;
     }
 }

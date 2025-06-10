@@ -69,13 +69,13 @@ public class TomcatCommandLineState extends JavaCommandLineState {
     private static final String PARAM_LOGGING_CONFIG = "java.util.logging.config.file";
     private static final String PARAM_LOGGING_MANAGER = "java.util.logging.manager";
     private static final String PARAM_LOGGING_MANAGER_VALUE = "org.apache.juli.ClassLoaderLogManager";
-    private TomcatRunConfiguration configuration;
+    private EnhancedTomcatRunConfiguration configuration;
 
     protected TomcatCommandLineState(@NotNull ExecutionEnvironment environment) {
         super(environment);
     }
 
-    protected TomcatCommandLineState(ExecutionEnvironment environment, TomcatRunConfiguration configuration) {
+    protected TomcatCommandLineState(ExecutionEnvironment environment, EnhancedTomcatRunConfiguration configuration) {
         this(environment);
         this.configuration = configuration;
     }
@@ -179,7 +179,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         return new ServerConsoleView(configuration);
     }
 
-    private void updateServerConf(Path confPath, TomcatRunConfiguration cfg)
+    private void updateServerConf(Path confPath, EnhancedTomcatRunConfiguration cfg)
             throws ParserConfigurationException, XPathExpressionException, TransformerException, IOException, SAXException {
         Path serverXml = confPath.resolve("server.xml");
         Document doc = PluginUtils.createDocumentBuilder().parse(serverXml.toFile());

@@ -17,7 +17,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ArrayUtil;
-import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
+import com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
 import com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable;
@@ -100,7 +100,7 @@ public final class PluginUtils {
     }
 
     @Nullable
-    private static Path defaultCatalinaBase(TomcatRunConfiguration configuration) {
+    private static Path defaultCatalinaBase(EnhancedTomcatRunConfiguration configuration) {
         String userHome = System.getProperty("user.home");
         Project project = configuration.getProject();
         Module module = configuration.getModule();
@@ -122,7 +122,7 @@ public final class PluginUtils {
     }
 
     @Nullable
-    public static Path getCatalinaBase(TomcatRunConfiguration configuration) {
+    public static Path getCatalinaBase(EnhancedTomcatRunConfiguration configuration) {
         if(!StringUtil.isEmptyOrSpaces(configuration.getCatalinaBase())) {
             /* CATALINA_BASE override from intellij run configuration */
             return Paths.get(configuration.getCatalinaBase());
@@ -131,7 +131,7 @@ public final class PluginUtils {
         return defaultCatalinaBase(configuration);
     }
 
-    public static Path getTomcatLogsDirPath(TomcatRunConfiguration configuration) {
+    public static Path getTomcatLogsDirPath(EnhancedTomcatRunConfiguration configuration) {
         Path catalinaBase = getCatalinaBase(configuration);
         if (catalinaBase != null) {
             return catalinaBase.resolve("logs");

@@ -18,12 +18,12 @@ import java.util.regex.Pattern;
  * Time   : 00:13
  */
 public class ServerConsoleView extends ConsoleViewImpl {
-    private final TomcatRunConfiguration configuration;
+    private final EnhancedTomcatRunConfiguration configuration;
     private boolean printStarted = false;
     private final List<String> httpPorts = new ArrayList<>();
     private final List<String> httpsPorts = new ArrayList<>();
 
-    public ServerConsoleView(TomcatRunConfiguration configuration) {
+    public ServerConsoleView(EnhancedTomcatRunConfiguration configuration) {
         super(configuration.getProject(), true);
         this.configuration = configuration;
     }

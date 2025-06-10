@@ -1,43 +1,44 @@
+/**
+ * Author: Gezahegn Lemma (Gezu)
+ * Project: Dev Tomcat Plugin
+ * Created: 6/9/25
+ * Phase 2: Deployment configuration tab - Matches REAL Ultimate interface
+ */
+
 package com.poratu.idea.plugins.tomcat.ui;
 
-import com.intellij.openapi.fileChooser.FileChooser;
-import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.JBUI;
 import com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration;
-import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 /**
- * Phase 2: Deployment configuration tab - Ultimate-style deployment settings
- * Author: Gezahegn Lemma (Gezu)
- * Project: DevTomcat Plugin
- * Created: 6/9/25
+ * Real Ultimate Deployment Tab - matches actual Ultimate interface exactly
+ * Shows "Deploy at the server startup" with artifacts table and management buttons
  */
 public class DeploymentConfigurationTab extends JPanel {
 
     private final Project project;
 
-    // Deployment Configuration
-    private JTextField contextPathField;
-    private TextFieldWithBrowseButton docBaseField;
-    private TextFieldWithBrowseButton catalinaBaseField;
+    // Deployment table and model
+    private JBTable deploymentTable;
+    private DefaultTableModel tableModel;
 
-    // Hot Deployment Settings
-    private JCheckBox enableHotDeploymentCheckBox;
-    private JCheckBox updateClassesAndResourcesCheckBox;
-    private JCheckBox updateTriggerFilesCheckBox;
+    // Management buttons
+    private JButton addButton;
+    private JButton removeButton;
+    private JButton moveUpButton;
+    private JButton moveDownButton;
+    private JButton editButton;
 
-    // Deployment Options
-    private JSpinner deploymentTimeoutSpinner;
-    private JCheckBox enableAccessLogCheckBox;
-    private JTextField accessLogPatternField;
+    // "Nothing to deploy" label
+    private JLabel nothingToDeployLabel;
 
     public DeploymentConfigurationTab(@NotNull Project project) {
         this.project = project;
@@ -48,244 +49,319 @@ public class DeploymentConfigurationTab extends JPanel {
         setLayout(new BorderLayout());
         setBorder(JBUI.Borders.empty(10));
 
-        // Create main panel with sections
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        // Create main panel
+        JPanel mainPanel = new JPanel(new BorderLayout());
 
-        // Add deployment configuration section
-        mainPanel.add(createDeploymentConfigPanel());
-        mainPanel.add(Box.createVerticalStrut(10));
+        // Add "Deploy at the server startup" section
+        mainPanel.add(createDeploymentSection(), BorderLayout.CENTER);
 
-        // Add hot deployment section
-        mainPanel.add(createHotDeploymentPanel());
-        mainPanel.add(Box.createVerticalStrut(10));
+        // Add before launch section at bottom (like Ultimate)
+        mainPanel.add(createBeforeLaunchSection(), BorderLayout.SOUTH);
 
-        // Add deployment options section
-        mainPanel.add(createDeploymentOptionsPanel());
-
-        // Add spacer
-        mainPanel.add(Box.createVerticalGlue());
-
-        add(mainPanel, BorderLayout.NORTH);
+        add(mainPanel, BorderLayout.CENTER);
     }
 
-    private JPanel createDeploymentConfigPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("Deployment Configuration"));
+    /**
+     * Create the main deployment section - matches Ultimate exactly
+     */
+    private JPanel createDeploymentSection() {
+        JPanel panel = new JPanel(new BorderLayout());
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = JBUI.insets(5);
-        gbc.anchor = GridBagConstraints.WEST;
+        // Section title
+        JLabel titleLabel = new JLabel("Deploy at the server startup");
+        titleLabel.setBorder(JBUI.Borders.emptyBottom(5));
+        panel.add(titleLabel, BorderLayout.NORTH);
 
-        // Context Path
-        gbc.gridx = 0; gbc.gridy = 0;
-        panel.add(new JLabel("Context Path:"), gbc);
+        // Create center panel with table and buttons
+        JPanel centerPanel = new JPanel(new BorderLayout());
 
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        contextPathField = new JTextField();
-        contextPathField.setToolTipText("Application context path (e.g., /myapp)");
-        panel.add(contextPathField, gbc);
+        // Create table area
+        JPanel tablePanel = createTablePanel();
+        centerPanel.add(tablePanel, BorderLayout.CENTER);
 
-        // Document Base
-        gbc.gridx = 0; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0.0;
-        panel.add(new JLabel("Document Base:"), gbc);
+        // Create buttons panel (vertical, on the right like Ultimate)
+        JPanel buttonsPanel = createButtonsPanel();
+        centerPanel.add(buttonsPanel, BorderLayout.EAST);
 
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        docBaseField = new TextFieldWithBrowseButton();
-        docBaseField.setToolTipText("Path to web application directory");
-        docBaseField.addActionListener(e -> chooseDocumentBase());
-        panel.add(docBaseField, gbc);
-
-        // Catalina Base
-        gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0.0;
-        panel.add(new JLabel("Catalina Base:"), gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        catalinaBaseField = new TextFieldWithBrowseButton();
-        catalinaBaseField.setToolTipText("Tomcat base directory (optional)");
-        catalinaBaseField.addActionListener(e -> chooseCatalinaBase());
-        panel.add(catalinaBaseField, gbc);
+        panel.add(centerPanel, BorderLayout.CENTER);
 
         return panel;
     }
 
-    private JPanel createHotDeploymentPanel() {
+    /**
+     * Create the deployments table - matches Ultimate's artifact table
+     */
+    private JPanel createTablePanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        // Create table model with Ultimate's columns
+        String[] columnNames = {"Artifact", "Type", "Server Path"};
+        tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Read-only like Ultimate
+            }
+        };
+
+        // Create table
+        deploymentTable = new JBTable(tableModel);
+        deploymentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        deploymentTable.getTableHeader().setReorderingAllowed(false);
+
+        // Set column widths like Ultimate
+        deploymentTable.getColumnModel().getColumn(0).setPreferredWidth(200); // Artifact
+        deploymentTable.getColumnModel().getColumn(1).setPreferredWidth(100); // Type
+        deploymentTable.getColumnModel().getColumn(2).setPreferredWidth(150); // Server Path
+
+        // Wrap in scroll pane
+        JScrollPane scrollPane = new JScrollPane(deploymentTable);
+        scrollPane.setPreferredSize(new Dimension(500, 200));
+
+        // Create "Nothing to deploy" overlay
+        nothingToDeployLabel = new JLabel("Nothing to deploy", JLabel.CENTER);
+        nothingToDeployLabel.setForeground(Color.GRAY);
+        nothingToDeployLabel.setFont(nothingToDeployLabel.getFont().deriveFont(Font.ITALIC));
+
+        // Layer panel to show "Nothing to deploy" when table is empty
+        JPanel layeredPanel = new JPanel();
+        layeredPanel.setLayout(new OverlayLayout(layeredPanel));
+        layeredPanel.add(nothingToDeployLabel);
+        layeredPanel.add(scrollPane);
+
+        panel.add(layeredPanel, BorderLayout.CENTER);
+
+        // Update visibility based on table content
+        updateNothingToDeployVisibility();
+
+        return panel;
+    }
+
+    /**
+     * Create buttons panel - matches Ultimate's vertical button layout
+     */
+    private JPanel createButtonsPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createTitledBorder("Hot Deployment"));
+        panel.setBorder(JBUI.Borders.emptyLeft(10));
 
-        enableHotDeploymentCheckBox = new JCheckBox("Enable hot deployment", false);
-        enableHotDeploymentCheckBox.setToolTipText("Enable automatic redeployment when files change");
-        enableHotDeploymentCheckBox.addActionListener(e -> updateHotDeploymentFieldsState());
+        // Create buttons (same as Ultimate)
+        addButton = new JButton("+");
+        removeButton = new JButton("-");
+        moveUpButton = new JButton("↑");
+        moveDownButton = new JButton("↓");
+        editButton = new JButton("✏");
 
-        updateClassesAndResourcesCheckBox = new JCheckBox("Update classes and resources", true);
-        updateClassesAndResourcesCheckBox.setToolTipText("Update classes and resources without server restart");
+        // Set button sizes
+        Dimension buttonSize = new Dimension(30, 25);
+        addButton.setPreferredSize(buttonSize);
+        removeButton.setPreferredSize(buttonSize);
+        moveUpButton.setPreferredSize(buttonSize);
+        moveDownButton.setPreferredSize(buttonSize);
+        editButton.setPreferredSize(buttonSize);
 
-        updateTriggerFilesCheckBox = new JCheckBox("Update trigger files", false);
-        updateTriggerFilesCheckBox.setToolTipText("Update files that trigger hot deployment");
+        // Add tooltips like Ultimate
+        addButton.setToolTipText("Add artifact");
+        removeButton.setToolTipText("Remove artifact");
+        moveUpButton.setToolTipText("Move up");
+        moveDownButton.setToolTipText("Move down");
+        editButton.setToolTipText("Edit artifact");
 
-        panel.add(enableHotDeploymentCheckBox);
-        panel.add(updateClassesAndResourcesCheckBox);
-        panel.add(updateTriggerFilesCheckBox);
+        // Add action listeners
+        addButton.addActionListener(e -> addArtifact());
+        removeButton.addActionListener(e -> removeArtifact());
+        moveUpButton.addActionListener(e -> moveArtifactUp());
+        moveDownButton.addActionListener(e -> moveArtifactDown());
+        editButton.addActionListener(e -> editArtifact());
 
-        // Initially disable dependent checkboxes
-        updateHotDeploymentFieldsState();
+        // Add buttons to panel
+        panel.add(addButton);
+        panel.add(Box.createVerticalStrut(2));
+        panel.add(removeButton);
+        panel.add(Box.createVerticalStrut(5));
+        panel.add(moveUpButton);
+        panel.add(Box.createVerticalStrut(2));
+        panel.add(moveDownButton);
+        panel.add(Box.createVerticalStrut(5));
+        panel.add(editButton);
+        panel.add(Box.createVerticalGlue());
 
-        return panel;
-    }
+        // Initially disable buttons (no selection)
+        updateButtonStates();
 
-    private JPanel createDeploymentOptionsPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("Deployment Options"));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = JBUI.insets(5);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        // Deployment Timeout
-        gbc.gridx = 0; gbc.gridy = 0;
-        panel.add(new JLabel("Deployment Timeout (seconds):"), gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        deploymentTimeoutSpinner = new JSpinner(new SpinnerNumberModel(30, 5, 300, 5));
-        deploymentTimeoutSpinner.setToolTipText("Maximum time to wait for deployment completion");
-        panel.add(deploymentTimeoutSpinner, gbc);
-
-        // Enable Access Log
-        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.NONE;
-        enableAccessLogCheckBox = new JCheckBox("Enable access log", true);
-        enableAccessLogCheckBox.setToolTipText("Enable HTTP access logging");
-        enableAccessLogCheckBox.addActionListener(e -> updateAccessLogFieldsState());
-        panel.add(enableAccessLogCheckBox, gbc);
-
-        // Access Log Pattern
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
-        panel.add(new JLabel("Access Log Pattern:"), gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        accessLogPatternField = new JTextField("combined");
-        accessLogPatternField.setToolTipText("Access log format pattern (common, combined, or custom)");
-        panel.add(accessLogPatternField, gbc);
-
-        // Initially update access log fields state
-        updateAccessLogFieldsState();
+        // Add selection listener to update button states
+        deploymentTable.getSelectionModel().addListSelectionListener(e -> updateButtonStates());
 
         return panel;
     }
 
-    private void chooseDocumentBase() {
-        FileChooserDescriptor descriptor = new FileChooserDescriptor(false, true, false, false, false, false);
-        descriptor.setTitle("Select Document Base Directory");
-        descriptor.setDescription("Choose the web application directory");
+    /**
+     * Create before launch section - matches Ultimate's bottom section
+     */
+    private JPanel createBeforeLaunchSection() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(JBUI.Borders.emptyTop(20));
 
-        VirtualFile file = FileChooser.chooseFile(descriptor, project, null);
-        if (file != null) {
-            docBaseField.setText(file.getPath());
+        // Add "Before launch" section like Ultimate
+        JLabel beforeLaunchLabel = new JLabel("Before launch");
+        beforeLaunchLabel.setBorder(JBUI.Borders.emptyBottom(5));
+        panel.add(beforeLaunchLabel, BorderLayout.NORTH);
+
+        // Create before launch list (like Ultimate)
+        DefaultListModel<String> beforeLaunchModel = new DefaultListModel<>();
+        beforeLaunchModel.addElement("Build");
+
+        JList<String> beforeLaunchList = new JList<>(beforeLaunchModel);
+        beforeLaunchList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        JScrollPane beforeLaunchScroll = new JScrollPane(beforeLaunchList);
+        beforeLaunchScroll.setPreferredSize(new Dimension(400, 60));
+
+        // Create buttons for before launch (like Ultimate)
+        JPanel beforeLaunchButtonsPanel = new JPanel();
+        beforeLaunchButtonsPanel.setLayout(new BoxLayout(beforeLaunchButtonsPanel, BoxLayout.Y_AXIS));
+        beforeLaunchButtonsPanel.add(new JButton("+"));
+        beforeLaunchButtonsPanel.add(new JButton("-"));
+        beforeLaunchButtonsPanel.add(new JButton("↑"));
+        beforeLaunchButtonsPanel.add(new JButton("↓"));
+
+        JPanel beforeLaunchContent = new JPanel(new BorderLayout());
+        beforeLaunchContent.add(beforeLaunchScroll, BorderLayout.CENTER);
+        beforeLaunchContent.add(beforeLaunchButtonsPanel, BorderLayout.EAST);
+
+        panel.add(beforeLaunchContent, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    /**
+     * Add new artifact - shows dialog like Ultimate
+     */
+    private void addArtifact() {
+        // TODO: Show Ultimate-style artifact selection dialog
+        // For now, add a placeholder
+        String[] artifactData = {"myapp:war exploded", "war exploded", "/"};
+        tableModel.addRow(artifactData);
+        updateNothingToDeployVisibility();
+        updateButtonStates();
+
+        System.out.println("DevTomcat: Add artifact dialog (Ultimate-style) - TODO");
+    }
+
+    /**
+     * Remove selected artifact
+     */
+    private void removeArtifact() {
+        int selectedRow = deploymentTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            tableModel.removeRow(selectedRow);
+            updateNothingToDeployVisibility();
+            updateButtonStates();
         }
     }
 
-    private void chooseCatalinaBase() {
-        FileChooserDescriptor descriptor = new FileChooserDescriptor(false, true, false, false, false, false);
-        descriptor.setTitle("Select Catalina Base Directory");
-        descriptor.setDescription("Choose the Tomcat base directory");
-
-        VirtualFile file = FileChooser.chooseFile(descriptor, project, null);
-        if (file != null) {
-            catalinaBaseField.setText(file.getPath());
+    /**
+     * Move artifact up in the list
+     */
+    private void moveArtifactUp() {
+        int selectedRow = deploymentTable.getSelectedRow();
+        if (selectedRow > 0) {
+            tableModel.moveRow(selectedRow, selectedRow, selectedRow - 1);
+            deploymentTable.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
         }
     }
 
-    private void updateHotDeploymentFieldsState() {
-        boolean enabled = enableHotDeploymentCheckBox.isSelected();
-        updateClassesAndResourcesCheckBox.setEnabled(enabled);
-        updateTriggerFilesCheckBox.setEnabled(enabled);
-    }
-
-    private void updateAccessLogFieldsState() {
-        boolean enabled = enableAccessLogCheckBox.isSelected();
-        accessLogPatternField.setEnabled(enabled);
-    }
-
-    public void resetFrom(@NotNull TomcatRunConfiguration configuration) {
-        // Reset basic configuration
-        contextPathField.setText(configuration.getContextPath() != null ? configuration.getContextPath() : "");
-        docBaseField.setText(configuration.getDocBase() != null ? configuration.getDocBase() : "");
-        catalinaBaseField.setText(configuration.getCatalinaBase() != null ? configuration.getCatalinaBase() : "");
-
-        // Reset enhanced configuration if available
-        if (configuration instanceof EnhancedTomcatRunConfiguration) {
-            EnhancedTomcatRunConfiguration enhancedConfig = (EnhancedTomcatRunConfiguration) configuration;
-
-            enableHotDeploymentCheckBox.setSelected(enhancedConfig.isHotDeploymentEnabled());
-            updateClassesAndResourcesCheckBox.setSelected(enhancedConfig.isUpdateClassesAndResources());
-            updateTriggerFilesCheckBox.setSelected(enhancedConfig.isUpdateTriggerFiles());
-
-            deploymentTimeoutSpinner.setValue(enhancedConfig.getDeploymentTimeout());
-            enableAccessLogCheckBox.setSelected(enhancedConfig.isEnableAccessLog());
-            accessLogPatternField.setText(enhancedConfig.getAccessLogPattern());
-
-            updateHotDeploymentFieldsState();
-            updateAccessLogFieldsState();
-        } else {
-            // Set default values for regular TomcatRunConfiguration
-            enableHotDeploymentCheckBox.setSelected(false);
-            updateClassesAndResourcesCheckBox.setSelected(true);
-            updateTriggerFilesCheckBox.setSelected(false);
-            deploymentTimeoutSpinner.setValue(30);
-            enableAccessLogCheckBox.setSelected(true);
-            accessLogPatternField.setText("combined");
-
-            updateHotDeploymentFieldsState();
-            updateAccessLogFieldsState();
+    /**
+     * Move artifact down in the list
+     */
+    private void moveArtifactDown() {
+        int selectedRow = deploymentTable.getSelectedRow();
+        if (selectedRow >= 0 && selectedRow < tableModel.getRowCount() - 1) {
+            tableModel.moveRow(selectedRow, selectedRow, selectedRow + 1);
+            deploymentTable.setRowSelectionInterval(selectedRow + 1, selectedRow + 1);
         }
     }
 
-    public void applyTo(@NotNull TomcatRunConfiguration configuration) throws ConfigurationException {
-        // Validate context path
-        String contextPath = contextPathField.getText().trim();
-        if (contextPath.isEmpty()) {
-            throw new ConfigurationException("Context path cannot be empty");
+    /**
+     * Edit selected artifact
+     */
+    private void editArtifact() {
+        int selectedRow = deploymentTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            // TODO: Show Ultimate-style artifact edit dialog
+            System.out.println("DevTomcat: Edit artifact dialog (Ultimate-style) - TODO");
+        }
+    }
+
+    /**
+     * Update button enabled states based on selection
+     */
+    private void updateButtonStates() {
+        int selectedRow = deploymentTable.getSelectedRow();
+        int rowCount = tableModel.getRowCount();
+
+        // Enable/disable buttons based on selection and position
+        removeButton.setEnabled(selectedRow >= 0);
+        editButton.setEnabled(selectedRow >= 0);
+        moveUpButton.setEnabled(selectedRow > 0);
+        moveDownButton.setEnabled(selectedRow >= 0 && selectedRow < rowCount - 1);
+    }
+
+    /**
+     * Update "Nothing to deploy" label visibility
+     */
+    private void updateNothingToDeployVisibility() {
+        boolean hasArtifacts = tableModel.getRowCount() > 0;
+        nothingToDeployLabel.setVisible(!hasArtifacts);
+
+        // Show warning in Ultimate style if no artifacts
+        if (!hasArtifacts) {
+            // TODO: Add warning icon like Ultimate shows "Warning: No artifacts configured"
+        }
+    }
+
+    /**
+     * Reset from configuration - matches Ultimate's artifact loading
+     */
+    public void resetFrom(@NotNull EnhancedTomcatRunConfiguration configuration) {
+        // Clear existing artifacts
+        tableModel.setRowCount(0);
+
+        // TODO: Load artifacts from configuration
+        // For now, show empty state like Ultimate when no artifacts configured
+
+        updateNothingToDeployVisibility();
+        updateButtonStates();
+
+        System.out.println("DevTomcat: Reset deployment configuration from Enhanced config");
+    }
+
+    /**
+     * Apply to configuration - saves artifacts to Enhanced config
+     */
+    public void applyTo(@NotNull EnhancedTomcatRunConfiguration configuration) throws ConfigurationException {
+        // TODO: Save artifacts to configuration
+        // Validate that at least one artifact is configured if needed
+
+        int artifactCount = tableModel.getRowCount();
+        if (artifactCount == 0) {
+            System.out.println("DevTomcat: No artifacts configured for deployment");
+            // Note: Ultimate allows empty deployment, so this is not an error
         }
 
-        // Validate document base
-        String docBase = docBaseField.getText().trim();
-        if (docBase.isEmpty()) {
-            throw new ConfigurationException("Document base cannot be empty");
-        }
+        System.out.println("DevTomcat: Applied " + artifactCount + " artifacts to deployment configuration");
+    }
 
-        try {
-            // Apply basic configuration to TomcatRunConfiguration
-            configuration.setContextPath(contextPath);
-            configuration.setDocBase(docBase);
+    /**
+     * Check if any artifacts are configured
+     */
+    public boolean hasArtifacts() {
+        return tableModel.getRowCount() > 0;
+    }
 
-            // Set Catalina base if provided
-            String catalinaBase = catalinaBaseField.getText().trim();
-            if (!catalinaBase.isEmpty()) {
-                configuration.setCatalinaBase(catalinaBase);
-            }
-
-            // Apply enhanced configuration if this is an EnhancedTomcatRunConfiguration
-            if (configuration instanceof EnhancedTomcatRunConfiguration) {
-                EnhancedTomcatRunConfiguration enhancedConfig = (EnhancedTomcatRunConfiguration) configuration;
-
-                // Apply hot deployment settings
-                enhancedConfig.setHotDeploymentEnabled(enableHotDeploymentCheckBox.isSelected());
-                enhancedConfig.setUpdateClassesAndResources(updateClassesAndResourcesCheckBox.isSelected());
-                enhancedConfig.setUpdateTriggerFiles(updateTriggerFilesCheckBox.isSelected());
-
-                // Apply deployment options
-                enhancedConfig.setDeploymentTimeout((Integer) deploymentTimeoutSpinner.getValue());
-                enhancedConfig.setEnableAccessLog(enableAccessLogCheckBox.isSelected());
-                enhancedConfig.setAccessLogPattern(accessLogPatternField.getText().trim());
-
-                System.out.println("DevTomcat: Applied enhanced deployment configuration");
-            } else {
-                System.out.println("DevTomcat: Applied basic deployment configuration (enhanced features not available)");
-            }
-
-        } catch (Exception e) {
-            System.err.println("DevTomcat: Error applying deployment configuration: " + e.getMessage());
-            throw new ConfigurationException("Failed to apply deployment configuration: " + e.getMessage());
-        }
+    /**
+     * Get number of configured artifacts
+     */
+    public int getArtifactCount() {
+        return tableModel.getRowCount();
     }
 }

@@ -1,76 +1,25 @@
 <idea-plugin>
-    <id>com.poratu.idea.plugins.tomcat</id>
     <name>DevTomcat</name>
-    <vendor email="gezahegn.lemma@example.com">Gezahegn Lemma (Gezu)</vendor>
-    <version>1.0.0</version>
+    <vendor email="zengkid@msn.com">zengkid</vendor>
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="193.5233.102"/>
 
-    <description><![CDATA[
-    <h3>DevTomcat - Enhanced Tomcat Integration</h3>
-    <p>Professional Tomcat plugin bringing Ultimate-like features to IntelliJ Community Edition:</p>
-    <ul>
-        <li><strong>Enhanced Deployment Logging</strong> - Real-time deployment progress with Ultimate-style messages</li>
-        <li><strong>Intelligent Process Monitoring</strong> - Smart log parsing and deployment detection</li>
-        <li><strong>Professional Console Output</strong> - Structured logging with timestamps and status indicators</li>
-        <li><strong>Development Mode Optimizations</strong> - Hot deployment and enhanced debugging support</li>
-        <li><strong>Multi-Project Support</strong> - Spring Boot, Maven, and Gradle project detection</li>
-    </ul>
-    <p>Perfect for JSP, Spring Boot, and enterprise Java development.</p>
-    ]]></description>
-
-    <change-notes><![CDATA[
-    <h3>Version 1.0.0 - DevTomcat Launch</h3>
-    <ul>
-        <li>Enhanced deployment logging with Ultimate-style messages</li>
-        <li>Real-time deployment progress monitoring</li>
-        <li>Intelligent Tomcat log parsing and analysis</li>
-        <li>Professional deployment status feedback</li>
-        <li>Smart project type detection (Spring Boot, Maven, Gradle)</li>
-        <li>Development mode optimizations for faster workflows</li>
-    </ul>
-    ]]></change-notes>
-
-    <!-- Compatible with IntelliJ IDEA 2019.3+ -->
-    <idea-version since-build="193.5233" until-build="241.*"/>
-
-    <!-- Dependencies -->
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
     <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Core DevTomcat Extensions -->
+        <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable" />
         <applicationService serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState"/>
-
-        <!-- Run Configuration Support -->
         <configurationType implementation="com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType"/>
         <runConfigurationProducer implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunConfigurationProducer"/>
-
-        <!-- DevTomcat Registry Keys -->
-        <registryKey key="devTomcat.disableRunConfigurationProducer"
-                     description="If enabled, the DevTomcat run configuration producer will be disabled."
-                     defaultValue="false"
-                     restartRequired="false" />
-
-        <registryKey key="devTomcat.enableDeploymentLogging"
-                     description="Enable enhanced deployment logging with Ultimate-style messages."
-                     defaultValue="true"
-                     restartRequired="false" />
-
-        <registryKey key="devTomcat.developmentMode"
-                     description="Enable development mode optimizations (hot deployment, enhanced debugging)."
-                     defaultValue="true"
-                     restartRequired="false" />
-
-        <registryKey key="devTomcat.resources.allowLinking"
-                     description="If enabled, symlinks will be allowed inside the web application, pointing to resources inside or outside the web application base path."
-                     defaultValue="false"
-                     restartRequired="false" />
-
-        <registryKey key="devTomcat.resources.cacheMaxSize"
-                     description="The maximum size of the static resource cache in kilobytes."
-                     defaultValue="10240"
-                     restartRequired="false" />
+        <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunner"/>
+        <programRunner implementation="com.poratu.idea.plugins.tomcat.runner.TomcatDebugger"/>
+        <registryKey key="smartTomcat.disableRunConfigurationProducer" description="If enabled, the run configuration producer will be disabled." defaultValue="false" restartRequired="false" />
+        <registryKey key="smartTomcat.resources.allowLinking" description="If enabled, symlinks will be allowed inside the web application, pointing to resources inside or outside the web application base path." defaultValue="false" restartRequired="false" />
+        <registryKey key="smartTomcat.resources.cacheMaxSize" description="The maximum size of the static resource cache in kilobytes." defaultValue="10240" restartRequired="false" />
     </extensions>
 
-    <actions>
-        <!-- Future: DevTomcat-specific actions can be added here -->
-    </actions>
+    <actions/>
+
 </idea-plugin>

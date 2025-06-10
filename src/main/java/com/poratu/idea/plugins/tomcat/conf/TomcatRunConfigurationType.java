@@ -114,8 +114,8 @@ public class TomcatRunConfigurationType implements ConfigurationType {
         public @NotNull RunConfiguration createConfiguration(@Nullable String name, @NotNull RunConfiguration template) {
             if (template instanceof EnhancedTomcatRunConfiguration) {
                 return ((EnhancedTomcatRunConfiguration) template).clone();
-            } else if (template instanceof TomcatRunConfiguration) {
-                return ((TomcatRunConfiguration) template).clone();
+            } else if (template instanceof EnhancedTomcatRunConfiguration) {
+                return ((EnhancedTomcatRunConfiguration) template).clone();
             }
             return createTemplateConfiguration(template.getProject());
         }

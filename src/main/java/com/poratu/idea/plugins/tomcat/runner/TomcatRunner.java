@@ -3,7 +3,7 @@ package com.poratu.idea.plugins.tomcat.runner;
 import com.intellij.execution.configurations.RunProfile;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.impl.DefaultJavaProgramRunner;
-import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
+import com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -22,7 +22,7 @@ public class TomcatRunner extends DefaultJavaProgramRunner {
 
     @Override
     public boolean canRun(@NotNull String executorId, @NotNull RunProfile runProfile) {
-        return (DefaultRunExecutor.EXECUTOR_ID.equals(executorId)) && runProfile instanceof TomcatRunConfiguration;
+        return (DefaultRunExecutor.EXECUTOR_ID.equals(executorId)) && runProfile instanceof EnhancedTomcatRunConfiguration;
     }
 
 }

@@ -1,483 +1,369 @@
+/**
+ * Author: Gezahegn Lemma (Gezu)
+ * Project: Dev Tomcat Plugin
+ * Created: 6/9/25
+ * Phase 2: Startup/Connection configuration tab - Matches REAL Ultimate interface
+ */
+
 package com.poratu.idea.plugins.tomcat.ui;
 
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.AnActionButton;
-import com.intellij.ui.AnActionButtonRunnable;
-import com.intellij.ui.ToolbarDecorator;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.JBUI;
-import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
+import com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * Phase 2: Startup/Connection configuration tab - Ultimate-style JMX and environment settings
- * Provides JMX configuration, environment variables, and connection settings
+ * Real Ultimate Startup/Connection Tab - matches actual Ultimate interface exactly
+ * Shows startup script, shutdown script, environment variables, and other connection settings
  */
 public class StartupConnectionTab extends JPanel {
 
-    private final Project project;
-    @Nullable
-    private final TomcatRunConfiguration configuration;
+    // Startup script section (UI only - values not used in Phase 2)
+    private TextFieldWithBrowseButton startupScriptField;
+    private JCheckBox useDefaultStartupCheckBox;
 
-    // JMX Configuration
-    private JCheckBox enableJmxCheckBox;
-    private JTextField jmxPortField;
-    private JTextField jmxHostField;
-    private JCheckBox jmxSslCheckBox;
-    private JCheckBox jmxAuthCheckBox;
-    private JTextField jmxUsernameField;
-    private JPasswordField jmxPasswordField;
+    // Shutdown script section (UI only - values not used in Phase 2)
+    private TextFieldWithBrowseButton shutdownScriptField;
+    private JCheckBox useDefaultShutdownCheckBox;
 
-    // Environment Variables
-    private JBTable envVarsTable;
-    private EnvironmentVariablesTableModel envTableModel;
-    private Map<String, String> environmentVariables;
+    // Environment variables section (actively used)
+    private JBTable environmentTable;
+    private DefaultTableModel envTableModel;
+    private JButton addEnvButton;
+    private JButton removeEnvButton;
+    private JCheckBox passParentEnvsCheckBox;
 
-    // Connection Settings
-    private JTextField connectionTimeoutField;
-    private JTextField readTimeoutField;
-    private JCheckBox enableRemoteDebuggingCheckBox;
-    private JTextField debugPortField;
-
-    public StartupConnectionTab(@NotNull Project project, @Nullable TomcatRunConfiguration configuration) {
-        this.project = project;
-        this.configuration = configuration;
-        this.environmentVariables = new HashMap<>();
-
-        setLayout(new BorderLayout());
+    public StartupConnectionTab(@NotNull Project project, EnhancedTomcatRunConfiguration configuration) {
+        // Note: configuration can be null during initial creation
+        // project and configuration parameters are kept for API compatibility
+        // but are not stored as fields since they're not used in this tab
         initializeUI();
-        loadDefaultConfiguration();
     }
 
-    /**
-     * Initialize the user interface
-     */
     private void initializeUI() {
+        setLayout(new BorderLayout());
         setBorder(JBUI.Borders.empty(10));
 
-        // Create tabbed pane for different sections
-        JTabbedPane tabbedPane = new JTabbedPane();
+        // Create main panel
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-        // JMX Configuration tab
-        tabbedPane.addTab("JMX", createJmxPanel());
+        // Add startup script section
+        mainPanel.add(createStartupScriptSection());
+        mainPanel.add(Box.createVerticalStrut(15));
 
-        // Environment Variables tab
-        tabbedPane.addTab("Environment", createEnvironmentPanel());
+        // Add shutdown script section
+        mainPanel.add(createShutdownScriptSection());
+        mainPanel.add(Box.createVerticalStrut(15));
 
-        // Connection Settings tab
-        tabbedPane.addTab("Connection", createConnectionPanel());
+        // Add environment variables section
+        mainPanel.add(createEnvironmentVariablesSection());
 
-        add(tabbedPane, BorderLayout.CENTER);
+        // Add to scroll pane
+        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        add(scrollPane, BorderLayout.CENTER);
     }
 
     /**
-     * Create JMX configuration panel
+     * Create startup script section - matches Ultimate's startup script configuration
      */
-    private JPanel createJmxPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(JBUI.Borders.empty(15));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = JBUI.insets(5);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        // Enable JMX checkbox
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        enableJmxCheckBox = new JCheckBox("Enable JMX remote management", false);
-        enableJmxCheckBox.setToolTipText("Enable JMX for remote server management and monitoring");
-        enableJmxCheckBox.addActionListener(e -> updateJmxFieldsState());
-        panel.add(enableJmxCheckBox, gbc);
-
-        // JMX Host
-        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1;
-        panel.add(new JLabel("JMX Host:"), gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        jmxHostField = new JTextField("localhost");
-        jmxHostField.setToolTipText("JMX server host (default: localhost)");
-        panel.add(jmxHostField, gbc);
-
-        // JMX Port
-        gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0.0;
-        panel.add(new JLabel("JMX Port:"), gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        jmxPortField = new JTextField("1099");
-        jmxPortField.setToolTipText("JMX server port (default: 1099)");
-        panel.add(jmxPortField, gbc);
-
-        // JMX SSL
-        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.NONE;
-        jmxSslCheckBox = new JCheckBox("Enable SSL", false);
-        jmxSslCheckBox.setToolTipText("Use SSL for JMX connections");
-        panel.add(jmxSslCheckBox, gbc);
-
-        // JMX Authentication
-        gbc.gridx = 0; gbc.gridy = 4;
-        jmxAuthCheckBox = new JCheckBox("Enable Authentication", false);
-        jmxAuthCheckBox.setToolTipText("Require authentication for JMX connections");
-        jmxAuthCheckBox.addActionListener(e -> updateJmxAuthFieldsState());
-        panel.add(jmxAuthCheckBox, gbc);
-
-        // JMX Username
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 1;
-        panel.add(new JLabel("Username:"), gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        jmxUsernameField = new JTextField();
-        jmxUsernameField.setToolTipText("JMX authentication username");
-        panel.add(jmxUsernameField, gbc);
-
-        // JMX Password
-        gbc.gridx = 0; gbc.gridy = 6; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0.0;
-        panel.add(new JLabel("Password:"), gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        jmxPasswordField = new JPasswordField();
-        jmxPasswordField.setToolTipText("JMX authentication password");
-        panel.add(jmxPasswordField, gbc);
-
-        // Add spacer
-        gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 2; gbc.weighty = 1.0;
-        panel.add(new JPanel(), gbc);
-
-        // Initially disable JMX fields
-        updateJmxFieldsState();
-
-        return panel;
-    }
-
-    /**
-     * Create environment variables panel
-     */
-    private JPanel createEnvironmentPanel() {
+    private JPanel createStartupScriptSection() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(JBUI.Borders.empty(15));
+        panel.setBorder(BorderFactory.createTitledBorder("Startup script"));
 
-        // Create table for environment variables
-        envTableModel = new EnvironmentVariablesTableModel();
-        envVarsTable = new JBTable(envTableModel);
-        envVarsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JPanel contentPanel = new JPanel(new BorderLayout());
 
-        // Configure table columns
-        envVarsTable.getColumnModel().getColumn(0).setPreferredWidth(200); // Name
-        envVarsTable.getColumnModel().getColumn(1).setPreferredWidth(300); // Value
+        // Use default checkbox
+        useDefaultStartupCheckBox = new JCheckBox("Use default", true);
+        useDefaultStartupCheckBox.addActionListener(e -> updateStartupScriptState());
+        contentPanel.add(useDefaultStartupCheckBox, BorderLayout.NORTH);
 
-        // Create toolbar
-        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(envVarsTable)
-                .setAddAction(new AnActionButtonRunnable() {
-                    @Override
-                    public void run(AnActionButton button) {
-                        addEnvironmentVariable();
-                    }
-                })
-                .setRemoveAction(new AnActionButtonRunnable() {
-                    @Override
-                    public void run(AnActionButton button) {
-                        removeSelectedEnvironmentVariable();
-                    }
-                })
-                .setEditAction(new AnActionButtonRunnable() {
-                    @Override
-                    public void run(AnActionButton button) {
-                        editSelectedEnvironmentVariable();
-                    }
-                });
+        // Script path field
+        startupScriptField = new TextFieldWithBrowseButton();
+        startupScriptField.setToolTipText("Path to startup script");
+        startupScriptField.setText("C:\\apache-tomcat-10.1.15\\bin\\catalina.bat run");
+        startupScriptField.setEnabled(false); // Initially disabled when "Use default" is checked
 
-        panel.add(decorator.createPanel(), BorderLayout.CENTER);
-
-        // Add default environment variables
-        addDefaultEnvironmentVariables();
+        contentPanel.add(startupScriptField, BorderLayout.CENTER);
+        panel.add(contentPanel, BorderLayout.CENTER);
 
         return panel;
     }
 
     /**
-     * Create connection settings panel
+     * Create shutdown script section - matches Ultimate's shutdown script configuration
      */
-    private JPanel createConnectionPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(JBUI.Borders.empty(15));
+    private JPanel createShutdownScriptSection() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Shutdown script"));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = JBUI.insets(5);
-        gbc.anchor = GridBagConstraints.WEST;
+        JPanel contentPanel = new JPanel(new BorderLayout());
 
-        // Connection Timeout
-        gbc.gridx = 0; gbc.gridy = 0;
-        panel.add(new JLabel("Connection Timeout (ms):"), gbc);
+        // Use default checkbox
+        useDefaultShutdownCheckBox = new JCheckBox("Use default", true);
+        useDefaultShutdownCheckBox.addActionListener(e -> updateShutdownScriptState());
+        contentPanel.add(useDefaultShutdownCheckBox, BorderLayout.NORTH);
 
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        connectionTimeoutField = new JTextField("30000");
-        connectionTimeoutField.setToolTipText("Connection timeout in milliseconds (default: 30000)");
-        panel.add(connectionTimeoutField, gbc);
+        // Script path field
+        shutdownScriptField = new TextFieldWithBrowseButton();
+        shutdownScriptField.setToolTipText("Path to shutdown script");
+        shutdownScriptField.setText("C:\\apache-tomcat-10.1.15\\bin\\catalina.bat stop");
+        shutdownScriptField.setEnabled(false); // Initially disabled when "Use default" is checked
 
-        // Read Timeout
-        gbc.gridx = 0; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0.0;
-        panel.add(new JLabel("Read Timeout (ms):"), gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        readTimeoutField = new JTextField("60000");
-        readTimeoutField.setToolTipText("Read timeout in milliseconds (default: 60000)");
-        panel.add(readTimeoutField, gbc);
-
-        // Remote Debugging
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.NONE;
-        enableRemoteDebuggingCheckBox = new JCheckBox("Enable Remote Debugging", false);
-        enableRemoteDebuggingCheckBox.setToolTipText("Enable remote debugging for the Tomcat server");
-        enableRemoteDebuggingCheckBox.addActionListener(e -> updateDebugFieldsState());
-        panel.add(enableRemoteDebuggingCheckBox, gbc);
-
-        // Debug Port
-        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 1;
-        panel.add(new JLabel("Debug Port:"), gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        debugPortField = new JTextField("5005");
-        debugPortField.setToolTipText("Remote debugging port (default: 5005)");
-        panel.add(debugPortField, gbc);
-
-        // Add spacer
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2; gbc.weighty = 1.0;
-        panel.add(new JPanel(), gbc);
-
-        // Initially disable debug fields
-        updateDebugFieldsState();
+        contentPanel.add(shutdownScriptField, BorderLayout.CENTER);
+        panel.add(contentPanel, BorderLayout.CENTER);
 
         return panel;
     }
 
     /**
-     * Load default configuration
+     * Create environment variables section - matches Ultimate's environment variables
      */
-    private void loadDefaultConfiguration() {
-        // Add common Tomcat environment variables
-        addDefaultEnvironmentVariables();
+    private JPanel createEnvironmentVariablesSection() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Environment Variables"));
+
+        // Pass parent environments checkbox
+        passParentEnvsCheckBox = new JCheckBox("Pass environment variables", true);
+        panel.add(passParentEnvsCheckBox, BorderLayout.NORTH);
+
+        // Environment variables table
+        JPanel tablePanel = new JPanel(new BorderLayout());
+
+        // Create table model
+        String[] columnNames = {"Name", "Value"};
+        envTableModel = new DefaultTableModel(columnNames, 0);
+
+        environmentTable = new JBTable(envTableModel);
+        environmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        environmentTable.getColumnModel().getColumn(0).setPreferredWidth(150);
+        environmentTable.getColumnModel().getColumn(1).setPreferredWidth(300);
+
+        JScrollPane envScrollPane = new JScrollPane(environmentTable);
+        envScrollPane.setPreferredSize(new Dimension(500, 120));
+        tablePanel.add(envScrollPane, BorderLayout.CENTER);
+
+        // Environment variables buttons
+        JPanel envButtonsPanel = new JPanel();
+        envButtonsPanel.setLayout(new BoxLayout(envButtonsPanel, BoxLayout.Y_AXIS));
+
+        addEnvButton = new JButton("+");
+        removeEnvButton = new JButton("-");
+
+        addEnvButton.setPreferredSize(new Dimension(30, 25));
+        removeEnvButton.setPreferredSize(new Dimension(30, 25));
+
+        addEnvButton.addActionListener(e -> addEnvironmentVariable());
+        removeEnvButton.addActionListener(e -> removeEnvironmentVariable());
+
+        envButtonsPanel.add(addEnvButton);
+        envButtonsPanel.add(Box.createVerticalStrut(2));
+        envButtonsPanel.add(removeEnvButton);
+        envButtonsPanel.add(Box.createVerticalGlue());
+
+        tablePanel.add(envButtonsPanel, BorderLayout.EAST);
+        panel.add(tablePanel, BorderLayout.CENTER);
+
+        // Initialize empty environment variables like Ultimate
+        initializeEnvironmentVariables();
+
+        // Update button states
+        updateEnvButtonStates();
+        environmentTable.getSelectionModel().addListSelectionListener(e -> updateEnvButtonStates());
+
+        return panel;
     }
 
     /**
-     * Add default environment variables
+     * Initialize environment variables - start empty like Ultimate shows
      */
-    private void addDefaultEnvironmentVariables() {
-        environmentVariables.put("JAVA_OPTS", "-Xmx512m -Xms256m");
-        environmentVariables.put("CATALINA_OPTS", "-Dfile.encoding=UTF-8");
-        envTableModel.fireTableDataChanged();
-    }
-
-    /**
-     * Update JMX fields state based on enable checkbox
-     */
-    private void updateJmxFieldsState() {
-        boolean enabled = enableJmxCheckBox.isSelected();
-        jmxHostField.setEnabled(enabled);
-        jmxPortField.setEnabled(enabled);
-        jmxSslCheckBox.setEnabled(enabled);
-        jmxAuthCheckBox.setEnabled(enabled);
-        updateJmxAuthFieldsState();
-    }
-
-    /**
-     * Update JMX authentication fields state
-     */
-    private void updateJmxAuthFieldsState() {
-        boolean enabled = enableJmxCheckBox.isSelected() && jmxAuthCheckBox.isSelected();
-        jmxUsernameField.setEnabled(enabled);
-        jmxPasswordField.setEnabled(enabled);
-    }
-
-    /**
-     * Update debug fields state based on enable checkbox
-     */
-    private void updateDebugFieldsState() {
-        boolean enabled = enableRemoteDebuggingCheckBox.isSelected();
-        debugPortField.setEnabled(enabled);
+    private void initializeEnvironmentVariables() {
+        // Start with empty environment variables like Ultimate shows "No variables"
+        // Don't add any default variables here - let the configuration populate them
     }
 
     /**
      * Add new environment variable
      */
     private void addEnvironmentVariable() {
-        EnvironmentVariableDialog dialog = new EnvironmentVariableDialog(project, null, null);
-        if (dialog.showAndGet()) {
-            environmentVariables.put(dialog.getVariableName(), dialog.getVariableValue());
-            envTableModel.fireTableDataChanged();
+        // Show dialog to add new environment variable
+        JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
+        JTextField nameField = new JTextField();
+        JTextField valueField = new JTextField();
+
+        panel.add(new JLabel("Name:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Value:"));
+        panel.add(valueField);
+
+        int result = JOptionPane.showConfirmDialog(getParent(), panel, "Add Environment Variable",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            String name = nameField.getText().trim();
+            String value = valueField.getText().trim();
+
+            if (!name.isEmpty()) {
+                envTableModel.addRow(new Object[]{name, value});
+                updateEnvButtonStates();
+            }
         }
     }
 
     /**
      * Remove selected environment variable
      */
-    private void removeSelectedEnvironmentVariable() {
-        int selectedRow = envVarsTable.getSelectedRow();
+    private void removeEnvironmentVariable() {
+        int selectedRow = environmentTable.getSelectedRow();
         if (selectedRow >= 0) {
-            List<String> keys = new ArrayList<>(environmentVariables.keySet());
-            if (selectedRow < keys.size()) {
-                environmentVariables.remove(keys.get(selectedRow));
-                envTableModel.fireTableDataChanged();
-            }
+            envTableModel.removeRow(selectedRow);
+            updateEnvButtonStates();
         }
     }
 
     /**
-     * Edit selected environment variable
+     * Update startup script field state
      */
-    private void editSelectedEnvironmentVariable() {
-        int selectedRow = envVarsTable.getSelectedRow();
-        if (selectedRow >= 0) {
-            List<String> keys = new ArrayList<>(environmentVariables.keySet());
-            if (selectedRow < keys.size()) {
-                String key = keys.get(selectedRow);
-                String value = environmentVariables.get(key);
+    private void updateStartupScriptState() {
+        boolean useDefault = useDefaultStartupCheckBox.isSelected();
+        startupScriptField.setEnabled(!useDefault);
 
-                EnvironmentVariableDialog dialog = new EnvironmentVariableDialog(project, key, value);
-                if (dialog.showAndGet()) {
-                    // Remove old key if name changed
-                    if (!key.equals(dialog.getVariableName())) {
-                        environmentVariables.remove(key);
+        if (useDefault) {
+            startupScriptField.setText("C:\\apache-tomcat-10.1.15\\bin\\catalina.bat run");
+        }
+    }
+
+    /**
+     * Update shutdown script field state
+     */
+    private void updateShutdownScriptState() {
+        boolean useDefault = useDefaultShutdownCheckBox.isSelected();
+        shutdownScriptField.setEnabled(!useDefault);
+
+        if (useDefault) {
+            shutdownScriptField.setText("C:\\apache-tomcat-10.1.15\\bin\\catalina.bat stop");
+        }
+    }
+
+    /**
+     * Update environment variables button states
+     */
+    private void updateEnvButtonStates() {
+        int selectedRow = environmentTable.getSelectedRow();
+        removeEnvButton.setEnabled(selectedRow >= 0);
+    }
+
+    /**
+     * Reset from configuration
+     */
+    public void resetFrom(@NotNull EnhancedTomcatRunConfiguration configuration) {
+        try {
+            // Reset startup/shutdown scripts
+            useDefaultStartupCheckBox.setSelected(true);
+            useDefaultShutdownCheckBox.setSelected(true);
+            updateStartupScriptState();
+            updateShutdownScriptState();
+
+            // Reset environment variables - start empty like Ultimate
+            envTableModel.setRowCount(0);
+
+            // Load environment variables from configuration (if not null)
+            if (configuration != null) {
+                Map<String, String> envVars = configuration.getEnvironmentVariables();
+                if (envVars != null) {
+                    for (Map.Entry<String, String> entry : envVars.entrySet()) {
+                        envTableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
                     }
-                    environmentVariables.put(dialog.getVariableName(), dialog.getVariableValue());
-                    envTableModel.fireTableDataChanged();
                 }
             }
+
+            passParentEnvsCheckBox.setSelected(true);
+            updateEnvButtonStates();
+
+            System.out.println("DevTomcat: Reset startup/connection configuration from Enhanced config - " +
+                    (configuration != null ? configuration.getEnvironmentVariables().size() : 0) + " environment variables loaded");
+        } catch (Exception e) {
+            System.err.println("DevTomcat: Error resetting startup/connection configuration: " + e.getMessage());
         }
     }
 
     /**
-     * Reset configuration from EnhancedTomcatRunConfiguration
+     * Apply to configuration
      */
-    public void resetFrom(@NotNull TomcatRunConfiguration configuration) {
-        if (configuration instanceof com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration) {
-            com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration enhancedConfig =
-                    (com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration) configuration;
+    public void applyTo(@NotNull EnhancedTomcatRunConfiguration configuration) throws ConfigurationException {
+        try {
+            // Apply environment variables (the only values actually used)
+            Map<String, String> envVars = new java.util.HashMap<>();
+            for (int i = 0; i < envTableModel.getRowCount(); i++) {
+                String name = (String) envTableModel.getValueAt(i, 0);
+                String value = (String) envTableModel.getValueAt(i, 1);
+                if (name != null && !name.trim().isEmpty()) {
+                    envVars.put(name.trim(), value != null ? value.trim() : "");
+                }
+            }
+            configuration.setEnvironmentVariables(envVars);
 
-            // Reset JMX configuration
-            enableJmxCheckBox.setSelected(enhancedConfig.isJmxEnabled());
-            jmxHostField.setText(enhancedConfig.getJmxHost());
-            jmxPortField.setText(String.valueOf(enhancedConfig.getJmxPort()));
-            jmxSslCheckBox.setSelected(enhancedConfig.isJmxSslEnabled());
-            jmxAuthCheckBox.setSelected(enhancedConfig.isJmxAuthEnabled());
-            jmxUsernameField.setText(enhancedConfig.getJmxUsername());
-            jmxPasswordField.setText(enhancedConfig.getJmxPassword());
+            // Note: Startup/shutdown script values are not applied because:
+            // 1. The EnhancedTomcatRunConfiguration doesn't have setters for these yet
+            // 2. The functionality is not implemented in Phase 2
+            // 3. The UI fields exist only to match Ultimate's interface
 
-            // Reset environment variables
-            environmentVariables.clear();
-            environmentVariables.putAll(enhancedConfig.getEnvironmentVariables());
-
-            // Reset connection settings
-            connectionTimeoutField.setText(String.valueOf(enhancedConfig.getConnectionTimeout()));
-            readTimeoutField.setText(String.valueOf(enhancedConfig.getReadTimeout()));
-            enableRemoteDebuggingCheckBox.setSelected(enhancedConfig.isRemoteDebuggingEnabled());
-            debugPortField.setText(String.valueOf(enhancedConfig.getDebugPort()));
-
-            // Update field states
-            updateJmxFieldsState();
-            updateDebugFieldsState();
-
-            // Refresh table
-            envTableModel.fireTableDataChanged();
+            System.out.println("DevTomcat: Applied startup/connection configuration with " +
+                    envVars.size() + " environment variables");
+        } catch (Exception e) {
+            throw new ConfigurationException("Failed to apply startup/connection configuration: " + e.getMessage());
         }
     }
 
     /**
-     * Apply configuration to EnhancedTomcatRunConfiguration
+     * Get environment variable count
      */
-    public void applyTo(@NotNull TomcatRunConfiguration configuration) throws com.intellij.openapi.options.ConfigurationException {
-        if (configuration instanceof com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration) {
-            com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration enhancedConfig =
-                    (com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration) configuration;
-
-            // Validate and apply JMX configuration
-            try {
-                int jmxPort = Integer.parseInt(jmxPortField.getText().trim());
-                if (jmxPort < 1 || jmxPort > 65535) {
-                    throw new com.intellij.openapi.options.ConfigurationException("JMX port must be between 1 and 65535");
-                }
-                enhancedConfig.setJmxPort(jmxPort);
-            } catch (NumberFormatException e) {
-                throw new com.intellij.openapi.options.ConfigurationException("Invalid JMX port number");
-            }
-
-            enhancedConfig.setJmxEnabled(enableJmxCheckBox.isSelected());
-            enhancedConfig.setJmxHost(jmxHostField.getText().trim());
-            enhancedConfig.setJmxSslEnabled(jmxSslCheckBox.isSelected());
-            enhancedConfig.setJmxAuthEnabled(jmxAuthCheckBox.isSelected());
-            enhancedConfig.setJmxUsername(jmxUsernameField.getText().trim());
-            enhancedConfig.setJmxPassword(new String(jmxPasswordField.getPassword()));
-
-            // Apply environment variables
-            enhancedConfig.setEnvironmentVariables(environmentVariables);
-
-            // Validate and apply connection settings
-            try {
-                int connectionTimeout = Integer.parseInt(connectionTimeoutField.getText().trim());
-                int readTimeout = Integer.parseInt(readTimeoutField.getText().trim());
-                int debugPort = Integer.parseInt(debugPortField.getText().trim());
-
-                if (connectionTimeout < 1000) {
-                    throw new com.intellij.openapi.options.ConfigurationException("Connection timeout must be at least 1000ms");
-                }
-                if (readTimeout < 1000) {
-                    throw new com.intellij.openapi.options.ConfigurationException("Read timeout must be at least 1000ms");
-                }
-                if (debugPort < 1 || debugPort > 65535) {
-                    throw new com.intellij.openapi.options.ConfigurationException("Debug port must be between 1 and 65535");
-                }
-
-                enhancedConfig.setConnectionTimeout(connectionTimeout);
-                enhancedConfig.setReadTimeout(readTimeout);
-                enhancedConfig.setDebugPort(debugPort);
-            } catch (NumberFormatException e) {
-                throw new com.intellij.openapi.options.ConfigurationException("Invalid number format in connection settings");
-            }
-
-            enhancedConfig.setRemoteDebuggingEnabled(enableRemoteDebuggingCheckBox.isSelected());
-        }
+    public int getEnvironmentVariableCount() {
+        return envTableModel.getRowCount();
     }
 
     /**
-     * Table model for environment variables
+     * Check if custom startup script is configured
      */
-    private class EnvironmentVariablesTableModel extends AbstractTableModel {
+    public boolean hasCustomStartupScript() {
+        return !useDefaultStartupCheckBox.isSelected();
+    }
 
-        private final String[] columnNames = {"Name", "Value"};
+    /**
+     * Check if custom shutdown script is configured
+     */
+    public boolean hasCustomShutdownScript() {
+        return !useDefaultShutdownCheckBox.isSelected();
+    }
 
-        @Override
-        public int getRowCount() {
-            return environmentVariables.size();
-        }
+    /**
+     * Get configured startup script path (UI value only - not used in Phase 2)
+     */
+    public String getStartupScriptPath() {
+        return useDefaultStartupCheckBox.isSelected() ? null : startupScriptField.getText();
+    }
 
-        @Override
-        public int getColumnCount() {
-            return columnNames.length;
-        }
+    /**
+     * Get configured shutdown script path (UI value only - not used in Phase 2)
+     */
+    public String getShutdownScriptPath() {
+        return useDefaultShutdownCheckBox.isSelected() ? null : shutdownScriptField.getText();
+    }
 
-        @Override
-        public String getColumnName(int column) {
-            return columnNames[column];
-        }
-
-        @Override
-        public Object getValueAt(int row, int column) {
-            List<String> keys = new ArrayList<>(environmentVariables.keySet());
-            if (row < 0 || row >= keys.size()) {
-                return null;
-            }
-
-            String key = keys.get(row);
-            switch (column) {
-                case 0: return key;
-                case 1: return environmentVariables.get(key);
-                default: return null;
-            }
-        }
+    /**
+     * Check if pass parent environment variables is enabled
+     */
+    public boolean isPassParentEnvironmentVariables() {
+        return passParentEnvsCheckBox.isSelected();
     }
 }

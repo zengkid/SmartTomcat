@@ -5,7 +5,7 @@ import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessListener;
 import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.openapi.util.Key;
-import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
+import com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.logging.TomcatDeploymentLogger;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 public class DevTomcatProcessHandler extends KillableColoredProcessHandler {
 
 	private final TomcatDeploymentLogger deploymentLogger;
-	private final TomcatRunConfiguration configuration;
+	private final EnhancedTomcatRunConfiguration configuration;
 	private final long processStartTime;
 
 	// Patterns for intelligent log parsing
@@ -43,7 +43,7 @@ public class DevTomcatProcessHandler extends KillableColoredProcessHandler {
 								   @NotNull String commandLine,
 								   @NotNull Charset charset,
 								   @NotNull TomcatDeploymentLogger deploymentLogger,
-								   @NotNull TomcatRunConfiguration configuration) {
+								   @NotNull EnhancedTomcatRunConfiguration configuration) {
 		super(process, commandLine, charset);
 		this.deploymentLogger = deploymentLogger;
 		this.configuration = configuration;
@@ -248,7 +248,7 @@ public class DevTomcatProcessHandler extends KillableColoredProcessHandler {
 	/**
 	 * Get configuration for external access
 	 */
-	public TomcatRunConfiguration getConfiguration() {
+	public EnhancedTomcatRunConfiguration getConfiguration() {
 		return configuration;
 	}
 

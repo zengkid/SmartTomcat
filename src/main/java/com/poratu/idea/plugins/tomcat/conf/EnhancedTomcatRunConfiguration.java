@@ -1,474 +1,528 @@
 package com.poratu.idea.plugins.tomcat.conf;
 
+import com.intellij.configurationStore.XmlSerializer;
 import com.intellij.execution.Executor;
-import com.intellij.execution.configurations.*;
+import com.intellij.execution.JavaRunConfigurationExtensionManager;
+import com.intellij.execution.configurations.ConfigurationFactory;
+import com.intellij.execution.configurations.LocatableConfigurationBase;
+import com.intellij.execution.configurations.LocatableRunConfigurationOptions;
+import com.intellij.execution.configurations.LogFileOptions;
+import com.intellij.execution.configurations.PredefinedLogFile;
+import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.execution.configurations.RunConfigurationModule;
+import com.intellij.execution.configurations.RunProfileState;
+import com.intellij.execution.configurations.RunProfileWithCompileBeforeLaunchOption;
+import com.intellij.execution.configurations.RuntimeConfigurationError;
+import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.poratu.idea.plugins.tomcat.logging.LogFileConfiguration;
+import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
+import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
 import com.poratu.idea.plugins.tomcat.ui.EnhancedTomcatConfigurationEditor;
+import com.poratu.idea.plugins.tomcat.utils.PluginUtils;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
- * Phase 2: Enhanced Tomcat run configuration with Ultimate-style 5-tab interface
- * Extends the basic TomcatRunConfiguration with advanced features:
- * - JMX integration
- * - Multiple log file monitoring
- * - Environment variables
- * - Connection settings
- * - Hot deployment
+ * Enhanced Tomcat Run Configuration - Phase 2 with Ultimate-like features
+ * This is the main configuration class that replaces the basic TomcatRunConfiguration
  */
-public class EnhancedTomcatRunConfiguration extends TomcatRunConfiguration {
+public class EnhancedTomcatRunConfiguration extends LocatableConfigurationBase<LocatableRunConfigurationOptions>
+        implements RunProfileWithCompileBeforeLaunchOption {
 
-    // Phase 2: Enhanced configuration properties
+    private static final List<TomcatLogFile> tomcatLogFiles = Arrays.asList(
+            new TomcatLogFile(TomcatLogFile.TOMCAT_LOCALHOST_LOG_ID, "localhost", true),
+            new TomcatLogFile(TomcatLogFile.TOMCAT_ACCESS_LOG_ID, "localhost_access_log", true),
+            new TomcatLogFile(TomcatLogFile.TOMCAT_CATALINA_LOG_ID, "catalina"),
+            new TomcatLogFile(TomcatLogFile.TOMCAT_MANAGER_LOG_ID, "manager"),
+            new TomcatLogFile(TomcatLogFile.TOMCAT_HOST_MANAGER_LOG_ID, "host-manager")
+    );
 
-    // JMX Configuration
-    private boolean jmxEnabled = false;
-    private String jmxHost = "localhost";
-    private int jmxPort = 1099;
-    private boolean jmxSslEnabled = false;
-    private boolean jmxAuthEnabled = false;
-    private String jmxUsername = "";
-    private String jmxPassword = "";
+    private static List<PredefinedLogFile> createPredefinedLogFiles() {
+        return tomcatLogFiles.stream()
+                .map(TomcatLogFile::createPredefinedLogFile)
+                .collect(Collectors.toList());
+    }
 
-    // Log File Configuration
-    private List<LogFileConfiguration> logFileConfigurations = new ArrayList<>();
-    private boolean loggingEnabled = true;
-    private boolean skipContent = false;
-    private boolean showAllMessages = true;
-
-    // Environment Variables
-    private Map<String, String> environmentVariables = new HashMap<>();
-
-    // Connection Settings
-    private int connectionTimeout = 30000;
-    private int readTimeout = 60000;
-    private boolean remoteDebuggingEnabled = false;
-    private int debugPort = 5005;
-
-    // Hot Deployment Settings
-    private boolean hotDeploymentEnabled = false;
-    private boolean updateClassesAndResources = true;
-    private boolean updateTriggerFiles = false;
-
-    // Code Coverage Settings
+    // Enhanced configuration options
+    private EnhancedTomcatRunConfigurationOptions enhancedOptions = new EnhancedTomcatRunConfigurationOptions();
+    private RunConfigurationModule configurationModule;
     private boolean coverageEnabled = false;
     private boolean trackPerTest = false;
 
-    public EnhancedTomcatRunConfiguration(Project project, ConfigurationFactory factory, String name) {
+    public boolean isCoverageEnabled() { return coverageEnabled; }
+    public void setCoverageEnabled(boolean coverageEnabled) { this.coverageEnabled = coverageEnabled; }
+
+    public boolean isTrackPerTest() { return trackPerTest; }
+    public void setTrackPerTest(boolean trackPerTest) { this.trackPerTest = trackPerTest; }
+
+    public EnhancedTomcatRunConfiguration(@NotNull Project project, @NotNull ConfigurationFactory factory, String name) {
         super(project, factory, name);
-        initializeDefaultConfiguration();
+        configurationModule = new RunConfigurationModule(project);
+
+        System.out.println("DevTomcat: EnhancedTomcatRunConfiguration constructor called");
+
+        try {
+            TomcatServerManagerState applicationService = ApplicationManager.getApplication().getService(TomcatServerManagerState.class);
+            List<TomcatInfo> tomcatInfos = applicationService.getTomcatInfos();
+            System.out.println("DevTomcat: Found " + tomcatInfos.size() + " Tomcat servers");
+
+            if (!tomcatInfos.isEmpty()) {
+                enhancedOptions.setTomcatInfo(tomcatInfos.get(0));
+                System.out.println("DevTomcat: Using Tomcat server: " + tomcatInfos.get(0).getName());
+            } else {
+                System.out.println("DevTomcat: WARNING - No Tomcat servers configured!");
+            }
+
+            // Initialize enhanced features
+            initializeEnhancedFeatures();
+            addPredefinedTomcatLogFiles();
+            System.out.println("DevTomcat: EnhancedTomcatRunConfiguration created successfully");
+
+        } catch (Exception e) {
+            System.err.println("DevTomcat: Error in constructor: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
-     * Initialize default configuration values
+     * Initialize enhanced Phase 2 features
      */
-    private void initializeDefaultConfiguration() {
+    private void initializeEnhancedFeatures() {
         // Initialize default log files
-        logFileConfigurations.add(LogFileConfiguration.createCatalinaLog());
-        logFileConfigurations.add(LogFileConfiguration.createLocalhostLog());
+        enhancedOptions.getLogFileConfigurations().add(LogFileConfiguration.createCatalinaLog());
+        enhancedOptions.getLogFileConfigurations().add(LogFileConfiguration.createLocalhostLog());
 
         // Initialize default environment variables
-        environmentVariables.put("JAVA_OPTS", "-Xmx512m -Xms256m");
-        environmentVariables.put("CATALINA_OPTS", "-Dfile.encoding=UTF-8");
+        enhancedOptions.getEnvironmentVariables().put("JAVA_OPTS", "-Xmx512m -Xms256m");
+        enhancedOptions.getEnvironmentVariables().put("CATALINA_OPTS", "-Dfile.encoding=UTF-8");
     }
 
+    @NotNull
     @Override
-    public @NotNull SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
+    public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
+        System.out.println("DevTomcat: Using Enhanced Ultimate-style 5-tab interface");
         return new EnhancedTomcatConfigurationEditor(getProject());
     }
 
     @Override
-    public @Nullable RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment environment) {
-        // Use enhanced command line state for Phase 2 features
-        return new EnhancedTomcatCommandLineState(environment, this);
+    public void checkConfiguration() throws RuntimeConfigurationException {
+        System.out.println("DevTomcat: Checking enhanced configuration...");
+
+        if (getTomcatInfo() == null) {
+            System.err.println("DevTomcat: No Tomcat server selected");
+            throw new RuntimeConfigurationError("Tomcat server is not selected");
+        }
+
+        if (StringUtil.isEmpty(getDocBase())) {
+            System.err.println("DevTomcat: No deployment directory");
+            throw new RuntimeConfigurationError("Deployment directory cannot be empty");
+        }
+
+        if (StringUtil.isEmpty(getContextPath())) {
+            System.err.println("DevTomcat: No context path");
+            throw new RuntimeConfigurationError("Context path cannot be empty");
+        }
+
+        if (getModule() == null) {
+            System.err.println("DevTomcat: No module selected");
+            throw new RuntimeConfigurationError("Module is not selected");
+        }
+
+        if (getPort() == null) {
+            System.err.println("DevTomcat: Port not configured");
+            throw new RuntimeConfigurationError("Port cannot be empty");
+        }
+
+        System.out.println("DevTomcat: Enhanced configuration check passed!");
+    }
+
+    @Override
+    public void onNewConfigurationCreated() {
+        super.onNewConfigurationCreated();
+
+        try {
+            Project project = getProject();
+            List<VirtualFile> webRoots = PluginUtils.findWebRoots(project);
+
+            if (!webRoots.isEmpty()) {
+                VirtualFile webRoot = webRoots.get(0);
+                enhancedOptions.setDocBase(webRoot.getPath());
+                Module module = PluginUtils.findContainingModule(webRoot.getPath(), project);
+
+                if (module == null) {
+                    module = PluginUtils.guessModule(project);
+                }
+
+                if (module != null) {
+                    enhancedOptions.setContextPath("/" + PluginUtils.extractContextPath(module));
+                }
+
+                configurationModule.setModule(module);
+            }
+        } catch (Exception e) {
+            System.err.println("DevTomcat: Error in onNewConfigurationCreated: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Module @NotNull [] getModules() {
+        ModuleManager moduleManager = ModuleManager.getInstance(getProject());
+        return moduleManager.getModules();
+    }
+
+    @Nullable
+    @Override
+    public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) {
+        System.out.println("DevTomcat: getState() called - using EnhancedTomcatCommandLineState");
+        return new EnhancedTomcatCommandLineState(executionEnvironment, this);
+    }
+
+
+    @Override
+    public @Nullable LogFileOptions getOptionsForPredefinedLogFile(PredefinedLogFile file) {
+        for (TomcatLogFile logFile : tomcatLogFiles) {
+            if (logFile.getId().equals(file.getId())) {
+                return logFile.createLogFileOptions(file, PluginUtils.getTomcatLogsDirPath(this));
+            }
+        }
+        return super.getOptionsForPredefinedLogFile(file);
     }
 
     @Override
     public void readExternal(@NotNull Element element) throws InvalidDataException {
         super.readExternal(element);
+        XmlSerializer.deserializeInto(element, enhancedOptions);
+        configurationModule.readExternal(element);
 
-        // Read Phase 2 specific configuration
-        readJmxConfiguration(element);
-        readLogConfiguration(element);
-        readEnvironmentConfiguration(element);
-        readConnectionConfiguration(element);
-        readHotDeploymentConfiguration(element);
-        readCoverageConfiguration(element);
+        if (getAllLogFiles().isEmpty()) {
+            addPredefinedTomcatLogFiles();
+        }
+
+        if (configurationModule.getModule() == null) {
+            configurationModule.setModule(PluginUtils.findContainingModule(enhancedOptions.getDocBase(), getProject()));
+        }
     }
 
     @Override
     public void writeExternal(@NotNull Element element) throws WriteExternalException {
         super.writeExternal(element);
-
-        // Write Phase 2 specific configuration
-        writeJmxConfiguration(element);
-        writeLogConfiguration(element);
-        writeEnvironmentConfiguration(element);
-        writeConnectionConfiguration(element);
-        writeHotDeploymentConfiguration(element);
-        writeCoverageConfiguration(element);
-    }
-
-    /**
-     * Read JMX configuration from XML
-     */
-    private void readJmxConfiguration(@NotNull Element element) {
-        Element jmxElement = element.getChild("jmx");
-        if (jmxElement != null) {
-            jmxEnabled = Boolean.parseBoolean(jmxElement.getAttributeValue("enabled", "false"));
-            jmxHost = jmxElement.getAttributeValue("host", "localhost");
-            jmxPort = Integer.parseInt(jmxElement.getAttributeValue("port", "1099"));
-            jmxSslEnabled = Boolean.parseBoolean(jmxElement.getAttributeValue("ssl", "false"));
-            jmxAuthEnabled = Boolean.parseBoolean(jmxElement.getAttributeValue("auth", "false"));
-            jmxUsername = jmxElement.getAttributeValue("username", "");
-            jmxPassword = jmxElement.getAttributeValue("password", "");
+        XmlSerializer.serializeObjectInto(enhancedOptions, element);
+        if (configurationModule.getModule() != null) {
+            configurationModule.writeExternal(element);
         }
     }
 
-    /**
-     * Write JMX configuration to XML
-     */
-    private void writeJmxConfiguration(@NotNull Element element) {
-        Element jmxElement = new Element("jmx");
-        jmxElement.setAttribute("enabled", String.valueOf(jmxEnabled));
-        jmxElement.setAttribute("host", jmxHost);
-        jmxElement.setAttribute("port", String.valueOf(jmxPort));
-        jmxElement.setAttribute("ssl", String.valueOf(jmxSslEnabled));
-        jmxElement.setAttribute("auth", String.valueOf(jmxAuthEnabled));
-        jmxElement.setAttribute("username", jmxUsername);
-        jmxElement.setAttribute("password", jmxPassword);
-        element.addContent(jmxElement);
-    }
-
-    /**
-     * Read log configuration from XML
-     */
-    private void readLogConfiguration(@NotNull Element element) {
-        Element logsElement = element.getChild("logs");
-        if (logsElement != null) {
-            loggingEnabled = Boolean.parseBoolean(logsElement.getAttributeValue("enabled", "true"));
-            skipContent = Boolean.parseBoolean(logsElement.getAttributeValue("skipContent", "false"));
-            showAllMessages = Boolean.parseBoolean(logsElement.getAttributeValue("showAll", "true"));
-
-            logFileConfigurations.clear();
-            for (Element logFileElement : logsElement.getChildren("logFile")) {
-                LogFileConfiguration config = new LogFileConfiguration(
-                        logFileElement.getAttributeValue("alias", ""),
-                        logFileElement.getAttributeValue("path", ""),
-                        Boolean.parseBoolean(logFileElement.getAttributeValue("active", "true")),
-                        logFileElement.getAttributeValue("description", ""),
-                        Boolean.parseBoolean(logFileElement.getAttributeValue("skipContent", "false")),
-                        Boolean.parseBoolean(logFileElement.getAttributeValue("showAll", "true"))
-                );
-                logFileConfigurations.add(config);
-            }
-        }
-    }
-
-    /**
-     * Write log configuration to XML
-     */
-    private void writeLogConfiguration(@NotNull Element element) {
-        Element logsElement = new Element("logs");
-        logsElement.setAttribute("enabled", String.valueOf(loggingEnabled));
-        logsElement.setAttribute("skipContent", String.valueOf(skipContent));
-        logsElement.setAttribute("showAll", String.valueOf(showAllMessages));
-
-        for (LogFileConfiguration config : logFileConfigurations) {
-            Element logFileElement = new Element("logFile");
-            logFileElement.setAttribute("alias", config.getAlias());
-            logFileElement.setAttribute("path", config.getFilePath());
-            logFileElement.setAttribute("active", String.valueOf(config.isActive()));
-            logFileElement.setAttribute("description", config.getDescription());
-            logFileElement.setAttribute("skipContent", String.valueOf(config.isSkipContent()));
-            logFileElement.setAttribute("showAll", String.valueOf(config.isShowAllMessages()));
-            logsElement.addContent(logFileElement);
-        }
-
-        element.addContent(logsElement);
-    }
-
-    /**
-     * Read environment configuration from XML
-     */
-    private void readEnvironmentConfiguration(@NotNull Element element) {
-        Element envElement = element.getChild("environment");
-        if (envElement != null) {
-            environmentVariables.clear();
-            for (Element varElement : envElement.getChildren("variable")) {
-                String name = varElement.getAttributeValue("name");
-                String value = varElement.getAttributeValue("value");
-                if (name != null && value != null) {
-                    environmentVariables.put(name, value);
-                }
-            }
-        }
-    }
-
-    /**
-     * Write environment configuration to XML
-     */
-    private void writeEnvironmentConfiguration(@NotNull Element element) {
-        Element envElement = new Element("environment");
-        for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
-            Element varElement = new Element("variable");
-            varElement.setAttribute("name", entry.getKey());
-            varElement.setAttribute("value", entry.getValue());
-            envElement.addContent(varElement);
-        }
-        element.addContent(envElement);
-    }
-
-    /**
-     * Read connection configuration from XML
-     */
-    private void readConnectionConfiguration(@NotNull Element element) {
-        Element connectionElement = element.getChild("connection");
-        if (connectionElement != null) {
-            connectionTimeout = Integer.parseInt(connectionElement.getAttributeValue("timeout", "30000"));
-            readTimeout = Integer.parseInt(connectionElement.getAttributeValue("readTimeout", "60000"));
-            remoteDebuggingEnabled = Boolean.parseBoolean(connectionElement.getAttributeValue("debugEnabled", "false"));
-            debugPort = Integer.parseInt(connectionElement.getAttributeValue("debugPort", "5005"));
-            deploymentTimeout = Integer.parseInt(connectionElement.getAttributeValue("deploymentTimeout", "30"));
-
-        }
-    }
-
-    /**
-     * Write connection configuration to XML
-     */
-    private void writeConnectionConfiguration(@NotNull Element element) {
-        Element connectionElement = new Element("connection");
-        connectionElement.setAttribute("timeout", String.valueOf(connectionTimeout));
-        connectionElement.setAttribute("readTimeout", String.valueOf(readTimeout));
-        connectionElement.setAttribute("debugEnabled", String.valueOf(remoteDebuggingEnabled));
-        connectionElement.setAttribute("debugPort", String.valueOf(debugPort));
-        connectionElement.setAttribute("deploymentTimeout", String.valueOf(deploymentTimeout));
-        element.addContent(connectionElement);
-    }
-
-    /**
-     * Read hot deployment configuration from XML
-     */
-    private void readHotDeploymentConfiguration(@NotNull Element element) {
-        Element hotDeployElement = element.getChild("hotDeploy");
-        if (hotDeployElement != null) {
-            hotDeploymentEnabled = Boolean.parseBoolean(hotDeployElement.getAttributeValue("enabled", "false"));
-            updateClassesAndResources = Boolean.parseBoolean(hotDeployElement.getAttributeValue("updateClasses", "true"));
-            updateTriggerFiles = Boolean.parseBoolean(hotDeployElement.getAttributeValue("updateTriggers", "false"));
-            enableAccessLog = Boolean.parseBoolean(hotDeployElement.getAttributeValue("enableAccessLog", "true"));
-            accessLogPattern = hotDeployElement.getAttributeValue("accessLogPattern", "combined");
-        }
-    }
-
-    /**
-     * Write hot deployment configuration to XML
-     */
-    private void writeHotDeploymentConfiguration(@NotNull Element element) {
-        Element hotDeployElement = new Element("hotDeploy");
-        hotDeployElement.setAttribute("enabled", String.valueOf(hotDeploymentEnabled));
-        hotDeployElement.setAttribute("updateClasses", String.valueOf(updateClassesAndResources));
-        hotDeployElement.setAttribute("updateTriggers", String.valueOf(updateTriggerFiles));
-        hotDeployElement.setAttribute("enableAccessLog", String.valueOf(enableAccessLog));
-        hotDeployElement.setAttribute("accessLogPattern", accessLogPattern);
-        element.addContent(hotDeployElement);
-    }
-
-    /**
-     * Read code coverage configuration from XML
-     */
-    private void readCoverageConfiguration(@NotNull Element element) {
-        Element coverageElement = element.getChild("coverage");
-        if (coverageElement != null) {
-            coverageEnabled = Boolean.parseBoolean(coverageElement.getAttributeValue("enabled", "false"));
-            trackPerTest = Boolean.parseBoolean(coverageElement.getAttributeValue("perTest", "false"));
-        }
-    }
-
-    /**
-     * Write code coverage configuration to XML
-     */
-    private void writeCoverageConfiguration(@NotNull Element element) {
-        Element coverageElement = new Element("coverage");
-        coverageElement.setAttribute("enabled", String.valueOf(coverageEnabled));
-        coverageElement.setAttribute("perTest", String.valueOf(trackPerTest));
-        element.addContent(coverageElement);
-    }
-
-    // Getters and Setters for Phase 2 configuration
-
-    // JMX Configuration
-    public boolean isJmxEnabled() { return jmxEnabled; }
-    public void setJmxEnabled(boolean jmxEnabled) { this.jmxEnabled = jmxEnabled; }
-
-    public String getJmxHost() { return jmxHost; }
-    public void setJmxHost(String jmxHost) { this.jmxHost = jmxHost; }
-
-    public int getJmxPort() { return jmxPort; }
-    public void setJmxPort(int jmxPort) { this.jmxPort = jmxPort; }
-
-    public boolean isJmxSslEnabled() { return jmxSslEnabled; }
-    public void setJmxSslEnabled(boolean jmxSslEnabled) { this.jmxSslEnabled = jmxSslEnabled; }
-
-    public boolean isJmxAuthEnabled() { return jmxAuthEnabled; }
-    public void setJmxAuthEnabled(boolean jmxAuthEnabled) { this.jmxAuthEnabled = jmxAuthEnabled; }
-
-    public String getJmxUsername() { return jmxUsername; }
-    public void setJmxUsername(String jmxUsername) { this.jmxUsername = jmxUsername; }
-
-    public String getJmxPassword() { return jmxPassword; }
-    public void setJmxPassword(String jmxPassword) { this.jmxPassword = jmxPassword; }
-
-    // Log Configuration
-    public List<LogFileConfiguration> getLogFileConfigurations() { return new ArrayList<>(logFileConfigurations); }
-    public void setLogFileConfigurations(List<LogFileConfiguration> configurations) {
-        this.logFileConfigurations = new ArrayList<>(configurations);
-    }
-
-    public boolean isLoggingEnabled() { return loggingEnabled; }
-    public void setLoggingEnabled(boolean loggingEnabled) { this.loggingEnabled = loggingEnabled; }
-
-    public boolean isSkipContent() { return skipContent; }
-    public void setSkipContent(boolean skipContent) { this.skipContent = skipContent; }
-
-    public boolean isShowAllMessages() { return showAllMessages; }
-    public void setShowAllMessages(boolean showAllMessages) { this.showAllMessages = showAllMessages; }
-
-    // Environment Variables
-    public Map<String, String> getEnvironmentVariables() { return new HashMap<>(environmentVariables); }
-    public void setEnvironmentVariables(Map<String, String> environmentVariables) {
-        this.environmentVariables = new HashMap<>(environmentVariables);
-    }
-
-    // Connection Settings
-    public int getConnectionTimeout() { return connectionTimeout; }
-    public void setConnectionTimeout(int connectionTimeout) { this.connectionTimeout = connectionTimeout; }
-
-    public int getReadTimeout() { return readTimeout; }
-    public void setReadTimeout(int readTimeout) { this.readTimeout = readTimeout; }
-
-    public boolean isRemoteDebuggingEnabled() { return remoteDebuggingEnabled; }
-    public void setRemoteDebuggingEnabled(boolean remoteDebuggingEnabled) { this.remoteDebuggingEnabled = remoteDebuggingEnabled; }
-
-    public int getDebugPort() { return debugPort; }
-    public void setDebugPort(int debugPort) { this.debugPort = debugPort; }
-
-    // Hot Deployment Settings
-    public boolean isHotDeploymentEnabled() { return hotDeploymentEnabled; }
-    public void setHotDeploymentEnabled(boolean hotDeploymentEnabled) { this.hotDeploymentEnabled = hotDeploymentEnabled; }
-
-    public boolean isUpdateClassesAndResources() { return updateClassesAndResources; }
-    public void setUpdateClassesAndResources(boolean updateClassesAndResources) { this.updateClassesAndResources = updateClassesAndResources; }
-
-    public boolean isUpdateTriggerFiles() { return updateTriggerFiles; }
-    public void setUpdateTriggerFiles(boolean updateTriggerFiles) { this.updateTriggerFiles = updateTriggerFiles; }
-
-    /**
-     * Get JMX VM options for Tomcat startup
-     */
-    public String getJmxVmOptions() {
-        if (!jmxEnabled) {
-            return "";
-        }
-
-        StringBuilder options = new StringBuilder();
-        options.append("-Dcom.sun.management.jmxremote");
-        options.append(" -Dcom.sun.management.jmxremote.port=").append(jmxPort);
-        options.append(" -Dcom.sun.management.jmxremote.ssl=").append(jmxSslEnabled);
-        options.append(" -Dcom.sun.management.jmxremote.authenticate=").append(jmxAuthEnabled);
-
-        if (!jmxAuthEnabled) {
-            options.append(" -Dcom.sun.management.jmxremote.local.only=false");
-        }
-
-        return options.toString();
-    }
-
-    /**
-     * Get remote debugging VM options
-     */
-    public String getDebugVmOptions() {
-        if (!remoteDebuggingEnabled) {
-            return "";
-        }
-
-        return String.format("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=%d", debugPort);
+    private void addPredefinedTomcatLogFiles() {
+        createPredefinedLogFiles().forEach(this::addPredefinedLogFile);
     }
 
     @Override
     public RunConfiguration clone() {
         EnhancedTomcatRunConfiguration clone = (EnhancedTomcatRunConfiguration) super.clone();
-
-        // Deep clone Phase 2 specific configurations
-        clone.logFileConfigurations = new ArrayList<>();
-        for (LogFileConfiguration config : this.logFileConfigurations) {
-            clone.logFileConfigurations.add(new LogFileConfiguration(config));
-        }
-
-        clone.environmentVariables = new HashMap<>(this.environmentVariables);
-
+        clone.configurationModule = new RunConfigurationModule(getProject());
+        clone.configurationModule.setModule(configurationModule.getModule());
+        clone.enhancedOptions = XmlSerializerUtil.createCopy(enhancedOptions);
         return clone;
     }
 
-    // Add these exact missing methods to your EnhancedTomcatRunConfiguration class:
+    // Basic Tomcat configuration methods (inherited from original)
+    @Nullable
+    public Module getModule() {
+        return this.configurationModule.getModule();
+    }
 
-    // 1. Missing field and methods for deploymentTimeout (used in DeploymentConfigurationTab)
-    private int deploymentTimeout = 30;
+    public void setModule(Module module) {
+        this.configurationModule.setModule(module);
+    }
+
+    public TomcatInfo getTomcatInfo() {
+        return enhancedOptions.getTomcatInfo();
+    }
+
+    public void setTomcatInfo(TomcatInfo tomcatInfo) {
+        enhancedOptions.setTomcatInfo(tomcatInfo);
+    }
+
+    public String getCatalinaBase() {
+        return enhancedOptions.getCatalinaBase();
+    }
+
+    public void setCatalinaBase(String catalinaBase) {
+        enhancedOptions.setCatalinaBase(catalinaBase);
+    }
+
+    public String getDocBase() {
+        return enhancedOptions.getDocBase();
+    }
+
+    public void setDocBase(String docBase) {
+        enhancedOptions.setDocBase(docBase);
+    }
+
+    public String getContextPath() {
+        return enhancedOptions.getContextPath();
+    }
+
+    public void setContextPath(String contextPath) {
+        enhancedOptions.setContextPath(contextPath);
+    }
+
+    public Integer getPort() {
+        return enhancedOptions.getPort();
+    }
+
+    public void setPort(Integer port) {
+        enhancedOptions.setPort(port);
+    }
+
+    public Integer getSslPort() {
+        return enhancedOptions.getSslPort();
+    }
+
+    public void setSslPort(Integer sslPort) {
+        enhancedOptions.setSslPort(sslPort);
+    }
+
+    public Integer getAdminPort() {
+        return enhancedOptions.getAdminPort();
+    }
+
+    public void setAdminPort(Integer adminPort) {
+        enhancedOptions.setAdminPort(adminPort);
+    }
+
+    public String getVmOptions() {
+        return enhancedOptions.getVmOptions();
+    }
+
+    public void setVmOptions(String vmOptions) {
+        enhancedOptions.setVmOptions(vmOptions);
+    }
+
+    public Map<String, String> getEnvOptions() {
+        return enhancedOptions.getEnvOptions();
+    }
+
+    public void setEnvOptions(Map<String, String> envOptions) {
+        enhancedOptions.setEnvOptions(envOptions);
+    }
+
+    public Boolean isPassParentEnvs() {
+        return enhancedOptions.isPassParentEnvs();
+    }
+
+    public void setPassParentEnvironmentVariables(Boolean passParentEnvs) {
+        enhancedOptions.setPassParentEnvs(passParentEnvs);
+    }
+
+    public String getExtraClassPath() {
+        return enhancedOptions.getExtraClassPath();
+    }
+
+    public void setExtraClassPath(String extraClassPath) {
+        enhancedOptions.setExtraClassPath(extraClassPath);
+    }
+
+    // Enhanced Phase 2 configuration methods
+    public boolean isJmxEnabled() {
+        return enhancedOptions.isJmxEnabled();
+    }
+
+    public void setJmxEnabled(boolean jmxEnabled) {
+        enhancedOptions.setJmxEnabled(jmxEnabled);
+    }
+
+    public String getJmxHost() {
+        return enhancedOptions.getJmxHost();
+    }
+
+    public void setJmxHost(String jmxHost) {
+        enhancedOptions.setJmxHost(jmxHost);
+    }
+
+    public int getJmxPort() {
+        return enhancedOptions.getJmxPort();
+    }
+
+    public void setJmxPort(int jmxPort) {
+        enhancedOptions.setJmxPort(jmxPort);
+    }
+
+    public List<LogFileConfiguration> getLogFileConfigurations() {
+        return enhancedOptions.getLogFileConfigurations();
+    }
+
+    public void setLogFileConfigurations(List<LogFileConfiguration> configurations) {
+        enhancedOptions.setLogFileConfigurations(configurations);
+    }
+
+    public Map<String, String> getEnvironmentVariables() {
+        return enhancedOptions.getEnvironmentVariables();
+    }
+
+    public void setEnvironmentVariables(Map<String, String> environmentVariables) {
+        enhancedOptions.setEnvironmentVariables(environmentVariables);
+    }
+
+    public boolean isHotDeploymentEnabled() {
+        return enhancedOptions.isHotDeploymentEnabled();
+    }
+
+    public void setHotDeploymentEnabled(boolean hotDeploymentEnabled) {
+        enhancedOptions.setHotDeploymentEnabled(hotDeploymentEnabled);
+    }
+
+    public boolean isUpdateClassesAndResources() {
+        return enhancedOptions.isUpdateClassesAndResources();
+    }
+
+    public void setUpdateClassesAndResources(boolean updateClassesAndResources) {
+        enhancedOptions.setUpdateClassesAndResources(updateClassesAndResources);
+    }
 
     public int getDeploymentTimeout() {
-        return deploymentTimeout;
+        return enhancedOptions.getDeploymentTimeout();
     }
 
     public void setDeploymentTimeout(int deploymentTimeout) {
-        this.deploymentTimeout = deploymentTimeout;
+        enhancedOptions.setDeploymentTimeout(deploymentTimeout);
     }
 
-    // 2. Missing fields and methods for access log (used in DeploymentConfigurationTab)
-    private boolean enableAccessLog = true;
-    private String accessLogPattern = "combined";
-
     public boolean isEnableAccessLog() {
-        return enableAccessLog;
+        return enhancedOptions.isEnableAccessLog();
     }
 
     public void setEnableAccessLog(boolean enableAccessLog) {
-        this.enableAccessLog = enableAccessLog;
+        enhancedOptions.setEnableAccessLog(enableAccessLog);
     }
 
     public String getAccessLogPattern() {
-        return accessLogPattern;
+        return enhancedOptions.getAccessLogPattern();
     }
 
     public void setAccessLogPattern(String accessLogPattern) {
-        this.accessLogPattern = accessLogPattern;
+        enhancedOptions.setAccessLogPattern(accessLogPattern);
     }
 
-    // Code Coverage
-    public boolean isCoverageEnabled() {
-        return coverageEnabled;
+    /**
+     * Enhanced configuration options class - combines all Phase 2 features
+     */
+    private static class EnhancedTomcatRunConfigurationOptions implements Serializable {
+        // Basic Tomcat options
+        private TomcatInfo tomcatInfo;
+        private String catalinaBase;
+        private String docBase;
+        private String contextPath;
+        private Integer port = 8080;
+        private Integer sslPort;
+        private Integer adminPort = 8005;
+        private String vmOptions;
+        private Map<String, String> envOptions = new HashMap<>();
+        private Boolean passParentEnvs = true;
+        private String extraClassPath;
+
+        // Enhanced Phase 2 options
+        private boolean jmxEnabled = false;
+        private String jmxHost = "localhost";
+        private int jmxPort = 1099;
+        private List<LogFileConfiguration> logFileConfigurations = new ArrayList<>();
+        private Map<String, String> environmentVariables = new HashMap<>();
+        private boolean hotDeploymentEnabled = false;
+        private boolean updateClassesAndResources = true;
+        private int deploymentTimeout = 30;
+        private boolean enableAccessLog = true;
+        private String accessLogPattern = "combined";
+
+        // Basic getters/setters
+        public TomcatInfo getTomcatInfo() { return tomcatInfo; }
+        public void setTomcatInfo(TomcatInfo tomcatInfo) { this.tomcatInfo = tomcatInfo; }
+
+        public String getCatalinaBase() { return catalinaBase; }
+        public void setCatalinaBase(String catalinaBase) { this.catalinaBase = catalinaBase; }
+
+        public String getDocBase() { return docBase; }
+        public void setDocBase(String docBase) { this.docBase = docBase; }
+
+        public String getContextPath() { return contextPath; }
+        public void setContextPath(String contextPath) { this.contextPath = contextPath; }
+
+        public Integer getPort() { return port; }
+        public void setPort(Integer port) { this.port = port; }
+
+        public Integer getSslPort() { return sslPort; }
+        public void setSslPort(Integer sslPort) { this.sslPort = sslPort; }
+
+        public Integer getAdminPort() { return adminPort; }
+        public void setAdminPort(Integer adminPort) { this.adminPort = adminPort; }
+
+        public String getVmOptions() { return vmOptions; }
+        public void setVmOptions(String vmOptions) { this.vmOptions = vmOptions; }
+
+        public Map<String, String> getEnvOptions() { return envOptions; }
+        public void setEnvOptions(Map<String, String> envOptions) { this.envOptions = envOptions; }
+
+        public Boolean isPassParentEnvs() { return passParentEnvs; }
+        public void setPassParentEnvs(Boolean passParentEnvs) { this.passParentEnvs = passParentEnvs; }
+
+        public String getExtraClassPath() { return extraClassPath; }
+        public void setExtraClassPath(String extraClassPath) { this.extraClassPath = extraClassPath; }
+
+        // Enhanced getters/setters
+        public boolean isJmxEnabled() { return jmxEnabled; }
+        public void setJmxEnabled(boolean jmxEnabled) { this.jmxEnabled = jmxEnabled; }
+
+        public String getJmxHost() { return jmxHost; }
+        public void setJmxHost(String jmxHost) { this.jmxHost = jmxHost; }
+
+        public int getJmxPort() { return jmxPort; }
+        public void setJmxPort(int jmxPort) { this.jmxPort = jmxPort; }
+
+        public List<LogFileConfiguration> getLogFileConfigurations() { return logFileConfigurations; }
+        public void setLogFileConfigurations(List<LogFileConfiguration> logFileConfigurations) {
+            this.logFileConfigurations = logFileConfigurations;
+        }
+
+        public Map<String, String> getEnvironmentVariables() { return environmentVariables; }
+        public void setEnvironmentVariables(Map<String, String> environmentVariables) {
+            this.environmentVariables = environmentVariables;
+        }
+
+        public boolean isHotDeploymentEnabled() { return hotDeploymentEnabled; }
+        public void setHotDeploymentEnabled(boolean hotDeploymentEnabled) {
+            this.hotDeploymentEnabled = hotDeploymentEnabled;
+        }
+
+        public boolean isUpdateClassesAndResources() { return updateClassesAndResources; }
+        public void setUpdateClassesAndResources(boolean updateClassesAndResources) {
+            this.updateClassesAndResources = updateClassesAndResources;
+        }
+
+        public int getDeploymentTimeout() { return deploymentTimeout; }
+        public void setDeploymentTimeout(int deploymentTimeout) { this.deploymentTimeout = deploymentTimeout; }
+
+        public boolean isEnableAccessLog() { return enableAccessLog; }
+        public void setEnableAccessLog(boolean enableAccessLog) { this.enableAccessLog = enableAccessLog; }
+
+        public String getAccessLogPattern() { return accessLogPattern; }
+        public void setAccessLogPattern(String accessLogPattern) { this.accessLogPattern = accessLogPattern; }
     }
-
-    public void setCoverageEnabled(boolean coverageEnabled) {
-        this.coverageEnabled = coverageEnabled;
-    }
-
-    public boolean isTrackPerTest() {
-        return trackPerTest;
-    }
-
-    public void setTrackPerTest(boolean trackPerTest) {
-        this.trackPerTest = trackPerTest;
-    }
-
-
 }

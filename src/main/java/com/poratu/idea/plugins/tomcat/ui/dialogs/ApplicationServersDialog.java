@@ -227,9 +227,9 @@ public class ApplicationServersDialog extends DialogWrapper {
 
 	addLibraryButton = new JButton("+");
 	removeLibraryButton = new JButton("-");
-	attachSourcesButton = new JButton("📎");
+	attachSourcesButton = new JButton("Attach");
 
-	Dimension libButtonSize = new Dimension(30, 25);
+	Dimension libButtonSize = new Dimension(60, 25);
 	addLibraryButton.setPreferredSize(libButtonSize);
 	removeLibraryButton.setPreferredSize(libButtonSize);
 	attachSourcesButton.setPreferredSize(libButtonSize);
@@ -414,7 +414,7 @@ public class ApplicationServersDialog extends DialogWrapper {
     private void removeServer() {
 	TomcatServerInfo selected = serverList.getSelectedValue();
 	if (selected != null) {
-	    int result = JOptionPane.showConfirmDialog(this,
+	    int result = JOptionPane.showConfirmDialog(getContentPane(),
 		    "Remove server '" + selected.getName() + "'?",
 		    "Remove Server",
 		    JOptionPane.YES_NO_OPTION);
@@ -453,8 +453,8 @@ public class ApplicationServersDialog extends DialogWrapper {
     /**
      * Get configured servers
      */
-    public List<TomcatServerInfo> getConfiguredServers() {
-	List<TomcatServerInfo> servers = new ArrayList<>();
+    public java.util.List<TomcatServerInfo> getConfiguredServers() {
+	java.util.List<TomcatServerInfo> servers = new ArrayList<>();
 	for (int i = 0; i < serverListModel.getSize(); i++) {
 	    servers.add(serverListModel.getElementAt(i));
 	}

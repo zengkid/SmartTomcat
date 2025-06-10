@@ -14,7 +14,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.ContainerUtil;
-import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfiguration;
+import com.poratu.idea.plugins.tomcat.conf.EnhancedTomcatRunConfiguration;
 import com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType;
 import com.poratu.idea.plugins.tomcat.setting.TomcatInfo;
 import com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState;
@@ -33,7 +33,7 @@ import java.util.List;
  * - Development mode optimization
  * - Multiple deployment artifact support
  */
-public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer<TomcatRunConfiguration> {
+public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer<EnhancedTomcatRunConfiguration> {
 
     private static final String DEVTOMCAT_REGISTRY_KEY = "devTomcat.disableRunConfigurationProducer";
     private static final String DEFAULT_CONTEXT_PREFIX = "Tomcat: ";
@@ -46,7 +46,7 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
     }
 
     @Override
-    protected boolean setupConfigurationFromContext(@NotNull TomcatRunConfiguration configuration,
+    protected boolean setupConfigurationFromContext(@NotNull EnhancedTomcatRunConfiguration configuration,
                                                     @NotNull ConfigurationContext context,
                                                     @NotNull Ref<PsiElement> sourceElement) {
         // Check if DevTomcat configuration producer is disabled
@@ -85,14 +85,14 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
     @Override
     public boolean isPreferredConfiguration(ConfigurationFromContext self, ConfigurationFromContext other) {
         // Phase 2: DevTomcat configurations are preferred for web modules
-        if (self.getConfiguration() instanceof TomcatRunConfiguration) {
+        if (self.getConfiguration() instanceof EnhancedTomcatRunConfiguration) {
             return isWebModuleContext(self.getSourceElement());
         }
         return false;
     }
 
     @Override
-    public boolean isConfigurationFromContext(@NotNull TomcatRunConfiguration configuration,
+    public boolean isConfigurationFromContext(@NotNull EnhancedTomcatRunConfiguration configuration,
                                               @NotNull ConfigurationContext context) {
         if (Registry.is(DEVTOMCAT_REGISTRY_KEY)) {
             return false;
@@ -141,7 +141,7 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
     /**
      * Setup Tomcat server configuration with intelligent defaults
      */
-    private boolean setupTomcatServer(@NotNull TomcatRunConfiguration configuration) {
+    private boolean setupTomcatServer(@NotNull EnhancedTomcatRunConfiguration configuration) {
         List<TomcatInfo> tomcatInfos = TomcatServerManagerState.getInstance().getTomcatInfos();
 
         if (tomcatInfos.isEmpty()) {
@@ -157,7 +157,7 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
     /**
      * Enhanced configuration setup with intelligent naming and paths
      */
-    private void setupEnhancedConfiguration(@NotNull TomcatRunConfiguration configuration,
+    private void setupEnhancedConfiguration(@NotNull EnhancedTomcatRunConfiguration configuration,
                                             @NotNull Module module,
                                             @NotNull List<VirtualFile> webRoots) {
         // Enhanced context path extraction
@@ -229,7 +229,7 @@ public class TomcatRunConfigurationProducer extends LazyRunConfigurationProducer
     /**
      * Enable development mode defaults for better development experience
      */
-    private void enableDevelopmentModeDefaults(@NotNull TomcatRunConfiguration configuration) {
+    private void enableDevelopmentModeDefaults(@NotNull EnhancedTomcatRunConfiguration configuration) {
         // Phase 2: These would be implemented when we add the configuration options
         // For now, this sets up the foundation for development mode features
 
