@@ -284,7 +284,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
     private void collectResources(Document doc, Element contextRoot, Module module, String tomcatVersion) {
         String majorVersionStr = tomcatVersion.split("\\.")[0];
-        int majorVersion = Integer.parseInt(majorVersionStr);
+        int majorVersion = majorVersionStr.isEmpty() ? 8 : Integer.parseInt(majorVersionStr);
         PathsList pathsList = OrderEnumerator.orderEntries(module)
                 .withoutSdk().runtimeOnly().productionOnly().getPathsList();
 
