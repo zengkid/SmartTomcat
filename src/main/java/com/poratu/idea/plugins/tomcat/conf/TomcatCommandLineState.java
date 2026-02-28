@@ -186,7 +186,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         XPath xpath = XPathFactory.newInstance().newXPath();
         XPathExpression exprConnectorShutdown = xpath.compile("/Server[@shutdown='SHUTDOWN']");
         XPathExpression serviceExpression = xpath.compile("/Server/Service[@name='Catalina']");
-        XPathExpression exprConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[(@protocol='HTTP/1.1' or @protocol='org.apache.coyote.http11.Http11NioProtocol' or @protocol='org.apache.coyote.http11.Http11Protocol') and (not(@SSLEnabled) or @SSLEnabled='false')]");
+        XPathExpression exprConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[@protocol and (not(@SSLEnabled) or @SSLEnabled='false')]");
         XPathExpression exprSSLConnector = xpath.compile("/Server/Service[@name='Catalina']/Connector[@SSLEnabled='true']");
         XPathExpression exprContext = xpath.compile("/Server/Service[@name='Catalina']/Engine[@name='Catalina']/Host/Context");
 
@@ -284,7 +284,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
     private void collectResources(Document doc, Element contextRoot, Module module, String tomcatVersion) {
         String majorVersionStr = tomcatVersion.split("\\.")[0];
-        int majorVersion = Integer.parseInt(majorVersionStr);
+        int majorVersion = majorVersionStr.isEmpty() ? 8 : Integer.parseInt(majorVersionStr);
         PathsList pathsList = OrderEnumerator.orderEntries(module)
                 .withoutSdk().runtimeOnly().productionOnly().getPathsList();
 
