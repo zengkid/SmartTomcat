@@ -1,6 +1,12 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 # SmartTomcat Changelog
 
+## [4.8.0]
+
+### Changes
+- support Intellij Idea since 2022.1 
+- support Java version 17
+
 ## [4.7.5]
 
 ### Fixed
