@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        intellijIdeaCommunity(providers.gradleProperty("pluginSinceBuild"))
+        intellijIdea(prop("platformVersion"))
         bundledPlugin("com.intellij.java")
     }
 }
@@ -30,10 +30,10 @@ dependencies {
 // Configure Gradle IntelliJ Plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
 intellijPlatform {
     pluginConfiguration {
-        name = providers.gradleProperty("pluginName")
-        version = providers.gradleProperty("pluginVersion")
+        name = prop("pluginName")
+        version = prop("pluginVersion")
         ideaVersion {
-            sinceBuild = providers.gradleProperty("pluginSinceBuild")
+            sinceBuild = prop("pluginSinceBuild")
         }
 
         description = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
@@ -51,7 +51,7 @@ intellijPlatform {
 
 }
 changelog {
-    version = providers.gradleProperty("pluginVersion")
+    version = prop("pluginVersion")
     itemPrefix = "-"
     keepUnreleasedSection = true
     unreleasedTerm = "[Unreleased]"
