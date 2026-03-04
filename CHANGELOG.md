@@ -3,8 +3,8 @@
 
 ## [4.8.0]
 
-### Changes
-- support Intellij Idea since 2022.1 
+### Changed
+- support Intellij Idea since 2024.2 
 - support Java version 17
 
 ## [4.7.5]
