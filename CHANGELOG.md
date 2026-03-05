@@ -4,8 +4,8 @@
 ## [4.8.0]
 
 ### Changed
-- support Intellij Idea since 2024.2 
-- support Java version 17
+- Requires 2024.2+ 
+- Requires Java 17+
 
 ## [4.7.5]
 
