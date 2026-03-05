@@ -1,5 +1,7 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+//import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 
 fun prop(key: String) = providers.gradleProperty(key).get()
 
@@ -46,6 +48,19 @@ intellijPlatform {
                 }
                 subList(indexOf(start) + 1, indexOf(end)).joinToString("\n").let(::markdownToHTML)
             }
+        }
+    }
+
+    pluginVerification {
+
+        ides {
+            create(IntelliJPlatformType.IntellijIdea, prop("platformVersion"))
+//            recommended()
+//            select {
+//                types = listOf(IntelliJPlatformType.IntellijIdea)
+//                channels = listOf(ProductRelease.Channel.RELEASE)
+//                sinceBuild = prop("pluginSinceBuild")
+//            }
         }
     }
 
