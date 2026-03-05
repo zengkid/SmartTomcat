@@ -34,11 +34,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -46,6 +42,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Author : zengkid
@@ -119,7 +116,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
             Map<String, String> envOptions = configuration.getEnvOptions();
 
             //copy to project folder, and then user is able to update server.xml under the project.
-            Path projectConfPath = Paths.get(project.getBasePath(), ".smarttomcat", module.getName(), "conf");
+            Path projectConfPath = Paths.get(Objects.requireNonNull(project.getBasePath()), ".smarttomcat", module.getName(), "conf");
             if (!projectConfPath.toFile().exists() || PluginUtils.isEmptyFolder(projectConfPath)) {
                 FileUtil.createDirectory(projectConfPath.toFile());
                 FileUtil.copyDir(tomcatInstallationPath.resolve("conf").toFile(), projectConfPath.toFile());
@@ -127,7 +124,7 @@ public class TomcatCommandLineState extends JavaCommandLineState {
 
             // Copy the Tomcat configuration files to the working directory
             Path confPath = catalinaBase.resolve("conf");
-            FileUtil.delete(confPath);
+            FileUtil.delete(confPath.toFile());
             FileUtil.createDirectory(confPath.toFile());
             FileUtil.copyDir(projectConfPath.toFile(), confPath.toFile());
             // create the temp folder
@@ -214,10 +211,14 @@ public class TomcatCommandLineState extends JavaCommandLineState {
         if (sslPortE != null && sslPort != null) {
             // Update SSL configuration
             sslPortE.setAttribute("port", sslPort.toString());
-            portE.setAttribute("redirectPort", sslPort.toString());
+            if (portE != null) {
+                portE.setAttribute("redirectPort", sslPort.toString());
+            }
         } else {
             // Clean up SSL configuration
-            portE.removeAttribute("redirectPort");
+            if (portE != null) {
+                portE.removeAttribute("redirectPort");
+            }
             if (serviceE != null && sslPortE != null) {
                 serviceE.removeChild(sslPortE);
             }

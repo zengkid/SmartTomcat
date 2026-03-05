@@ -214,7 +214,7 @@ public final class PluginUtils {
         List<VirtualFile> parentRoots = Stream.of(sourceRoots)
                 .map(VirtualFile::getParent)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         for (VirtualFile parentRoot : parentRoots) {
             fileIndex.iterateContentUnderDirectory(parentRoot, file -> {
@@ -321,7 +321,7 @@ public final class PluginUtils {
     public static boolean isEmptyFolder(Path path) throws IOException {
         if (Files.isDirectory(path)) {
             try (Stream<Path> entries = Files.list(path)) {
-                return !entries.findFirst().isPresent();
+                return entries.findFirst().isEmpty();
             }
         }
         return false;

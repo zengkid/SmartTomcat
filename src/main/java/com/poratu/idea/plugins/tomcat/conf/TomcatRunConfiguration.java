@@ -5,19 +5,8 @@ import com.intellij.diagnostic.logging.LogConfigurationPanel;
 import com.intellij.execution.ExecutionBundle;
 import com.intellij.execution.Executor;
 import com.intellij.execution.JavaRunConfigurationExtensionManager;
-import com.intellij.execution.configurations.ConfigurationFactory;
-import com.intellij.execution.configurations.LocatableConfigurationBase;
-import com.intellij.execution.configurations.LocatableRunConfigurationOptions;
-import com.intellij.execution.configurations.LogFileOptions;
-import com.intellij.execution.configurations.PredefinedLogFile;
-import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.execution.configurations.RunConfigurationModule;
-import com.intellij.execution.configurations.RunProfileState;
-import com.intellij.execution.configurations.RunProfileWithCompileBeforeLaunchOption;
-import com.intellij.execution.configurations.RuntimeConfigurationError;
-import com.intellij.execution.configurations.RuntimeConfigurationException;
+import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
@@ -69,7 +58,7 @@ public class TomcatRunConfiguration extends LocatableConfigurationBase<Locatable
         super(project, factory, name);
         configurationModule = new RunConfigurationModule(project);
 
-        TomcatServerManagerState applicationService = ApplicationManager.getApplication().getService(TomcatServerManagerState.class);
+        TomcatServerManagerState applicationService = TomcatServerManagerState.getInstance();
         List<TomcatInfo> tomcatInfos = applicationService.getTomcatInfos();
         if (!tomcatInfos.isEmpty()) {
             tomcatOptions.setTomcatInfo(tomcatInfos.get(0));

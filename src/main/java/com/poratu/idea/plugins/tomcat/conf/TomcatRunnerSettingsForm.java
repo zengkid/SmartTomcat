@@ -7,14 +7,12 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.RawCommandLineEditor;
@@ -139,14 +137,23 @@ public class TomcatRunnerSettingsForm implements Disposable {
     }
 
     private void initCatalinaBaseDirectory() {
-        FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
-        catalinaBaseField.addBrowseFolderListener("Select Catalina Base", "Please select the Catalina Base directory",
-                project, descriptor);
+        FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                .withTitle("Select Catalina Base")
+                .withDescription("Please select the Catalina Base directory");
+//        catalinaBaseField.addBrowseFolderListener("Select Catalina Base", "Please select the Catalina Base directory",
+//                project, descriptor);
+        TextBrowseFolderListener listener = new TextBrowseFolderListener(descriptor);
+
+        catalinaBaseField.addBrowseFolderListener(listener);
     }
+
     private void initDeploymentDirectory() {
-        FileChooserDescriptor descriptor = new IgnoreOutputFileChooserDescriptor(project);
-        docBaseField.addBrowseFolderListener("Select Deployment Directory", "Please the directory to deploy",
-                project, descriptor);
+        FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                .withTitle("Select Deployment Directory")
+                .withDescription("Please the directory to deploy");
+//        docBaseField.addBrowseFolderListener("Select Deployment Directory", "Please the directory to deploy",
+//                project, descriptor);
+        docBaseField.addBrowseFolderListener(new TextBrowseFolderListener(descriptor));
         docBaseField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
             // Update module selection when docBase is changed
             @Override
@@ -310,6 +317,10 @@ public class TomcatRunnerSettingsForm implements Disposable {
 
     }
 
+    //isFileVisible  is Non-extendable method usage violation,
+    // use withExtensionFilter instead, but it's not support folder
+
+    /*
     private static class IgnoreOutputFileChooserDescriptor extends FileChooserDescriptor {
         private static final FileChooserDescriptor singleFolderDescriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
         private final Project project;
@@ -335,6 +346,6 @@ public class TomcatRunnerSettingsForm implements Disposable {
             return super.isFileVisible(file, showHiddenFiles);
         }
     }
-
+*/
 }
 
