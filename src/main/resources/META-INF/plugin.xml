@@ -10,8 +10,7 @@
     <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable"
-                                 displayName="Tomcat Server"/>
+        <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable"/>
         <applicationService serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState"/>
         <configurationType implementation="com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType"/>
         <runConfigurationProducer implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunConfigurationProducer"/>
