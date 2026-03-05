@@ -1,4 +1,5 @@
 <idea-plugin>
+    <id>com.poratu.idea.plugins.tomcat</id>
     <name>Smart Tomcat</name>
     <vendor email="zengkid@msn.com">zengkid</vendor>
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
@@ -9,7 +10,8 @@
     <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable" />
+        <applicationConfigurable instance="com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable"
+                                 displayName="Tomcat Server"/>
         <applicationService serviceImplementation="com.poratu.idea.plugins.tomcat.setting.TomcatServerManagerState"/>
         <configurationType implementation="com.poratu.idea.plugins.tomcat.conf.TomcatRunConfigurationType"/>
         <runConfigurationProducer implementation="com.poratu.idea.plugins.tomcat.runner.TomcatRunConfigurationProducer"/>
